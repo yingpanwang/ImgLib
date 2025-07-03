@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgLib", "ImgLib\ImgLib.csproj", "{4332A92E-F83E-4B8A-9E93-9A90C4A6677B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgLib.UI", "ImgLib.UI\ImgLib.UI.csproj", "{56327F9D-4208-43D5-BC6B-FD28DC99B2DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4332A92E-F83E-4B8A-9E93-9A90C4A6677B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4332A92E-F83E-4B8A-9E93-9A90C4A6677B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4332A92E-F83E-4B8A-9E93-9A90C4A6677B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4332A92E-F83E-4B8A-9E93-9A90C4A6677B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56327F9D-4208-43D5-BC6B-FD28DC99B2DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56327F9D-4208-43D5-BC6B-FD28DC99B2DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56327F9D-4208-43D5-BC6B-FD28DC99B2DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56327F9D-4208-43D5-BC6B-FD28DC99B2DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

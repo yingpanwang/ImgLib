@@ -1,0 +1,27 @@
+<Window
+    x:Class="ImgLib.UI.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="using:ImgLib.UI"
+    Title="ImgLib.UI"
+    Width="800"
+    Height="450"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Background=""
+    mc:Ignorable="d">
+    <Grid ColumnDefinitions="*,4,*">
+        <v:ImgListView Grid.Column="0" />
+        <GridSplitter Grid.Column="1" />
+        <DockPanel Grid.Column="2">
+            <StackPanel MinHeight="450" DockPanel.Dock="Top">
+                <v:WatermarkDesignView />
+            </StackPanel>
+            <StackPanel MinHeight="450" DockPanel.Dock="Bottom">
+                <v:DebugeView DebugText="show debug text" />
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>
