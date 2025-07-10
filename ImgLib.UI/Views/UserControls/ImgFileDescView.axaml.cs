@@ -21,12 +21,12 @@ public sealed partial class ImgFileDescView : UserControl
 
         DataContext = new ImgFileDescViewModel();
 
-        //this.GetObservable<string>(ImgFilePathProperty)
-        //    .Subscribe(path =>
-        //    {
-        //        DataContext = new ImgFileDescViewModel(path);
-        //        // You can add additional logic here if needed when ImgFilePath changes
-        //    });
+        this.GetObservable<string>(ImgFilePathProperty)
+            .Subscribe(path =>
+            {
+                DataContext = new ImgFileDescViewModel(path);
+                // You can add additional logic here if needed when ImgFilePath changes
+            });
     }
 
 }

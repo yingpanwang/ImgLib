@@ -5,9 +5,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ImgLib.UI.ViewModels"
-    d:DesignHeight="450"
+    d:DesignHeight="850"
     d:DesignWidth="800"
     x:DataType="vm:WatermarkDesignViewModel"
     mc:Ignorable="d">
-    <Image Margin="25,25" Source="{Binding PreviewImageSource}" />
+    <DockPanel>
+        <Image
+            Margin="25,25"
+            DockPanel.Dock="Top"
+            Source="{Binding PreviewImageSource}" />
+
+        <UniformGrid DockPanel.Dock="Bottom">
+            <Button Command="{Binding SetBackgroundCommand}" Content="设置背景图" />
+            <Button Content="test" />
+            <Button Content="test" />
+            <Button Content="test" />
+            <Button Content="test" />
+        </UniformGrid>
+    </DockPanel>
 </UserControl>

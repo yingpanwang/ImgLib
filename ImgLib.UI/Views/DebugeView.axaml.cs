@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
+using System.Threading;
 
 namespace ImgLib.UI;
 
@@ -31,6 +33,20 @@ public partial class DebugeView : UserControl
         {
             string x = text;
             dtb.Text = x;
+        });
+
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                Dispatcher.UIThread.Invoke(() =>
+                {
+                    DebugText = $"Debug Text: {DateTime.Now:HH:mm:ss.fff}";
+
+                });
+
+                Thread.Sleep(1000);
+            }
         });
     }
 }

@@ -1,7 +1,8 @@
 ﻿
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.Input;
 using System.IO;
-using System.Threading;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -12,21 +13,40 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase
 
     public WatermarkDesignViewModel()
     {
-        PreviewImageSource = new Bitmap(@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG");
+        PreviewImageSource = new Bitmap
+            (
+           @"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
+//@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
+);
+    }
 
-        Task.Run(() =>
+    [RelayCommand]
+    public async Task SetBackground()
+    {
+
+        Stream? output = default;
+
+        using Stream inputStream = new MemoryStream();
+
+        await Task.Run(() =>
         {
-            Thread.Sleep(5000);
-
-            using Stream inputStream = new MemoryStream();
             PreviewImageSource.Save(inputStream);
+
             inputStream.Seek(0, SeekOrigin.Begin);
 
-            var output = new MemoryStream();
+            output = new MemoryStream();
             ImageService.Generate(inputStream, output);
             output.Seek(0, SeekOrigin.Begin);
-            PreviewImageSource = new Bitmap(output);
         });
+
+
+        if (output != null)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                PreviewImageSource = new Bitmap(output);
+            });
+        }
     }
 
     public Task Load()
