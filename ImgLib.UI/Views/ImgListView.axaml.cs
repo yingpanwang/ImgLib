@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using ImgLib.UI.ViewModels;
 
@@ -5,6 +6,36 @@ namespace ImgLib.UI;
 
 public partial class ImgListView : UserControl
 {
+
+    /// <summary>
+    /// Path StyledProperty definition
+    /// </summary>
+    public static readonly StyledProperty<string> PathProperty =
+        AvaloniaProperty.Register<ImgListView, string>(
+            nameof(Path),
+            defaultBindingMode: Avalonia.Data.BindingMode.TwoWay
+            );
+
+    /// <summary>
+    /// Gets or sets the Path property. This StyledProperty
+    /// indicates ....
+    /// </summary>
+    public string Path
+    {
+        get => GetValue(PathProperty);
+        set => SetValue(PathProperty, value);
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == PathProperty)
+        {
+            DataContext = new ImgListViewModel(Path);
+        }
+    }
+
     public ImgListView()
     {
         InitializeComponent();

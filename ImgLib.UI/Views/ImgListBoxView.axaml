@@ -1,0 +1,80 @@
+<UserControl
+    x:Class="ImgLib.UI.ImgListBoxView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="using:ImgLib.UI"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    x:DataType="v:ImgListBoxView"
+    mc:Ignorable="d">
+    <UserControl.Styles>
+        <Style Selector="ListBox:empty">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontStyle="Italic"
+                            Text="暂无数据" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
+    <ListBox
+        Name="l"
+        ItemsSource="{Binding ImgListItems}"
+        SelectedItem="{Binding SelectedImgItem, Mode=TwoWay}">
+        <ListBox.ItemTemplate>
+            <DataTemplate DataType="vm:ImgListItemViewModel">
+                <Border
+                    Margin="2"
+                    Padding="4"
+                    BorderBrush="LightGray"
+                    BorderThickness="1">
+
+                    <Grid ColumnDefinitions="*,*">
+                        <Image
+                            Grid.Column="0"
+                            MaxHeight="250"
+                            Margin="25"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Source="{Binding ImageSource}" />
+                        <UniformGrid
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Columns="2"
+                            Rows="2">
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="文件名:1111" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Text="文件地址:2222" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Text="文件数量:3" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Content="Exif 信息" />
+
+                        </UniformGrid>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

@@ -5,19 +5,26 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="using:ImgLib.UI"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
     Title="ImgLib.UI"
     Width="800"
     Height="450"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    x:DataType="vm:MainWindowViewModel"
     Background=""
     mc:Ignorable="d">
     <Grid ColumnDefinitions="*,4,*">
-        <v:ImgListView Grid.Column="0" />
+        <v:ImgListBoxView
+            Name="ilv"
+            Grid.Column="0"
+            SelectedImgItem="{Binding ImgListBoxSelectedItem, Mode=TwoWay}" />
+
+        <!--<v:ImgListView Name="ilv" Grid.Column="0"  Path="C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG" />-->
         <GridSplitter Grid.Column="1" />
         <DockPanel Grid.Column="2">
             <StackPanel MinHeight="450" DockPanel.Dock="Top">
-                <v:WatermarkDesignView />
+                <v:WatermarkDesignView Name="wdv" />
             </StackPanel>
             <StackPanel MinHeight="450" DockPanel.Dock="Bottom">
                 <!--<v:DebugeView DebugText="show debug text" />-->

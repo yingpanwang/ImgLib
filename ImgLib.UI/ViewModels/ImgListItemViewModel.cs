@@ -53,7 +53,6 @@ public sealed partial class ImgListItemViewModel(string filePath) : ViewModelBas
             .Where(file => file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".gif", StringComparison.OrdinalIgnoreCase))
-            .Take(5)
             .Select(file => new ImgListItemViewModel(file))
             .ToArray();
 
