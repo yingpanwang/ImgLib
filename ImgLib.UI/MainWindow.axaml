@@ -14,21 +14,20 @@
     x:DataType="vm:MainWindowViewModel"
     Background=""
     mc:Ignorable="d">
-    <Grid ColumnDefinitions="*,4,*">
-        <v:ImgListBoxView
-            Name="ilv"
-            Grid.Column="0"
-            SelectedImgItem="{Binding ImgListBoxSelectedItem, Mode=TwoWay}" />
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="菜单">
+                <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
+            </MenuItem>
+        </Menu>
+        <Grid ColumnDefinitions="2*,4,6*">
+            <v:ImgListBoxView Grid.Column="0" DataContext="{Binding ImgListBoxViewModel}" />
 
-        <!--<v:ImgListView Name="ilv" Grid.Column="0"  Path="C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG" />-->
-        <GridSplitter Grid.Column="1" />
-        <DockPanel Grid.Column="2">
-            <StackPanel MinHeight="450" DockPanel.Dock="Top">
-                <v:WatermarkDesignView Name="wdv" />
-            </StackPanel>
-            <StackPanel MinHeight="450" DockPanel.Dock="Bottom">
-                <!--<v:DebugeView DebugText="show debug text" />-->
-            </StackPanel>
-        </DockPanel>
-    </Grid>
+            <!--<v:ImgListView Name="ilv" Grid.Column="0"  Path="C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG" />-->
+            <GridSplitter Grid.Column="1" />
+            <DockPanel Grid.Column="2">
+                <v:WatermarkDesignView DataContext="{Binding WatermarkDesignViewModel}" />
+            </DockPanel>
+        </Grid>
+    </DockPanel>
 </Window>

@@ -9,8 +9,7 @@
     d:DesignWidth="800"
     x:DataType="vm:WatermarkDesignViewModel"
     mc:Ignorable="d">
-    <ScrollViewer>
-        <DockPanel>
+    <!--<DockPanel>
             <Image
                 Margin="25,25"
                 DockPanel.Dock="Top"
@@ -76,6 +75,67 @@
                     <Button Content="test" />
                 </UniformGrid>
             </Border>
-        </DockPanel>
-    </ScrollViewer>
+        </DockPanel>-->
+    <Grid ColumnDefinitions="*" RowDefinitions="4*,*">
+        <Border
+            Grid.Row="0"
+            BorderBrush="LightGray"
+            BorderThickness="1">
+            <Image
+                Margin="5,5"
+                DockPanel.Dock="Top"
+                Source="{Binding PreviewImageSource}" />
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            BorderBrush="LightGray"
+            BorderThickness="1">
+            <UniformGrid DockPanel.Dock="Bottom">
+                <Border BorderBrush="LightGray" BorderThickness="1">
+                    <UniformGrid Columns="2" DockPanel.Dock="Top">
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="缩放比例" />
+                        <TextBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Text="{Binding ImageGenerateOption.Scale, Mode=TwoWay}" />
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="CornerRadius" />
+                        <TextBox
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="{Binding ImageGenerateOption.CornerRadius, Mode=TwoWay}" />
+
+                        <TextBlock
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="虚化Blur值" />
+                        <TextBox
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="{Binding ImageGenerateOption.BlurSigma}" />
+
+                        <TextBlock
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Text="阴影偏移值" />
+                        <TextBox
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Text="{Binding ImageGenerateOption.ShadowOffsetX}" />
+
+                    </UniformGrid>
+                </Border>
+                <Button Content="test" />
+                <Button Content="test" />
+            </UniformGrid>
+        </Border>
+    </Grid>
 </UserControl>

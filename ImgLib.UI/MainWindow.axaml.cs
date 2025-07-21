@@ -5,19 +5,23 @@ namespace ImgLib.UI;
 
 public partial class MainWindow : Window
 {
+    private readonly MainWindowViewModel _vm;
     public MainWindow()
     {
         InitializeComponent();
 
-        DataContext = new MainWindowViewModel();
-        ilv.Path = @"C:\Users\Administrator\Desktop\后期临时\2024-09-22西湖公园";
-        ilv.PropertyChanged += (sender, args) =>
+        _vm = new MainWindowViewModel(GetTopLevel(this)!.StorageProvider);
+
+        DataContext = _vm;
+
+        _vm.ImgListBoxViewModel.PropertyChanged += (s, e) =>
         {
-            if (args.Property.Name == nameof(ilv.SelectedImgItem))
+            if (e.PropertyName == nameof(_vm.ImgListBoxViewModel.SelectedImgItem))
             {
-                if (!string.IsNullOrEmpty(ilv.SelectedImgItem?.FilePath))
+                if (_vm.ImgListBoxViewModel.SelectedImgItem != null)
                 {
-                    wdv.DataContext = new WatermarkDesignViewModel(ilv.SelectedImgItem.FilePath);
+                    _vm.WatermarkDesignViewModel.Reset();
+                    _vm.WatermarkDesignViewModel.PreviewFilePath = _vm.ImgListBoxViewModel.SelectedImgItem.FilePath;
                 }
             }
         };

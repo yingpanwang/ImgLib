@@ -145,6 +145,24 @@ public sealed partial class ImageService
         }
     }
 
+    public static void GenerateWithOptions(
+        Stream inputStream,
+        Stream outputStream,
+        ImageGenerateOption options
+        )
+    {
+        GenerateWithOptions(
+            inputStream,
+            outputStream,
+            options.Scale,
+            options.CornerRadius,
+            options.BlurSigma,
+            options.ShadowOffsetX,
+            options.ShadowOffsetX,
+            options.ShadowSigma
+            );
+    }
+
     public static void GenerateWithContext(ImageGenContext context)
     {
         var original = context.Origin;

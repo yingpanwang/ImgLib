@@ -2,73 +2,63 @@
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
-using SkiaSharp;
+using ImgLib.Models;
 using System.IO;
 
 namespace ImgLib.UI.ViewModels;
 
-public sealed partial class WatermarkDesignViewModel : ViewModelBase
+public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposable
 {
     [ObservableProperty]
-    private Bitmap previewImageSource;
+    public Bitmap? _previewImageSource;
 
     [ObservableProperty]
-    private ImageGenerateOption imageGenerateOption = new ImageGenerateOption(0.89f);
+    private ImageGenerateOption _imageGenerateOption = new ImageGenerateOption(0.89f);
 
     private volatile ImageGenContext? ImgGenContext;
 
-    public WatermarkDesignViewModel(string filePath)
+    [ObservableProperty]
+    public partial string? PreviewFilePath { get; set; }
+
+    public WatermarkDesignViewModel()
     {
+        if (string.IsNullOrEmpty(PreviewFilePath))
+            return;
+
+        PreviewImageSource = new(PreviewFilePath);
+    }
+
+    partial void OnPreviewFilePathChanged(string? value)
+    {
+        if (string.IsNullOrEmpty(PreviewFilePath))
+            return;
+
         PreviewImageSource = new Bitmap
             (
-            filePath
+            PreviewFilePath
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
 );
     }
 
-
     [RelayCommand]
     public async Task SetBackground()
     {
+        if (PreviewImageSource == null || string.IsNullOrWhiteSpace(PreviewFilePath))
+            return;
 
-        if (this.ImgGenContext == null)
-        {
-            Stream inputStream = new MemoryStream();
+        using MemoryStream input = new();
+        using MemoryStream output = new();
 
-            PreviewImageSource.Save(inputStream);
+        PreviewImageSource.Save(input);
 
-            inputStream.Seek(0, SeekOrigin.Begin);
+        input.Seek(0, SeekOrigin.Begin);
 
-            var original = SKBitmap.Decode(inputStream);
+        ExifInfo.From(File.OpenRead(PreviewFilePath));
 
-            ImgGenContext = new ImageGenContext(original);
+        ImageService.GenerateWithOptions(input, output, ImageGenerateOption);
 
-        }
-
-        ImgGenContext.Options = ImageGenerateOption;
-
-        Stream? output = default;
-
-        //using Stream inputStream = new MemoryStream();
-
-        //await Task.Run(() =>
-        //{
-        //    PreviewImageSource.Save(inputStream);
-
-        //    inputStream.Seek(0, SeekOrigin.Begin);
-
-        //    output = new MemoryStream();
-        //    ImageService.Generate(inputStream, output);
-        //    output.Seek(0, SeekOrigin.Begin);
-        //});
-
-        await ImgGenContext.Listen();
-
-        using var imgData = ImgGenContext.CurrentOutputImage?.Encode(SKEncodedImageFormat.Jpeg, 100);
-
-        output = imgData?.AsStream();
-
+        output.Seek(0, SeekOrigin.Begin);
         if (output != null)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
@@ -81,5 +71,16 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase
     public Task Load()
     {
         return Task.CompletedTask;
+    }
+
+    public void Reset()
+    {
+        PreviewImageSource?.Dispose();
+        ImgGenContext?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        Reset();
     }
 }

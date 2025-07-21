@@ -6,10 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:v="using:ImgLib.UI"
     xmlns:vm="using:ImgLib.UI.ViewModels"
-    d:DesignHeight="450"
+    xmlns:vmd="using:ImgLib.UI.ViewModels.Design"
+    d:DesignHeight="650"
     d:DesignWidth="800"
-    x:DataType="v:ImgListBoxView"
+    x:DataType="vm:ImgListBoxViewModel"
     mc:Ignorable="d">
+    <Design.DataContext>
+        <vmd:Design_ImgListBoxViewModel />
+    </Design.DataContext>
     <UserControl.Styles>
         <Style Selector="ListBox:empty">
             <Setter Property="Template">
@@ -40,7 +44,7 @@
                     BorderBrush="LightGray"
                     BorderThickness="1">
 
-                    <Grid ColumnDefinitions="*,*">
+                    <Grid ColumnDefinitions="2*,3*">
                         <Image
                             Grid.Column="0"
                             MaxHeight="250"
@@ -48,33 +52,48 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             Source="{Binding ImageSource}" />
-                        <UniformGrid
+                        <!--<UniformGrid
                             Grid.Column="1"
-                            HorizontalAlignment="Left"
+                            HorizontalAlignment="Stretch"
                             VerticalAlignment="Center"
                             Columns="2"
                             Rows="2">
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Text="文件名:1111" />
-                            <TextBlock
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Text="文件地址:2222" />
-                            <TextBlock
-                                Grid.Row="0"
-                                Grid.Column="0"
-                                Text="文件数量:3" />
-                            <Button
-                                Grid.Row="1"
-                                Grid.Column="1"
-                                Content="Exif 信息" />
 
-                        </UniformGrid>
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                FontWeight="Bold"
+                                Text="文件名:" />
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Text="{Binding FileName}"
+                                TextAlignment="Left" />
+                        </UniformGrid>-->
+                        <Grid
+                            Grid.Column="1"
+                            Margin="25"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            ColumnDefinitions="*,5*">
+
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                MinWidth="120"
+                                Content="文件名称:" />
+
+                            <TextBlock
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Text="阿三打撒打撒十大测试111111111asddddddddddddddddddddddddddddddddddddddddfdsfsdgsdgdsg.png"
+                                TextWrapping="Wrap" />
+                        </Grid>
                     </Grid>
+
                 </Border>
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>
+
 </UserControl>
