@@ -15,7 +15,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [ObservableProperty]
     private ImageGenerateOption _imageGenerateOption = new ImageGenerateOption(0.89f);
 
-    private volatile ImageGenContext? ImgGenContext;
 
     [ObservableProperty]
     public partial string? PreviewFilePath { get; set; }
@@ -24,8 +23,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     {
         if (string.IsNullOrEmpty(PreviewFilePath))
             return;
-
-        PreviewImageSource = new(PreviewFilePath);
     }
 
     partial void OnPreviewFilePathChanged(string? value)
@@ -54,7 +51,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         input.Seek(0, SeekOrigin.Begin);
 
-        ExifInfo.From(File.OpenRead(PreviewFilePath));
+        var e = new NikonExifInfo(PreviewFilePath);
 
         ImageService.GenerateWithOptions(input, output, ImageGenerateOption);
 
@@ -76,7 +73,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     public void Reset()
     {
         PreviewImageSource?.Dispose();
-        ImgGenContext?.Dispose();
     }
 
     public void Dispose()

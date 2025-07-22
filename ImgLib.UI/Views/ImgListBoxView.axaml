@@ -81,13 +81,15 @@
                                 Grid.Row="0"
                                 Grid.Column="0"
                                 MinWidth="120"
-                                Content="文件名称:" />
+                                Content="文件名称:"
+                                FontWeight="Bold" />
 
                             <TextBlock
                                 Grid.Row="0"
                                 Grid.Column="1"
-                                Text="阿三打撒打撒十大测试111111111asddddddddddddddddddddddddddddddddddddddddfdsfsdgsdgdsg.png"
-                                TextWrapping="Wrap" />
+                                Margin="0,1,0,0"
+                                Text="Psngdai.png"
+                                TextDecorations="Underline" />
                         </Grid>
                     </Grid>
 

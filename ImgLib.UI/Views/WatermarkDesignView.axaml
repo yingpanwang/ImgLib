@@ -91,8 +91,11 @@
             Grid.Row="1"
             BorderBrush="LightGray"
             BorderThickness="1">
-            <UniformGrid DockPanel.Dock="Bottom">
-                <Border BorderBrush="LightGray" BorderThickness="1">
+            <Grid DockPanel.Dock="Bottom" RowDefinitions="*,*">
+                <Border
+                    Grid.Row="0"
+                    BorderBrush="LightGray"
+                    BorderThickness="1">
                     <UniformGrid Columns="2" DockPanel.Dock="Top">
 
                         <TextBlock
@@ -133,9 +136,11 @@
 
                     </UniformGrid>
                 </Border>
-                <Button Content="test" />
-                <Button Content="test" />
-            </UniformGrid>
+                <Button
+                    Grid.Row="1"
+                    Command="{Binding SetBackgroundCommand}"
+                    Content="测试按钮" />
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

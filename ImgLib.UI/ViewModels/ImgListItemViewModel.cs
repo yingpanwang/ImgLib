@@ -34,8 +34,8 @@ public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBa
             return null;
         try
         {
-            //return LoadThumbnail(FilePath, 200, 120);
-            return new Bitmap(FilePath);
+            return LoadThumbnail(FilePath, 200, 120);
+            //return new Bitmap(FilePath);
         }
         catch
         {
@@ -71,7 +71,10 @@ public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBa
             int resizedWidth = (int)(width * scale);
             int resizedHeight = (int)(height * scale);
 
-            using var resized = original.Resize(new SKImageInfo(resizedWidth, resizedHeight), SKFilterQuality.Medium);
+            using var resized = original.Resize(
+                new SKImageInfo(resizedWidth, resizedHeight),
+                new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None)
+                );
             using var image = SKImage.FromBitmap(resized);
             using var data = image.Encode(SKEncodedImageFormat.Png, 90);
             using var memStream = new MemoryStream();
@@ -94,7 +97,8 @@ public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBa
             .Where(file => file.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
-                           file.EndsWith(".NEF", StringComparison.OrdinalIgnoreCase))
+                           file.EndsWith(".NEF", StringComparison.OrdinalIgnoreCase) ||
+                           file.EndsWith(".ARW", StringComparison.OrdinalIgnoreCase))
             .Select(file => new ImgListItemViewModel(file))
             .ToArray();
 
