@@ -1,15 +1,19 @@
 ﻿using Avalonia.Media.Imaging;
+using ImgLib.Models;
 using SkiaSharp;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 namespace ImgLib.UI.ViewModels;
 
-public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBase
+public sealed partial class ImgListItemViewModel(ImageFile sourceFile) : ViewModelBase, IDisposable
 {
+    public ImageFile SourceFile { get; init; } = sourceFile;
+
     [ObservableProperty]
-    public partial string? FilePath { get; set; } = filePath;
+    public partial string? FilePath { get; private set; } = sourceFile.Path;
 
     public string? FileName => FilePath is not null ? System.IO.Path.GetFileName(FilePath) : null;
 
@@ -26,7 +30,20 @@ public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBa
         }
     }
 
-    public Bitmap? ImageSource => LoadImage();
+    public Task<Bitmap?> ImageSource => LoadImageAsync();
+
+    private async Task<Bitmap?> LoadImageAsync()
+    {
+        try
+        {
+            return await Task.Run(LoadImage);
+        }
+        catch (Exception)
+        {
+            // Handle exceptions (e.g., file not found, unsupported format)
+            return default;
+        }
+    }
 
     private Bitmap? LoadImage()
     {
@@ -99,9 +116,18 @@ public sealed partial class ImgListItemViewModel(string? filePath) : ViewModelBa
                            file.EndsWith(".gif", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".NEF", StringComparison.OrdinalIgnoreCase) ||
                            file.EndsWith(".ARW", StringComparison.OrdinalIgnoreCase))
-            .Select(file => new ImgListItemViewModel(file))
+            .Select(file => new ImgListItemViewModel(
+                    file.EndsWith(".NEF", StringComparison.InvariantCultureIgnoreCase)
+                        ? new RAWFile(file)
+                        : new JpegFile(file)
+                ))
             .ToArray();
 
         return files;
+    }
+
+    public void Dispose()
+    {
+        Debug.WriteLine($"{FileName} disposed !");
     }
 }

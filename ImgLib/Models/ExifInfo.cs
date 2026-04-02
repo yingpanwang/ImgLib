@@ -1,6 +1,6 @@
 ﻿using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
-using MetadataExtractor.Formats.Exif.Makernotes;
+using System.Text.Json;
 
 namespace ImgLib.Models;
 public partial record class ExifInfo
@@ -135,39 +135,10 @@ public partial record class ExifInfo
             true
             );
     }
-}
 
-
-public sealed partial record class NikonExifInfo : ExifInfo
-{
-    public NikonExifInfo(ExifInfo original) : base(original) { }
-
-    public NikonExifInfo(string filePath) : base(filePath) { }
-
-    public NikonExifInfo(Stream fileStream) : base(fileStream) { }
-
-    private NikonType1MakernoteDirectory? Type1Directory
+    public virtual string ToJson()
     {
-        get
-        {
-            if (field == null)
-            {
-                field = Metadata.Value.OfType<NikonType1MakernoteDirectory>().FirstOrDefault();
-            }
-            return field;
-        }
-    }
-
-    private NikonType2MakernoteDirectory? Type2Directory
-    {
-        get
-        {
-            if (field == null)
-            {
-                field = Metadata.Value.OfType<NikonType2MakernoteDirectory>().FirstOrDefault();
-            }
-            return field;
-        }
+        return JsonSerializer.Serialize(this);
     }
 }
 

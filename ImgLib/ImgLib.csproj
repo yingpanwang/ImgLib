@@ -11,8 +11,4 @@
     <PackageReference Include="MetadataExtractor" Version="2.8.1" />
     <PackageReference Include="SkiaSharp" Version="3.119.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
 </Project>

@@ -10,29 +10,32 @@ namespace ImgLib.UI.ViewModels;
 public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposable
 {
     [ObservableProperty]
-    public Bitmap? _previewImageSource;
+    public partial Bitmap? PreviewImageSource { get; private set; }
 
-    [ObservableProperty]
-    private ImageGenerateOption _imageGenerateOption = new ImageGenerateOption(0.89f);
-
+    //[ObservableProperty]
+    //public partial ImageGenerateOption ImageGenerateOption { get; private set; } = new ImageGenerateOption(0.89f);
 
     [ObservableProperty]
     public partial string? PreviewFilePath { get; set; }
 
-    public WatermarkDesignViewModel()
-    {
-        if (string.IsNullOrEmpty(PreviewFilePath))
-            return;
-    }
+    [ObservableProperty]
+    public partial bool IsLoading { get; set; }
+
+    [ObservableProperty]
+    public partial WatermarkSettingsViewModel WatermarkSettingsViewModel { get; private set; } = new();
+
+    private ImageFile? _previewImageFile;
 
     partial void OnPreviewFilePathChanged(string? value)
     {
         if (string.IsNullOrEmpty(PreviewFilePath))
             return;
 
+        _previewImageFile = ImageFile.GetImageFile(value!);
+
         PreviewImageSource = new Bitmap
             (
-            PreviewFilePath
+            _previewImageFile.GetSourceStream()
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
 );
@@ -44,16 +47,16 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         if (PreviewImageSource == null || string.IsNullOrWhiteSpace(PreviewFilePath))
             return;
 
-        using MemoryStream input = new();
+        if (_previewImageFile == null)
+            return;
+
+        NikonExifInfo exif = new NikonExifInfo(_previewImageFile.Path);
+
+        Console.WriteLine(exif.ToJson());
+
         using MemoryStream output = new();
 
-        PreviewImageSource.Save(input);
-
-        input.Seek(0, SeekOrigin.Begin);
-
-        var e = new NikonExifInfo(PreviewFilePath);
-
-        ImageService.GenerateWithOptions(input, output, ImageGenerateOption);
+        ImageService.GenerateWithOptions(_previewImageFile.GetSourceStream(), output, WatermarkSettingsViewModel.ImageGenerateOption);
 
         output.Seek(0, SeekOrigin.Begin);
         if (output != null)

@@ -1,6 +1,6 @@
 ﻿namespace ImgLib;
 
-public record ImageGenerateOption
+public class ImageGenerateOption
 {
     public ImageGenerateOption(
         float scale,
@@ -17,7 +17,6 @@ public record ImageGenerateOption
         ShadowOffsetY = shadowOffsetY;
         ShadowSigma = shadowSigma;
     }
-
 
     public float Scale { get; set; }
     public float CornerRadius { get; set; }

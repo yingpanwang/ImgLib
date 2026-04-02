@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace ImgLib.UI.ViewModels;
 
-public sealed partial class MainWindowViewModel(IStorageProvider storageProvider) : ViewModelBase
+public partial class MainWindowViewModel(IStorageProvider storageProvider) : ViewModelBase
 {
     [ObservableProperty]
     public partial ImgListBoxViewModel ImgListBoxViewModel { get; set; } = new();

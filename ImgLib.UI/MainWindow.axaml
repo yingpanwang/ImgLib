@@ -10,7 +10,6 @@
     d:DesignHeight="650"
     d:DesignWidth="800"
     x:DataType="vm:MainWindowViewModel"
-    Background=""
     mc:Ignorable="d">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -18,7 +17,7 @@
                 <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
             </MenuItem>
         </Menu>
-        <Grid ColumnDefinitions="2*,4,6*">
+        <Grid ColumnDefinitions="3*,4,5*">
             <v:ImgListBoxView Grid.Column="0" DataContext="{Binding ImgListBoxViewModel}" />
 
             <!--<v:ImgListView Name="ilv" Grid.Column="0"  Path="C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG" />-->
