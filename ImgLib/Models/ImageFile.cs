@@ -8,12 +8,10 @@ public abstract record ImageFile
     {
         Path = filePath;
         Name = SysIOPath.GetFileNameWithoutExtension(filePath);
-        Extension = SysIOPath.GetExtension(filePath);
         Exif = new ExifInfo(filePath);
 
         // TODO:临时写的，改成非打开对象获取(读取元数据）
         var f = new FileInfo(filePath);
-        Size = f.Length;
         Created = f.CreationTime;
         Modified = f.LastWriteTime;
     }
@@ -21,10 +19,6 @@ public abstract record ImageFile
     public string Name { get; private set; }
 
     public string Path { get; init; }
-
-    public string Extension { get; init; }
-
-    public long Size { get; private set; }
 
     public DateTime Created { get; init; }
 
@@ -66,9 +60,14 @@ public enum RAWType
 
 public record RAWFile : ImageFile
 {
-    public RAWFile(string filePath) : base(filePath)
+    public RAWFile(string filePath, bool throwExIfNotSupportRAWType = true) : base(filePath)
     {
-        RAWType = ParseRAWType(Extension);
+        string ext = SysIOPath.GetExtension(filePath);
+
+        RAWType = ParseRAWType(ext);
+
+        if (throwExIfNotSupportRAWType && RAWType == RAWType.Unknown)
+            throw new NotSupportedException($"Unsupported RAW file type: {ext}");
     }
 
     public RAWType RAWType { get; private set; }

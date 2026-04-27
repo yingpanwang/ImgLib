@@ -142,7 +142,6 @@ public partial record class ExifInfo
     }
 }
 
-
 //{
 //  "Make": "NIKON CORPORATION",
 //  "Model": "NIKON Z 6_2",

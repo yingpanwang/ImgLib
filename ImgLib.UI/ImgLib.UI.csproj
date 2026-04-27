@@ -20,8 +20,10 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="PanAndZoom" Version="11.3.0.5" />
     <PackageReference Include="ReactiveUI" Version="20.4.1" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
+    <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.0.12" />
   </ItemGroup>
 
   <ItemGroup>

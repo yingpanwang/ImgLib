@@ -7,7 +7,6 @@ public sealed partial class ImgFileDescViewModel : ViewModelBase
     [ObservableProperty]
     public partial string? FilePath { get; set; }
 
-
     public string? FileName => FilePath is not null ? System.IO.Path.GetFileName(FilePath) : null;
 
     public string? FileExtension => FilePath is not null ? System.IO.Path.GetExtension(FilePath) : null;
@@ -24,8 +23,6 @@ public sealed partial class ImgFileDescViewModel : ViewModelBase
     }
 
     public Bitmap? ImageFileSource { get; set; }
-
-
 
     public ImgFileDescViewModel(string? filePath = null)
     {

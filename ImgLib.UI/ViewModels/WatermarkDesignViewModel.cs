@@ -1,5 +1,4 @@
-﻿
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
@@ -26,6 +25,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     private ImageFile? _previewImageFile;
 
+    [ObservableProperty]
+    public partial bool PreviewFilePathRequested { get; private set; } = false;
+
     partial void OnPreviewFilePathChanged(string? value)
     {
         if (string.IsNullOrEmpty(PreviewFilePath))
@@ -39,6 +41,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
 );
+        PreviewFilePathRequested = !PreviewFilePathRequested;
     }
 
     [RelayCommand]
@@ -51,6 +54,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             return;
 
         NikonExifInfo exif = new NikonExifInfo(_previewImageFile.Path);
+
+        WatermarkSettingsViewModel.ExifInfo = exif;
+        WatermarkSettingsViewModel.BuildExifInfoTree();
 
         Console.WriteLine(exif.ToJson());
 
