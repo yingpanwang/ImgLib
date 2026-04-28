@@ -141,7 +141,7 @@ public sealed partial class ImageService
             // 画出矩形边框
             canvas.DrawRect(watermarkRect, borderPaint);
 
-            #endregion
+            #endregion 水印文本
         }
     }
 

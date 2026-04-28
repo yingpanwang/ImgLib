@@ -24,6 +24,8 @@
     <PackageReference Include="ReactiveUI" Version="20.4.1" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />
     <PackageReference Include="Xaml.Behaviors.Avalonia" Version="11.3.0.12" />
+    <PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.0.12" />
+    <PackageReference Include="Xaml.Behaviors.Interactions.Events" Version="11.3.0.12" />
   </ItemGroup>
 
   <ItemGroup>

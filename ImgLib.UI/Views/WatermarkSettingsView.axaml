@@ -76,22 +76,22 @@ mc:Ignorable="d">
                 </Border>
             </Grid>
         </TabItem>
-        <TabItem Header="测试">
-            <TreeView ItemsSource="{Binding ExifInfoTree}">
-                <TreeView.ItemTemplate>
-                    <TreeDataTemplate ItemsSource="{Binding Children}">
-						<StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
-                            <TextBlock Text=": " />
-                            <TextBlock Text="{Binding Value}" />
-                        </StackPanel>
-                    </TreeDataTemplate>
-                </TreeView.ItemTemplate>
-           </TreeView>
+        <TabItem Header="Exif信息">
+            <DockPanel>
+                <TreeView ItemsSource="{Binding ExifInfoTree}" DockPanel.Dock="Top">
+                    <TreeView.ItemTemplate>
+                        <TreeDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text=": " />
+                                <TextBlock Text="{Binding Value}" />
+                            </StackPanel>
+                        </TreeDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+
+                <Button Content="获取Exif信息" Command="{Binding GetExifInfoCommand}" DockPanel.Dock="Bottom" />
+            </DockPanel>
         </TabItem>
-         <TabItem Header="测试2"></TabItem>
-         <TabItem Header="测试3"></TabItem>
-         <TabItem Header="测试4"></TabItem>
-         <TabItem Header="测试5"></TabItem>
     </TabControl>
 </UserControl>

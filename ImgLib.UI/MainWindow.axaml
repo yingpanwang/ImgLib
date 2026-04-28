@@ -1,23 +1,28 @@
-<Window
-    x:Class="ImgLib.UI.MainWindow"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:v="using:ImgLib.UI"
-    xmlns:vm="using:ImgLib.UI.ViewModels"
-    Title="ImgLib.UI"
-    d:DesignHeight="650"
-    d:DesignWidth="800"
-    x:DataType="vm:MainWindowViewModel"
-    mc:Ignorable="d">
+﻿<Window
+x:Class="ImgLib.UI.MainWindow"
+xmlns="https://github.com/avaloniaui"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+xmlns:v="using:ImgLib.UI"
+xmlns:vm="using:ImgLib.UI.ViewModels"
+Title="ImgLib.UI"
+d:DesignHeight="650"
+d:DesignWidth="800"
+x:DataType="vm:MainWindowViewModel"
+mc:Ignorable="d">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="菜单">
                 <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
             </MenuItem>
         </Menu>
-        <Grid ColumnDefinitions="3*,4,5*">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="300"></ColumnDefinition>
+                <ColumnDefinition Width="2"></ColumnDefinition>
+                <ColumnDefinition Width="6*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
             <v:ImgListBoxView Grid.Column="0" DataContext="{Binding ImgListBoxViewModel}" />
 
             <!--<v:ImgListView Name="ilv" Grid.Column="0"  Path="C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG" />-->

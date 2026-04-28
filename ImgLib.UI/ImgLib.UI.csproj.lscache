@@ -55,6 +55,7 @@ TemporaryDependencyNodeTargetIdentifier=net8.0
 
 [sourceFiles]
 App.axaml.cs
+Behaviors/ResetOnSourceChangedBehavior.cs
 MainWindow.axaml.cs
 obj/Debug/net8.0/
  .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
@@ -78,7 +79,8 @@ Views/
 _GlobalUsing.cs
 
 [metadataReferences]
-../../../../../../Program Files/dotnet/packs/Microsoft.NETCore.App.Ref/8.0.22/ref/net8.0/
+../ImgLib/obj/Debug/net8.0/ref/ImgLib.dll
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.22/ref/net8.0/
  Microsoft.CSharp.dll
  Microsoft.VisualBasic.Core.dll
  Microsoft.VisualBasic.dll
@@ -242,7 +244,6 @@ _GlobalUsing.cs
  System.Xml.XPath.dll
  System.Xml.XPath.XDocument.dll
  WindowsBase.dll
-../ImgLib/obj/Debug/net8.0/ref/ImgLib.dll
 <NUGET>/
  avalonia.controls.colorpicker/11.3.0/lib/net8.0/Avalonia.Controls.ColorPicker.dll
  avalonia.desktop/11.3.0/lib/net8.0/Avalonia.Desktop.dll
@@ -282,17 +283,24 @@ _GlobalUsing.cs
  system.io.pipelines/8.0.0/lib/net8.0/System.IO.Pipelines.dll
  system.reactive/6.0.1/lib/net6.0/System.Reactive.dll
  tmds.dbus.protocol/0.21.2/lib/net8.0/Tmds.DBus.Protocol.dll
+ xaml.behaviors.interactions.custom/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.Custom.dll
+ xaml.behaviors.interactions.draganddrop/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.DragAndDrop.dll
+ xaml.behaviors.interactions.draggable/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.Draggable.dll
+ xaml.behaviors.interactions.events/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.Events.dll
+ xaml.behaviors.interactions.responsive/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.Responsive.dll
+ xaml.behaviors.interactions/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactions.dll
+ xaml.behaviors.interactivity/11.3.0.12/lib/net8.0/Xaml.Behaviors.Interactivity.dll
  xmpcore/6.1.10.1/lib/netstandard2.0/XmpCore.dll
 
 [analyzerReferences]
-../../../../../../Program Files/dotnet/packs/Microsoft.NETCore.App.Ref/8.0.22/analyzers/dotnet/cs/
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.22/analyzers/dotnet/cs/
  Microsoft.Interop.ComInterfaceGenerator.dll
  Microsoft.Interop.JavaScript.JSImportGenerator.dll
  Microsoft.Interop.LibraryImportGenerator.dll
  Microsoft.Interop.SourceGeneration.dll
  System.Text.Json.SourceGeneration.dll
  System.Text.RegularExpressions.Generator.dll
-../../../../../../Program Files/dotnet/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 <NUGET>/avalonia/11.3.0/analyzers/dotnet/cs/
@@ -303,7 +311,7 @@ _GlobalUsing.cs
  CommunityToolkit.Mvvm.SourceGenerators.dll
 
 [analyzerConfigFiles]
-../../../../../../Program Files/dotnet/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_8_default.globalconfig
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_8_default.globalconfig
 obj/Debug/net8.0/ImgLib.UI.GeneratedMSBuildEditorConfig.editorconfig
 
 [additionalFiles]

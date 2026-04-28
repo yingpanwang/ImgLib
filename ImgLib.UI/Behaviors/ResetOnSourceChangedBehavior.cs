@@ -22,7 +22,6 @@ internal class ResetOnSourceChangedBehavior : Behavior<ZoomBorder>
     protected override void OnAttached()
     {
         base.OnAttached();
-
         this.GetObservable(SourceProperty)
             .Subscribe(_ =>
         {

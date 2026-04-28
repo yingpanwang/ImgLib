@@ -1,6 +1,8 @@
-﻿using ImgLib.Models;
+﻿using CommunityToolkit.Mvvm.Input;
+using ImgLib.Models;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Windows.Input;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -22,10 +24,16 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         ExifInfo = exifInfo;
     }
 
+    public ICommand GetExifInfoCommand => new RelayCommand(
+            () => BuildExifInfoTree()
+        );
+
     public void BuildExifInfoTree()
     {
         if (ExifInfo == null)
             return;
+
+        ExifInfoTree.Clear();
 
         using var exifDoc = JsonSerializer.SerializeToDocument<ExifInfo>(ExifInfo);
 
@@ -34,6 +42,11 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             ExifInfoTree.Add(new ExifInfoNode(item.Name, item.Value.GetString()));
         }
+    }
+
+    partial void OnExifInfoChanged(ExifInfo? value)
+    {
+        ExifInfoTree.Clear();
     }
 }
 

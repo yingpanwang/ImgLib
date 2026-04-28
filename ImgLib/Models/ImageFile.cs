@@ -2,7 +2,12 @@
 
 using SysIOPath = System.IO.Path;
 
-public abstract record ImageFile
+public interface IImageFile
+{
+    Stream GetSourceStream();
+}
+
+public record ImageFile : IImageFile
 {
     public ImageFile(string filePath)
     {
@@ -93,10 +98,65 @@ public record RAWFile : ImageFile
         return new RAWFile(filePath);
     }
 }
-
 public record JpegFile : ImageFile
 {
     public JpegFile(string filePath) : base(filePath)
     {
+    }
+}
+public record PngFile : ImageFile
+{
+    public PngFile(string filePath) : base(filePath)
+    {
+    }
+}
+
+public record VirtualFile : IImageFile
+{
+    public VirtualFile(string virtualPath)
+    {
+        throw new NotImplementedException();
+        // TODO: 检查虚拟路径的合法性
+        // throw new ArgumentException("Invalid virtual path", nameof(virtualPath));
+    }
+
+    public Stream GetSourceStream()
+    {
+        // TODO: 实现获取虚拟文件内容的逻辑
+        throw new NotImplementedException();
+    }
+}
+
+public class FileGroup
+{
+    public string DisplayName { get; private set; } = string.Empty;
+
+    public string DisplayPath { get; private set; } = string.Empty;
+
+    public int Count => Files?.Count() ?? 0;
+
+    public IEnumerable<ImageFile>? Files
+    {
+        get => field;
+        set
+        {
+            field = value;
+            if (Count > 0)
+            {
+                var firstFile = field!.First();
+                DisplayName = firstFile.Name;
+                DisplayPath = System.IO.Path.GetDirectoryName(firstFile.Path) ?? string.Empty;
+            }
+            else
+            {
+                DisplayName = string.Empty;
+                DisplayPath = string.Empty;
+            }
+        }
+    }
+
+    public static FileGroup CreateFromFiles(IEnumerable<ImageFile> files)
+    {
+        return new FileGroup { Files = files };
     }
 }

@@ -66,7 +66,7 @@ obj/Debug/net8.0/
  ImgLib.GlobalUsings.g.cs
 
 [metadataReferences]
-../../../../../../Program Files/dotnet/packs/Microsoft.NETCore.App.Ref/8.0.22/ref/net8.0/
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.22/ref/net8.0/
  Microsoft.CSharp.dll
  Microsoft.VisualBasic.Core.dll
  Microsoft.VisualBasic.dll
@@ -236,17 +236,17 @@ obj/Debug/net8.0/
  xmpcore/6.1.10.1/lib/netstandard2.0/XmpCore.dll
 
 [analyzerReferences]
-../../../../../../Program Files/dotnet/packs/Microsoft.NETCore.App.Ref/8.0.22/analyzers/dotnet/cs/
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/8.0.22/analyzers/dotnet/cs/
  Microsoft.Interop.ComInterfaceGenerator.dll
  Microsoft.Interop.JavaScript.JSImportGenerator.dll
  Microsoft.Interop.LibraryImportGenerator.dll
  Microsoft.Interop.SourceGeneration.dll
  System.Text.Json.SourceGeneration.dll
  System.Text.RegularExpressions.Generator.dll
-../../../../../../Program Files/dotnet/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/
  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
  Microsoft.CodeAnalysis.NetAnalyzers.dll
 
 [analyzerConfigFiles]
-../../../../../../Program Files/dotnet/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_8_default.globalconfig
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_8_default.globalconfig
 obj/Debug/net8.0/ImgLib.GeneratedMSBuildEditorConfig.editorconfig

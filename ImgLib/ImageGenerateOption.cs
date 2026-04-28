@@ -25,4 +25,3 @@ public class ImageGenerateOption
     public float ShadowOffsetY { get; set; }
     public float ShadowSigma { get; set; }
 }
-

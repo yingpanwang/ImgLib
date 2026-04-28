@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
 using System.IO;
+using System.Windows.Input;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -10,6 +11,17 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 {
     [ObservableProperty]
     public partial Bitmap? PreviewImageSource { get; private set; }
+
+    [ObservableProperty]
+    public partial double PreviewAngle { get; private set; }
+
+    public ICommand RotateLeftCommand => new RelayCommand(
+            () => PreviewAngle -= 90
+        );
+
+    public ICommand RotateRightCommand => new RelayCommand(
+            () => PreviewAngle += 90
+        );
 
     //[ObservableProperty]
     //public partial ImageGenerateOption ImageGenerateOption { get; private set; } = new ImageGenerateOption(0.89f);
@@ -25,9 +37,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     private ImageFile? _previewImageFile;
 
-    [ObservableProperty]
-    public partial bool PreviewFilePathRequested { get; private set; } = false;
-
     partial void OnPreviewFilePathChanged(string? value)
     {
         if (string.IsNullOrEmpty(PreviewFilePath))
@@ -41,7 +50,12 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
 //@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
 );
-        PreviewFilePathRequested = !PreviewFilePathRequested;
+
+        Task.Factory.StartNew(() =>
+        {
+            NikonExifInfo exifInfo = new NikonExifInfo(_previewImageFile.Path);
+            WatermarkSettingsViewModel.ExifInfo = exifInfo;
+        }, TaskCreationOptions.LongRunning);
     }
 
     [RelayCommand]
@@ -52,13 +66,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         if (_previewImageFile == null)
             return;
-
-        NikonExifInfo exif = new NikonExifInfo(_previewImageFile.Path);
-
-        WatermarkSettingsViewModel.ExifInfo = exif;
-        WatermarkSettingsViewModel.BuildExifInfoTree();
-
-        Console.WriteLine(exif.ToJson());
 
         using MemoryStream output = new();
 
@@ -72,6 +79,10 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
                 PreviewImageSource = new Bitmap(output);
             });
         }
+    }
+
+    public async Task Left()
+    {
     }
 
     public Task Load()

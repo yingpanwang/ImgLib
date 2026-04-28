@@ -1,9 +1,13 @@
-﻿namespace ImgLib.UI.ViewModels.Design;
+﻿using DynamicData;
 
-internal sealed partial class Design_ImgListBoxViewModel : ImgListBoxViewModel
+namespace ImgLib.UI.ViewModels.Design;
+
+public sealed partial class Design_ImgListBoxViewModel : ImgListBoxViewModel
 {
     public Design_ImgListBoxViewModel()
     {
-        this.Path = @"C:\Users\Administrator\Pictures\watermark";
+        this.Path = @"C:\Users\Administrator\Desktop\后期临时";
+
+        ImgListItems?.AddRange(ImgListItemViewModel.Create(Path));
     }
 }
