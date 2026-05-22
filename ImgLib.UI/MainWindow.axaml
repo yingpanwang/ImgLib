@@ -19,7 +19,7 @@ mc:Ignorable="d">
         </Menu>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="300"></ColumnDefinition>
+                <ColumnDefinition Width="2*" MinWidth="350"></ColumnDefinition>
                 <ColumnDefinition Width="2"></ColumnDefinition>
                 <ColumnDefinition Width="6*"></ColumnDefinition>
             </Grid.ColumnDefinitions>

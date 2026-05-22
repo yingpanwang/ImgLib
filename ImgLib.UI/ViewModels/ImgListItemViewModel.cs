@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ImgLib.UI.ViewModels;
 
-public sealed partial class ImgListItemViewModel(ImageFile sourceFile) : ViewModelBase, IDisposable
+public partial class ImgListItemViewModel(ImageFile sourceFile) : ViewModelBase, IDisposable
 {
     public ImageFile SourceFile { get; init; } = sourceFile;
 
@@ -18,6 +18,8 @@ public sealed partial class ImgListItemViewModel(ImageFile sourceFile) : ViewMod
     public string? FileName => FilePath is not null ? System.IO.Path.GetFileName(FilePath) : null;
 
     public string? FileExtension => FilePath is not null ? System.IO.Path.GetExtension(FilePath) : null;
+
+    public string? FileCreationTime => SourceFile.Created.ToString("yyyy-MM-dd HH:mm:ss");
 
     public string? FileSize
     {

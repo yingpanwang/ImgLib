@@ -50,7 +50,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     }
 }
 
-public record ExifInfoNode
+public struct ExifInfoNode
 {
     public string Name { get; set; }
     public string DisplayName { get; set; }
