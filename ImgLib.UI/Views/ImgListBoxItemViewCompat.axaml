@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,22 +12,23 @@
  <Design.DataContext>
 	 		<vmd:Design_ImgListBoxItemViewCompatViewModel/>
  </Design.DataContext>
+			 <!-- Card: subtle border + white bg for visibility, ListBoxItem handles hover/selected -->
 			 <Border
-				Padding="8"
-				MinWidth="400"
-				BorderBrush="#DDD"
+				Padding="10,10"
+				MinWidth="340"
+				Background="White"
+				BorderBrush="{StaticResource BorderSubtle}"
 				BorderThickness="1"
-				CornerRadius="8"
-				Background="White">
-					<Grid ColumnDefinitions="120,*" ColumnSpacing="12">
+				CornerRadius="8">
+					<Grid ColumnDefinitions="110,*" ColumnSpacing="14">
 
 						<!-- 缩略图 -->
 						<Border
-						Width="120"
-						Height="90"
+						Width="110"
+						Height="82"
 						CornerRadius="6"
 						ClipToBounds="True"
-						Background="#F0F0F0">
+						Background="{StaticResource ThumbPlaceholderBg}">
 
 							<Image
 							Stretch="UniformToFill"
@@ -35,33 +36,47 @@
 						</Border>
 
 						<!-- 信息区 -->
-						<Grid
+						<StackPanel
 						Grid.Column="1"
-						ColumnDefinitions="70,Auto"
-						RowDefinitions="Auto,Auto,Auto,Auto"
-						RowSpacing="4"
 						VerticalAlignment="Center"
-						>
+						Spacing="5">
 
-							<!-- 名称 -->
-							<TextBlock Grid.Row="0" Text="名称:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="0" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileName}" VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
+							<!-- 文件名 -->
+							<TextBlock
+							FontSize="13"
+							FontWeight="SemiBold"
+							Foreground="{StaticResource TextPrimary}"
+							Text="{Binding FileName}"
+							TextTrimming="CharacterEllipsis"
+							MaxLines="1" />
 
 							<!-- 类型 -->
-							<TextBlock Grid.Row="1" Text="类型:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="1" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileExtension}"  VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
+							<StackPanel Orientation="Horizontal" Spacing="6">
+								<TextBlock
+								FontSize="11.5"
+								Foreground="{StaticResource TextSecondary}"
+								Text="类型" />
+								<TextBlock
+								FontSize="11.5"
+								Foreground="{StaticResource TextPrimary}"
+								Text="{Binding FileExtension}"
+								TextTrimming="CharacterEllipsis" />
+							</StackPanel>
 
 							<!-- 日期 -->
-							<TextBlock Grid.Row="2" Text="日期:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="2" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileCreationTime}"  VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
-						</Grid>
+							<StackPanel Orientation="Horizontal" Spacing="6">
+								<TextBlock
+								FontSize="11.5"
+								Foreground="{StaticResource TextSecondary}"
+								Text="日期" />
+								<TextBlock
+								FontSize="11.5"
+								Foreground="{StaticResource TextPrimary}"
+								Text="{Binding FileCreationTime}"
+								TextTrimming="CharacterEllipsis" />
+							</StackPanel>
 
+						</StackPanel>
 					</Grid>
 				</Border>
 </UserControl>

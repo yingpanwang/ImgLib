@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
 x:Class="ImgLib.UI.WatermarkDesignView"
 xmlns="https://github.com/avaloniaui"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -13,11 +13,15 @@ d:DesignHeight="850"
 d:DesignWidth="800"
 x:DataType="vm:WatermarkDesignViewModel"
 mc:Ignorable="d">
-	<Grid ColumnDefinitions="8*,3*" RowDefinitions="5*,25,45">
+	<Grid ColumnDefinitions="8*,3*" RowDefinitions="*,Auto">
+
+		<!-- ═══ Image Preview Area ═══ -->
 		<Border
 		Grid.Row="0"
-		BorderBrush="LightGray"
-		BorderThickness="1">
+		Background="#FAFAFA"
+		BorderBrush="{StaticResource BorderSubtle}"
+		BorderThickness="0,0,1,0"
+		Padding="0">
 			<paz:ZoomBorder
 			EnablePan="True"
 			PanButton="Left"
@@ -58,72 +62,34 @@ mc:Ignorable="d">
 				</i:Interaction.Behaviors>
 			</paz:ZoomBorder>
 		</Border>
+
+		<!-- ═══ Settings Panel ═══ -->
 		<Border
 		Grid.Row="0"
 		Grid.Column="1"
-		BorderBrush="LightGray"
-		BorderThickness="1">
+		Background="{StaticResource PanelBg}"
+		Padding="0">
 			<ScrollViewer>
 				<v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" DockPanel.Dock="Bottom" />
-
-				<!--<Grid DockPanel.Dock="Bottom" RowDefinitions="*,*">
-				<Border
-				Grid.Row="0"
-				BorderBrush="LightGray"
-				BorderThickness="1">
-				<UniformGrid Columns="2" DockPanel.Dock="Top">
-
-				<TextBlock
-				Grid.Row="0"
-				Grid.Column="0"
-				Text="缩放比例" />
-				<TextBox
-				Grid.Row="0"
-				Grid.Column="1"
-				Text="{Binding ImageGenerateOption.Scale, Mode=TwoWay}" />
-
-				<TextBlock
-				Grid.Row="1"
-				Grid.Column="1"
-				Text="CornerRadius" />
-				<TextBox
-				Grid.Row="1"
-				Grid.Column="1"
-				Text="{Binding ImageGenerateOption.CornerRadius, Mode=TwoWay}" />
-
-				<TextBlock
-				Grid.Row="2"
-				Grid.Column="1"
-				Text="虚化Blur值" />
-				<TextBox
-				Grid.Row="2"
-				Grid.Column="1"
-				Text="{Binding ImageGenerateOption.BlurSigma}" />
-
-				<TextBlock
-				Grid.Row="3"
-				Grid.Column="1"
-				Text="阴影偏移值" />
-				<TextBox
-				Grid.Row="3"
-				Grid.Column="1"
-				Text="{Binding ImageGenerateOption.ShadowOffsetX}" />
-
-				</UniformGrid>
-				</Border>
-				<Button
-				Grid.Row="1"
-				Command="{Binding SetBackgroundCommand}"
-				Content="测试按钮" />
-				</Grid>-->
 			</ScrollViewer>
 		</Border>
-		<Button
-		Grid.Column="1"
-		Grid.Row="2"
-		HorizontalAlignment="Right"
-		Command="{Binding SetBackgroundCommand}"
-		Content="预览更改"
-		Margin="0,0,10,0"/>
+
+		<!-- ═══ Bottom Action Bar ═══ -->
+		<Border
+		Grid.Row="1"
+		Grid.Column="0"
+		Grid.ColumnSpan="2"
+		Background="{StaticResource PanelBg}"
+		BorderBrush="{StaticResource BorderSubtle}"
+		BorderThickness="0,1,0,0"
+		Padding="16,10">
+			<DockPanel>
+				<Button
+				DockPanel.Dock="Right"
+				Classes="primary"
+				Command="{Binding SetBackgroundCommand}"
+				Content="预览更改" />
+			</DockPanel>
+		</Border>
 	</Grid>
 </UserControl>

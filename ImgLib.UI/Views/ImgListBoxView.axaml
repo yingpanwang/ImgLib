@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
 x:Class="ImgLib.UI.ImgListBoxView"
 xmlns="https://github.com/avaloniaui"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -16,84 +16,59 @@ mc:Ignorable="d">
 		<vmd:Design_ImgListBoxViewModel />
 	</Design.DataContext>
 	<UserControl.Styles>
+		<!-- Empty state -->
 		<Style Selector="ListBox:empty">
 			<Setter Property="Template">
 				<ControlTemplate>
 					<Border
-					Background="{TemplateBinding Background}"
-					BorderBrush="{TemplateBinding BorderBrush}"
-					BorderThickness="{TemplateBinding BorderThickness}">
-						<TextBlock
+					Background="Transparent">
+						<StackPanel
 						HorizontalAlignment="Center"
 						VerticalAlignment="Center"
-						FontStyle="Italic"
-						Text="暂无数据" />
+						Spacing="8">
+							<TextBlock
+							HorizontalAlignment="Center"
+							FontSize="28"
+							Foreground="{StaticResource TextTertiary}"
+							Text="📂" />
+							<TextBlock
+							HorizontalAlignment="Center"
+							FontSize="13"
+							Foreground="{StaticResource TextTertiary}"
+							Text="暂无图片" />
+							<TextBlock
+							HorizontalAlignment="Center"
+							FontSize="11"
+							Foreground="{StaticResource TextTertiary}"
+							Text="通过菜单打开图片目录" />
+						</StackPanel>
 					</Border>
 				</ControlTemplate>
 			</Setter>
 		</Style>
 	</UserControl.Styles>
-	<ListBox
-	Name="l"
-	ItemsSource="{Binding ImgListItems}"
-	SelectedItem="{Binding SelectedImgItem, Mode=TwoWay}">
-		<ListBox.ItemTemplate>
-			<DataTemplate DataType="vm:ImgListItemViewModel">
-				<!--<Border
-				Padding="8"
-				MinWidth="400"
-				BorderBrush="#DDD"
-				BorderThickness="1"
-				CornerRadius="8"
-				Background="White">
-					<Grid ColumnDefinitions="120,*" ColumnSpacing="12">
 
-						--><!-- 缩略图 --><!--
-						<Border
-						Width="120"
-						Height="90"
-						CornerRadius="6"
-						ClipToBounds="True"
-						Background="#F0F0F0">
+	<DockPanel Margin="0,8,0,0">
+		<!-- List Header -->
+		<Border DockPanel.Dock="Top"
+				Padding="14,6,14,10">
+			<TextBlock Text="图片列表"
+					   FontSize="14"
+					   FontWeight="SemiBold"
+					   Foreground="{StaticResource TextPrimary}" />
+		</Border>
 
-							<Image
-							Stretch="UniformToFill"
-							Source="{Binding ImageSource^}" />
-						</Border>
-
-						--><!-- 信息区 --><!--
-						<Grid
-						Grid.Column="1"
-						ColumnDefinitions="70,Auto"
-						RowDefinitions="Auto,Auto,Auto,Auto"
-						RowSpacing="4"
-						VerticalAlignment="Center"
-						>
-
-							--><!-- 名称 --><!--
-							<TextBlock Grid.Row="0" Text="名称:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="0" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileName}" VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
-
-							--><!-- 类型 --><!--
-							<TextBlock Grid.Row="1" Text="类型:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="1" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileExtension}"  VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
-
-							--><!-- 日期 --><!--
-							<TextBlock Grid.Row="2" Text="日期:" FontWeight="SemiBold"/>
-							<TextBlock Grid.Row="2" Grid.Column="1" FontSize="11"
-									   Text="{Binding FileCreationTime}"  VerticalAlignment="Bottom"
-									   TextTrimming="CharacterEllipsis"/>
-						</Grid>
-
-					</Grid>
-				</Border>-->
-				<v:ImgListBoxItemViewCompat/>
-			</DataTemplate>
-		</ListBox.ItemTemplate>
-	</ListBox>
+		<ListBox
+		Name="l"
+		Padding="4,0"
+		ItemsSource="{Binding ImgListItems}"
+		SelectedItem="{Binding SelectedImgItem, Mode=TwoWay}">
+			<ListBox.ItemTemplate>
+				<DataTemplate DataType="vm:ImgListItemViewModel">
+					<v:ImgListBoxItemViewCompat/>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+	</DockPanel>
 
 </UserControl>

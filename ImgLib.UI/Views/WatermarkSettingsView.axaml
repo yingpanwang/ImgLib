@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
 x:Class="ImgLib.UI.WatermarkSettingsView"
 xmlns="https://github.com/avaloniaui"
 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -9,88 +9,123 @@ d:DesignHeight="450"
 d:DesignWidth="800"
 x:DataType="vm:WatermarkSettingsViewModel"
 mc:Ignorable="d">
-    <TabControl>
+    <TabControl Padding="0" Margin="0,4,0,0">
+
+        <!-- ═══ 图像设置 Tab ═══ -->
         <TabItem Header="图像设置">
-            <Grid RowDefinitions="*,*">
-                <Border
-                Grid.Row="0"
-                BorderBrush="LightGray"
+            <ScrollViewer Padding="12,8">
+                <StackPanel Spacing="14">
 
-                BorderThickness="1">
-                    <UniformGrid Columns="2" DockPanel.Dock="Top">
-
+                    <!-- 中心缩放比例 -->
+                    <StackPanel Spacing="5">
                         <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Text="中心缩放比例" >
-                        </TextBlock>
+                        Text="中心缩放比例"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondary}" />
                         <NumericUpDown
-                        Grid.Row="0"
-                        Grid.Column="1"
                         Increment="0.05"
                         Maximum="1"
                         Minimum="0.5"
                         Value="{Binding ImageGenerateOption.Scale, Mode=TwoWay}" />
+                    </StackPanel>
 
+                    <!-- 圆角 -->
+                    <StackPanel Spacing="5">
                         <TextBlock
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Text="圆角" />
+                        Text="圆角"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Grid.Row="1"
-                        Grid.Column="1"
                         Text="{Binding ImageGenerateOption.CornerRadius, Mode=TwoWay}" />
+                    </StackPanel>
 
+                    <!-- 虚化Blur值 -->
+                    <StackPanel Spacing="5">
                         <TextBlock
-                        Grid.Row="2"
-                        Grid.Column="1"
-                        Text="虚化Blur值" />
+                        Text="虚化 Blur 值"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Grid.Row="2"
-                        Grid.Column="1"
                         Text="{Binding ImageGenerateOption.BlurSigma}" />
+                    </StackPanel>
 
+                    <!-- 阴影偏移值 -->
+                    <StackPanel Spacing="5">
                         <TextBlock
-                        Grid.Row="3"
-                        Grid.Column="1"
-                        Text="阴影偏移值" />
+                        Text="阴影偏移值"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Grid.Row="3"
-                        Grid.Column="1"
                         Text="{Binding ImageGenerateOption.ShadowOffsetX}" />
+                    </StackPanel>
 
-                        <TextBlock Text="旋转竖拍图片" />
+                    <!-- 旋转竖拍图片 -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
                         <CheckBox Grid.Row="4" Grid.Column="1" />
+                        <TextBlock
+                        Text="旋转竖拍图片"
+                        FontSize="12.5"
+                        Foreground="{StaticResource TextPrimary}"
+                        VerticalAlignment="Center" />
+                    </StackPanel>
 
-                    </UniformGrid>
-                </Border>
-            </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
+
+        <!-- ═══ 文本设置 Tab ═══ -->
         <TabItem Header="文本设置">
-            <Grid ColumnDefinitions="*" RowDefinitions="*,*">
-                <Border Grid.Row="0">
-                    <TextBox Text="\{\$Tag1.水印信息\}\ \{\$镜头型号\}\" />
-                </Border>
-                <Border Grid.Row="1">
-                    <Button Content="添加参数" />
-                </Border>
-            </Grid>
+            <DockPanel Margin="12,8">
+                <Button
+                DockPanel.Dock="Bottom"
+                Classes="secondary"
+                Content="添加参数"
+                HorizontalAlignment="Left"
+                Margin="0,10,0,0" />
+
+                <TextBox
+                Text="\{$Tag1.水印信息\}\ \{$镜头型号\}\"
+                AcceptsReturn="True"
+                MinHeight="80"
+                VerticalContentAlignment="Top" />
+            </DockPanel>
         </TabItem>
+
+        <!-- ═══ Exif信息 Tab ═══ -->
         <TabItem Header="Exif信息">
-            <DockPanel>
+            <DockPanel Margin="12,8">
+                <Button
+                DockPanel.Dock="Bottom"
+                Classes="secondary"
+                Content="获取 Exif 信息"
+                Command="{Binding GetExifInfoCommand}"
+                HorizontalAlignment="Left"
+                Margin="0,10,0,0" />
+
                 <TreeView ItemsSource="{Binding ExifInfoTree}" DockPanel.Dock="Top">
                     <TreeView.ItemTemplate>
                         <TreeDataTemplate ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text=": " />
-                                <TextBlock Text="{Binding Value}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock
+                                Text="{Binding Name}"
+                                Foreground="{StaticResource TextSecondary}"
+                                FontSize="12" />
+                                <TextBlock
+                                Text=":"
+                                Foreground="{StaticResource TextTertiary}"
+                                FontSize="12" />
+                                <TextBlock
+                                Text="{Binding Value}"
+                                Foreground="{StaticResource TextPrimary}"
+                                FontSize="12" />
                             </StackPanel>
                         </TreeDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-
-                <Button Content="获取Exif信息" Command="{Binding GetExifInfoCommand}" DockPanel.Dock="Bottom" />
             </DockPanel>
         </TabItem>
     </TabControl>

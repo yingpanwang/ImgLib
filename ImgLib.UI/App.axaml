@@ -5,7 +5,172 @@
     RequestedThemeVariant="Light">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
+    <Application.Resources>
+        <!-- ═══ Flat Design Color Palette ═══ -->
+        <SolidColorBrush x:Key="SidebarBg" Color="#F7F8FA" />
+        <SolidColorBrush x:Key="ContentBg" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="PanelBg" Color="#FAFBFC" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#4F6BED" />
+        <SolidColorBrush x:Key="AccentHoverBrush" Color="#3B55D9" />
+        <SolidColorBrush x:Key="AccentPressedBrush" Color="#2E45B8" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#1F2937" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#6B7280" />
+        <SolidColorBrush x:Key="TextTertiary" Color="#9CA3AF" />
+        <SolidColorBrush x:Key="BorderSubtle" Color="#E5E7EB" />
+        <SolidColorBrush x:Key="HoverBg" Color="#EEF0F7" />
+        <SolidColorBrush x:Key="SelectedBg" Color="#E8ECFB" />
+        <SolidColorBrush x:Key="ThumbPlaceholderBg" Color="#F0F1F3" />
+        <SolidColorBrush x:Key="InputBg" Color="#F9FAFB" />
+        <SolidColorBrush x:Key="InputBorder" Color="#D1D5DB" />
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
+
+        <!-- ═══ Global Font ═══ -->
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Inter, Microsoft YaHei UI, sans-serif" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Background" Value="#FFFFFF" />
+        </Style>
+
+        <!-- ═══ Primary Button (class: primary) ═══ -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource AccentHoverBrush}" />
+                <Setter Property="Foreground" Value="White" />
+            </Style>
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource AccentPressedBrush}" />
+                <Setter Property="Foreground" Value="White" />
+            </Style>
+        </Style>
+
+        <!-- ═══ Secondary Button (class: secondary) ═══ -->
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource HoverBg}" />
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource AccentHoverBrush}" />
+            </Style>
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource SelectedBg}" />
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource AccentPressedBrush}" />
+            </Style>
+        </Style>
+
+        <!-- ═══ ListBoxItem flat style ═══ -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="4,2" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource HoverBg}" />
+            </Style>
+            <Style Selector="^:selected /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource SelectedBg}" />
+            </Style>
+            <Style Selector="^:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{StaticResource SelectedBg}" />
+            </Style>
+        </Style>
+
+        <!-- ═══ ListBox flat ═══ -->
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <!-- ═══ TextBox flat ═══ -->
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="BorderBrush" Value="{StaticResource InputBorder}" />
+            <Setter Property="Background" Value="{StaticResource InputBg}" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="13" />
+            <Style Selector="^:focus /template/ Border#PART_BorderElement">
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+        </Style>
+
+        <!-- ═══ NumericUpDown flat ═══ -->
+        <Style Selector="NumericUpDown">
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <!-- ═══ Menu flat ═══ -->
+        <Style Selector="Menu">
+            <Setter Property="Background" Value="#F7F8FA" />
+            <Setter Property="Padding" Value="4,2" />
+        </Style>
+
+        <Style Selector="MenuItem">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+
+        <!-- ═══ TabControl flat ═══ -->
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+            <Style Selector="^:selected">
+                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+            </Style>
+            <Style Selector="^:pointerover">
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            </Style>
+        </Style>
+
+        <!-- ═══ GridSplitter thin ═══ -->
+        <Style Selector="GridSplitter">
+            <Setter Property="Background" Value="{StaticResource BorderSubtle}" />
+        </Style>
+
+        <!-- ═══ TreeView flat ═══ -->
+        <Style Selector="TreeView">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="TreeViewItem">
+            <Setter Property="FontSize" Value="12.5" />
+        </Style>
+
+        <!-- ═══ CheckBox flat ═══ -->
+        <Style Selector="CheckBox">
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <!-- ═══ ScrollViewer ═══ -->
+        <Style Selector="ScrollViewer">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+
     </Application.Styles>
 </Application>
