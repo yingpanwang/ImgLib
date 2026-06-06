@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
+using ImgLib.UI.Services;
 using System.IO;
 using System.Windows.Input;
 
@@ -37,8 +38,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     [ObservableProperty]
     public partial HistogramViewModel HistogramViewModel { get; private set; }
-
-    public ToastViewModel? ToastViewModel { get; set; }
 
     private ImageFile? _previewImageFile;
     private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
@@ -95,6 +94,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         PreviewImageSource = new Bitmap(_previewImageFile.GetSourceStream());
 
+        // 更新图片基础信息面板
+        WatermarkSettingsViewModel.ImageInfo.UpdateFromFile(value!);
+
         // 重用 ImageFile 已创建的 ExifInfo，包裹为 NikonExifInfo（record 拷贝构造器，零 I/O）
         var exifInfo = _previewImageFile.Exif is NikonExifInfo nef
             ? nef
@@ -128,20 +130,29 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         using MemoryStream output = new();
 
-        ImageService.GenerateWithOptions(_previewImageFile.GetSourceStream(), output, WatermarkSettingsViewModel.Settings.ToImageGenerateOption());
+        // 传递预览标志和降采样参数
+        var options = WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
+        options.EnablePreviewDownsampling = WatermarkSettingsViewModel.EnablePreviewDownsampling;
+        options.PreviewMaxDimension = WatermarkSettingsViewModel.PreviewMaxDimension;
+
+        ImageService.GenerateWithOptions(
+            _previewImageFile.GetSourceStream(),
+            output,
+            options,
+            WatermarkSettingsViewModel.ExifInfo,
+            isPreview: true);
 
         output.Seek(0, SeekOrigin.Begin);
-        if (output != null)
+        if (output.Length > 0)
         {
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
+                PreviewImageSource?.Dispose();
                 PreviewImageSource = new Bitmap(output);
                 System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 预览图像已更新");
 
                 // 显示 Toast 通知
-                System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] ToastViewModel = {ToastViewModel != null}");
-                ToastViewModel?.ShowMessage("预览已更新", ToastType.Success);
-                System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] Toast 消息已添加，数量 = {ToastViewModel?.Messages.Count}");
+                ToastService.ShowSuccess("预览已更新");
             });
         }
     }

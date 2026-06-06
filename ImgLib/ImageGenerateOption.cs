@@ -96,6 +96,17 @@ public class ImageGenerateOption
     /// 水印边框宽度
     /// </summary>
     public float WatermarkBorderWidth { get; set; } = 2f;
+
+    // ═══ 预览相关参数 ═══
+    /// <summary>
+    /// 是否启用预览降采样（默认启用）
+    /// </summary>
+    public bool EnablePreviewDownsampling { get; set; } = true;
+
+    /// <summary>
+    /// 预览降采样最大边长（像素），默认 1200
+    /// </summary>
+    public int PreviewMaxDimension { get; set; } = 1200;
 }
 
 public static class ImageGenerateOptionExtensions

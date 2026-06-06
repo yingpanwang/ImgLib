@@ -1,5 +1,6 @@
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
+using ImgLib.UI.Services;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -20,22 +21,14 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
         {
             if (_watermarkDesignViewModel == null)
             {
-                _watermarkDesignViewModel = new()
-                {
-                    ToastViewModel = _toastViewModel
-                };
+                _watermarkDesignViewModel = new();
+                ToastService.Initialize(_toastViewModel); // 初始化全局 Toast 服务
             }
             return _watermarkDesignViewModel;
         }
     }
 
     public ToastViewModel ToastViewModel => _toastViewModel;
-
-    // 触发初始化
-    public MainWindowViewModel() : this(null!)
-    {
-        var _ = WatermarkDesignViewModel; // 触发延迟初始化
-    }
 
     [RelayCommand]
     public async Task OpenRootFolder()

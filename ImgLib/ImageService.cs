@@ -19,14 +19,42 @@ public sealed partial class ImageService
         float shadowSigma = 25f,
         SKColor? shadowColor = null,
         ExifInfo? exifInfo = null,
-        ImageGenerateOption? options = null)
+        ImageGenerateOption? options = null,
+        bool isPreview = false)
     {
         using var original = SKBitmap.Decode(inputStream);
         if (original == null)
             throw new InvalidOperationException("无法解码图像");
 
-        int width = original.Width;
-        int height = original.Height;
+        // 预览降采样处理
+        SKBitmap? workingBitmap = null;
+        bool needDisposeWorking = false;
+
+        if (isPreview && options?.EnablePreviewDownsampling == true)
+        {
+            int maxDimension = Math.Max(original.Width, original.Height);
+            if (maxDimension > options.PreviewMaxDimension)
+            {
+                float downsampleScale = (float)options.PreviewMaxDimension / maxDimension;
+                int resizedWidth = (int)(original.Width * downsampleScale);
+                int resizedHeight = (int)(original.Height * downsampleScale);
+
+                workingBitmap = original.Resize(
+                    new SKImageInfo(resizedWidth, resizedHeight),
+                    new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
+                needDisposeWorking = true;
+            }
+        }
+
+        // 如果 workingBitmap 为空，说明不需要 resize，使用 original
+        if (workingBitmap == null)
+        {
+            workingBitmap = original;
+            needDisposeWorking = false; // original 会自动被 using 释放
+        }
+
+        int width = workingBitmap.Width;
+        int height = workingBitmap.Height;
 
         using var surface = SKSurface.Create(new SKImageInfo(width, height));
         var canvas = surface.Canvas;
@@ -57,7 +85,7 @@ public sealed partial class ImageService
                 ImageFilter = SKImageFilter.CreateBlur(blurSigma, blurSigma),
                 IsAntialias = true
             };
-            canvas.DrawBitmap(original, new SKRect(0, 0, width, height), blurPaint);
+            canvas.DrawBitmap(workingBitmap, new SKRect(0, 0, width, height), blurPaint);
 
             // ---------- 2. 中央图绘制准备 ----------
             // 绘制"路径阴影"——用 MaskFilter 模糊蒙版
@@ -82,7 +110,7 @@ public sealed partial class ImageService
                                  SKClipOperation.Intersect, true);
 
             // 4. 在裁剪后的区域内绘制原图
-            canvas.DrawBitmap(original, destRect);
+            canvas.DrawBitmap(workingBitmap, destRect);
 
             // 5. 恢复画布
             canvas.Restore();
@@ -106,15 +134,33 @@ public sealed partial class ImageService
             SKColor textColor = ParseColor(opts.WatermarkColor);
             SKColor shadowColor = ParseColor(opts.WatermarkShadowColor);
 
-            // 计算字体大小
+            // 计算初始字体大小
             float fontSize = Math.Max(12, height * opts.WatermarkFontSizeRatio);
 
-            // 创建字体和画笔
             using var typeface = SKTypeface.Default;
-            SKFont wFont = new(typeface, fontSize)
+
+            // 先用临时画笔测量文本宽度（不带阴影效果，避免干扰测量）
+            using var measurePaint = new SKPaint { IsAntialias = true };
+            SKFont wFont = new(typeface, fontSize) { Embolden = opts.WatermarkBold };
+            float textWidth = wFont.MeasureText(watermarkText, measurePaint);
+            float textHeight = wFont.Metrics.CapHeight;
+
+            // 自动缩小字体以适应图片宽度（左右各留20px边距）
+            float maxAvailableWidth = width - 40;
+            if (textWidth > maxAvailableWidth && maxAvailableWidth > 0)
             {
-                Embolden = opts.WatermarkBold
-            };
+                float scaleRatio = maxAvailableWidth / textWidth;
+                fontSize *= scaleRatio;
+                fontSize = Math.Max(12, fontSize); // 最小字体12px
+
+                // 使用调整后的字体大小重建字体
+                wFont.Dispose();
+                wFont = new SKFont(typeface, fontSize) { Embolden = opts.WatermarkBold };
+
+                // 重新测量文本尺寸
+                textWidth = wFont.MeasureText(watermarkText, measurePaint);
+                textHeight = wFont.Metrics.CapHeight;
+            }
 
             using var wPaint = new SKPaint
             {
@@ -127,10 +173,6 @@ public sealed partial class ImageService
                     opts.WatermarkShadowSigma,
                     shadowColor)
             };
-
-            // 测量文本尺寸
-            float textWidth = wFont.MeasureText(watermarkText, wPaint);
-            float textHeight = wFont.Metrics.CapHeight;
 
             // 计算水印位置
             float watermarkAreaTop = y + newHeight;
@@ -232,6 +274,12 @@ public sealed partial class ImageService
             canvas.DrawLine(rect.Right - markerSize, rect.Bottom, rect.Right, rect.Bottom, paint);
             canvas.DrawLine(rect.Right, rect.Bottom - markerSize, rect.Right, rect.Bottom, paint);
         }
+
+        // 释放降采样生成的 bitmap（如果需要）
+        if (needDisposeWorking && workingBitmap != null)
+        {
+            workingBitmap.Dispose();
+        }
     }
 
     /// <summary>
@@ -241,7 +289,8 @@ public sealed partial class ImageService
         Stream inputStream,
         Stream outputStream,
         ImageGenerateOption options,
-        ExifInfo? exifInfo = null)
+        ExifInfo? exifInfo = null,
+        bool isPreview = false)
     {
         GenerateWithOptions(
             inputStream,
@@ -254,7 +303,8 @@ public sealed partial class ImageService
             options.ShadowSigma,
             null,
             exifInfo,
-            options
+            options,
+            isPreview
         );
     }
 

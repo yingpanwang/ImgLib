@@ -26,9 +26,21 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool ShowHistogram { get; set; } = false;
 
+    // 图片基础信息
+    [ObservableProperty]
+    public partial ImgFileDescViewModel ImageInfo { get; set; } = new();
+
     // 自动预览开关
     [ObservableProperty]
     public partial bool AutoPreview { get; set; } = false;
+
+    // 启用预览降采样
+    [ObservableProperty]
+    public partial bool EnablePreviewDownsampling { get; set; } = true;
+
+    // 预览降采样最大边长
+    [ObservableProperty]
+    public partial int PreviewMaxDimension { get; set; } = 1200;
 
     // 水印预览文本
     [ObservableProperty]
@@ -128,6 +140,24 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             2 => "Right",
             _ => "Center"
         };
+    }
+
+    partial void OnEnablePreviewDownsamplingChanged(bool value)
+    {
+        // 启用/禁用预览降采样时触发预览
+        if (AutoPreview)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    partial void OnPreviewMaxDimensionChanged(int value)
+    {
+        // 降采样参数变化时触发预览
+        if (AutoPreview)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

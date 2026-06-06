@@ -144,6 +144,21 @@ public class WatermarkSettings : INotifyPropertyChanged
         set { _watermarkBorderWidth = value; OnPropertyChanged(); }
     }
 
+    // ═══ 预览相关参数 ═══
+    private bool _enablePreviewDownsampling = true;
+    public bool EnablePreviewDownsampling
+    {
+        get => _enablePreviewDownsampling;
+        set { _enablePreviewDownsampling = value; OnPropertyChanged(); }
+    }
+
+    private int _previewMaxDimension = 1200;
+    public int PreviewMaxDimension
+    {
+        get => _previewMaxDimension;
+        set { _previewMaxDimension = value; OnPropertyChanged(); }
+    }
+
     /// <summary>
     /// 从 ImageGenerateOption 复制值
     /// </summary>
@@ -168,6 +183,8 @@ public class WatermarkSettings : INotifyPropertyChanged
         ShowWatermarkBorder = option.ShowWatermarkBorder;
         WatermarkBorderColor = option.WatermarkBorderColor;
         WatermarkBorderWidth = option.WatermarkBorderWidth;
+        EnablePreviewDownsampling = option.EnablePreviewDownsampling;
+        PreviewMaxDimension = option.PreviewMaxDimension;
     }
 
     /// <summary>
@@ -194,7 +211,9 @@ public class WatermarkSettings : INotifyPropertyChanged
             WatermarkHorizontalAlignment = WatermarkHorizontalAlignment,
             ShowWatermarkBorder = ShowWatermarkBorder,
             WatermarkBorderColor = WatermarkBorderColor,
-            WatermarkBorderWidth = WatermarkBorderWidth
+            WatermarkBorderWidth = WatermarkBorderWidth,
+            EnablePreviewDownsampling = EnablePreviewDownsampling,
+            PreviewMaxDimension = PreviewMaxDimension
         };
     }
 

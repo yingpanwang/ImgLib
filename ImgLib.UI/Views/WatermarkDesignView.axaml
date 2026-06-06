@@ -13,83 +13,83 @@ d:DesignHeight="850"
 d:DesignWidth="800"
 x:DataType="vm:WatermarkDesignViewModel"
 mc:Ignorable="d">
-			<Grid ColumnDefinitions="8*,3*" RowDefinitions="*">
+				<Grid ColumnDefinitions="8*,3*" RowDefinitions="*">
 
-				<!-- ═══ Image Preview Area ═══ -->
-				<Border
-				Grid.Row="0"
-				Background="#FAFAFA"
-				BorderBrush="{StaticResource BorderSubtle}"
-				BorderThickness="0,0,1,0"
-				Padding="0">
-					<Grid>
-						<paz:ZoomBorder
-						EnablePan="True"
-						PanButton="Left"
-						Name="ZoomBorder"
-						Stretch="None"
-						ZoomSpeed="1.2"
-						ClipToBounds="True"
-						Focusable="True"
-						VerticalAlignment="Stretch"
-						EnableGestureRotation="True"
-						IsHitTestVisible="True"
-						HorizontalAlignment="Stretch">
-							<Image
-							Margin="5,5"
-							DockPanel.Dock="Top"
-							Source="{Binding PreviewImageSource}">
-								<Image.ContextMenu>
-									<ContextMenu>
-										<!-- <MenuItem Header="旋转" >
-										<MenuItem Header="向左旋转" Command="{Binding RotateLeftCommand}"/>
-										<MenuItem Header="向右旋转" Command="{Binding RotateRightCommand}"/>
-										</MenuItem>-->
-										<MenuItem Header="重置">
-											<i:Interaction.Behaviors>
-												<EventTrigger EventName="Click">
-													<CallMethodAction MethodName="ResetMatrix" TargetObject="{Binding #ZoomBorder}"/>
-												</EventTrigger>
-											</i:Interaction.Behaviors>
-										</MenuItem>
-									</ContextMenu>
-								</Image.ContextMenu>
-								<Image.RenderTransform>
-									<RotateTransform Angle="{Binding PreviewAngle}" />
-								</Image.RenderTransform>
-							</Image>
-							<i:Interaction.Behaviors>
-								<li:ResetOnSourceChangedBehavior Source="{Binding PreviewImageSource}"/>
-							</i:Interaction.Behaviors>
-						</paz:ZoomBorder>
+					<!-- ═══ Image Preview Area ═══ -->
+					<Border
+					Grid.Row="0"
+					Background="#FAFAFA"
+					BorderBrush="{StaticResource BorderSubtle}"
+					BorderThickness="0,0,1,0"
+					Padding="0">
+						<Grid>
+							<paz:ZoomBorder
+							EnablePan="True"
+							PanButton="Left"
+							Name="ZoomBorder"
+							Stretch="None"
+							ZoomSpeed="1.2"
+							ClipToBounds="True"
+							Focusable="True"
+							VerticalAlignment="Stretch"
+							EnableGestureRotation="True"
+							IsHitTestVisible="True"
+							HorizontalAlignment="Stretch">
+								<Image
+								Margin="5,5"
+								DockPanel.Dock="Top"
+								Source="{Binding PreviewImageSource}">
+									<Image.ContextMenu>
+										<ContextMenu>
+											<!-- <MenuItem Header="旋转" >
+											<MenuItem Header="向左旋转" Command="{Binding RotateLeftCommand}"/>
+											<MenuItem Header="向右旋转" Command="{Binding RotateRightCommand}"/>
+											</MenuItem>-->
+											<MenuItem Header="重置">
+												<i:Interaction.Behaviors>
+													<EventTrigger EventName="Click">
+														<CallMethodAction MethodName="ResetMatrix" TargetObject="{Binding #ZoomBorder}"/>
+													</EventTrigger>
+												</i:Interaction.Behaviors>
+											</MenuItem>
+										</ContextMenu>
+									</Image.ContextMenu>
+									<Image.RenderTransform>
+										<RotateTransform Angle="{Binding PreviewAngle}" />
+									</Image.RenderTransform>
+								</Image>
+								<i:Interaction.Behaviors>
+									<li:ResetOnSourceChangedBehavior Source="{Binding PreviewImageSource}"/>
+								</i:Interaction.Behaviors>
+							</paz:ZoomBorder>
 
-						<!-- ═══ 悬浮直方图 (右下角) ═══ -->
-						<Border
-						IsVisible="{Binding WatermarkSettingsViewModel.ShowHistogram}"
-						Background="#E6191919"
-						BorderBrush="#40000000"
-						BorderThickness="1"
-						CornerRadius="8"
-						Padding="8"
-						Margin="12,12,12,12"
-						HorizontalAlignment="Right"
-						VerticalAlignment="Bottom"
-						Width="200"
-						Height="140">
-							<v:HistogramView DataContext="{Binding HistogramViewModel}" />
-						</Border>
-					</Grid>
-				</Border>
+							<!-- ═══ 悬浮直方图 (右下角) ═══ -->
+							<Border
+							IsVisible="{Binding WatermarkSettingsViewModel.ShowHistogram}"
+							Background="#E6191919"
+							BorderBrush="#40000000"
+							BorderThickness="1"
+							CornerRadius="8"
+							Padding="8"
+							Margin="12,12,12,12"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Bottom"
+							Width="200"
+							Height="140">
+								<v:HistogramView DataContext="{Binding HistogramViewModel}" />
+							</Border>
+						</Grid>
+					</Border>
 
-				<!-- ═══ Settings Panel ═══ -->
-				<Border
-				Grid.Row="0"
-				Grid.Column="1"
-				Background="{StaticResource PanelBg}"
-				Padding="0">
-					<ScrollViewer>
-						<v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" DockPanel.Dock="Bottom" />
-					</ScrollViewer>
-				</Border>
-			</Grid>
-		</UserControl>
+					<!-- ═══ Settings Panel ═══ -->
+					<Border
+					Grid.Row="0"
+					Grid.Column="1"
+					Background="{StaticResource PanelBg}"
+					Padding="0">
+						<ScrollViewer>
+							<v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" DockPanel.Dock="Bottom" />
+						</ScrollViewer>
+					</Border>
+				</Grid>
+			</UserControl>
