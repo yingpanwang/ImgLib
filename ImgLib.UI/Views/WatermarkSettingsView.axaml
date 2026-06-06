@@ -27,7 +27,7 @@ mc:Ignorable="d">
                         Increment="0.05"
                         Maximum="1"
                         Minimum="0.5"
-                        Value="{Binding ImageGenerateOption.Scale, Mode=TwoWay}" />
+                        Value="{Binding Settings.Scale, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 圆角 -->
@@ -38,7 +38,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Text="{Binding ImageGenerateOption.CornerRadius, Mode=TwoWay}" />
+                        Text="{Binding Settings.CornerRadius, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 虚化Blur值 -->
@@ -49,7 +49,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Text="{Binding ImageGenerateOption.BlurSigma}" />
+                        Text="{Binding Settings.BlurSigma, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 阴影偏移值 X -->
@@ -60,7 +60,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Text="{Binding ImageGenerateOption.ShadowOffsetX}" />
+                        Text="{Binding Settings.ShadowOffsetX, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 阴影偏移值 Y -->
@@ -71,7 +71,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <TextBox
-                        Text="{Binding ImageGenerateOption.ShadowOffsetY}" />
+                        Text="{Binding Settings.ShadowOffsetY, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 显示直方图 -->
@@ -83,6 +83,22 @@ mc:Ignorable="d">
                         Foreground="{StaticResource TextPrimary}"
                         VerticalAlignment="Center" />
                     </StackPanel>
+
+                    <!-- 自动预览 -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <CheckBox IsChecked="{Binding AutoPreview, Mode=TwoWay}" />
+                        <TextBlock
+                        Text="自动预览"
+                        FontSize="12.5"
+                        Foreground="{StaticResource TextPrimary}"
+                        VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- 预览更改按钮 -->
+                    <Button
+                    Classes="primary"
+                    Command="{Binding PreviewCommand}"
+                    Content="预览更改" />
 
                 </StackPanel>
             </ScrollViewer>
@@ -106,7 +122,7 @@ mc:Ignorable="d">
                         Foreground="{StaticResource TextTertiary}"
                         Margin="0,0,0,4" />
                         <TextBox
-                        Text="{Binding ImageGenerateOption.WatermarkTemplate, Mode=TwoWay}"
+                        Text="{Binding Settings.WatermarkTemplate, Mode=TwoWay}"
                         AcceptsReturn="True"
                         MinHeight="80"
                         VerticalContentAlignment="Top" />
@@ -140,12 +156,12 @@ mc:Ignorable="d">
                         Maximum="0.1"
                         Minimum="0.01"
                         FormatString="F3"
-                        Value="{Binding ImageGenerateOption.WatermarkFontSizeRatio, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkFontSizeRatio, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 字体加粗 -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding ImageGenerateOption.WatermarkBold, Mode=TwoWay}" />
+                        <CheckBox IsChecked="{Binding Settings.WatermarkBold, Mode=TwoWay}" />
                         <TextBlock
                         Text="字体加粗"
                         FontSize="12.5"
@@ -179,7 +195,7 @@ mc:Ignorable="d">
                         Maximum="1"
                         Minimum="0"
                         FormatString="F1"
-                        Value="{Binding ImageGenerateOption.WatermarkVerticalPosition, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkVerticalPosition, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 文字颜色 -->
@@ -190,7 +206,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding ImageGenerateOption.WatermarkColor, Mode=TwoWay}" MinWidth="80"/>
+                            <TextBox Text="{Binding Settings.WatermarkColor, Mode=TwoWay}" MinWidth="80"/>
                             <Border Width="24" Height="24" Background="{Binding WatermarkColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                         </StackPanel>
                     </StackPanel>
@@ -215,7 +231,7 @@ mc:Ignorable="d">
                         Increment="1"
                         Maximum="20"
                         Minimum="-20"
-                        Value="{Binding ImageGenerateOption.WatermarkShadowOffsetX, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 阴影偏移 Y -->
@@ -229,7 +245,7 @@ mc:Ignorable="d">
                         Increment="1"
                         Maximum="20"
                         Minimum="-20"
-                        Value="{Binding ImageGenerateOption.WatermarkShadowOffsetY, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 阴影模糊半径 -->
@@ -243,7 +259,7 @@ mc:Ignorable="d">
                         Increment="1"
                         Maximum="20"
                         Minimum="0"
-                        Value="{Binding ImageGenerateOption.WatermarkShadowSigma, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
                     </StackPanel>
 
                     <!-- 阴影颜色 -->
@@ -254,7 +270,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding ImageGenerateOption.WatermarkShadowColor, Mode=TwoWay}" MinWidth="80"/>
+                            <TextBox Text="{Binding Settings.WatermarkShadowColor, Mode=TwoWay}" MinWidth="80"/>
                             <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                         </StackPanel>
                     </StackPanel>
@@ -270,7 +286,7 @@ mc:Ignorable="d">
 
                     <!-- 显示水印边框 -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding ImageGenerateOption.ShowWatermarkBorder, Mode=TwoWay}" />
+                        <CheckBox IsChecked="{Binding Settings.ShowWatermarkBorder, Mode=TwoWay}" />
                         <TextBlock
                         Text="显示水印边框"
                         FontSize="12.5"
@@ -286,7 +302,7 @@ mc:Ignorable="d">
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding ImageGenerateOption.WatermarkBorderColor, Mode=TwoWay}" MinWidth="80"/>
+                            <TextBox Text="{Binding Settings.WatermarkBorderColor, Mode=TwoWay}" MinWidth="80"/>
                             <Border Width="24" Height="24" Background="{Binding WatermarkBorderColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                         </StackPanel>
                     </StackPanel>
@@ -302,7 +318,7 @@ mc:Ignorable="d">
                         Increment="1"
                         Maximum="10"
                         Minimum="1"
-                        Value="{Binding ImageGenerateOption.WatermarkBorderWidth, Mode=TwoWay}" />
+                        Value="{Binding Settings.WatermarkBorderWidth, Mode=TwoWay}" />
                     </StackPanel>
 
                 </StackPanel>

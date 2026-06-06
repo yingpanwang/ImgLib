@@ -172,5 +172,13 @@
             <Setter Property="Background" Value="Transparent" />
         </Style>
 
+        <!-- ═══ Toast Styles ═══ -->
+        <Style Selector="Border.toast">
+        </Style>
+
+        <Style Selector="Button.toast-close:pointerover">
+            <Setter Property="Background" Value="{StaticResource HoverBg}" />
+        </Style>
+
     </Application.Styles>
 </Application>

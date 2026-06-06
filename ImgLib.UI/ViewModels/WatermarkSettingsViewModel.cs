@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib;
 using ImgLib.Models;
+using ImgLib.UI.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -13,7 +14,7 @@ namespace ImgLib.UI.ViewModels;
 public partial class WatermarkSettingsViewModel : ViewModelBase
 {
     [ObservableProperty]
-    public partial ImageGenerateOption ImageGenerateOption { get; private set; }
+    public partial WatermarkSettings Settings { get; private set; }
 
     [ObservableProperty]
     public partial ObservableCollection<ExifInfoNode> ExifInfoTree { get; private set; } = new();
@@ -24,6 +25,10 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     // 控制是否显示直方图
     [ObservableProperty]
     public partial bool ShowHistogram { get; set; } = false;
+
+    // 自动预览开关
+    [ObservableProperty]
+    public partial bool AutoPreview { get; set; } = false;
 
     // 水印预览文本
     [ObservableProperty]
@@ -45,13 +50,47 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial int HorizontalAlignIndex { get; set; } = 1;
 
+    // 预览命令（由外部注入）
+    public ICommand? PreviewCommand { get; set; }
+
+    // 预览触发事件（用于自动预览）
+    public event EventHandler? PreviewRequested;
+
+    private WatermarkSettings? _currentSettings;
+
     public WatermarkSettingsViewModel(ImageGenerateOption? option = null, ExifInfo? exifInfo = null)
     {
-        ImageGenerateOption = option ?? new ImageGenerateOption(0.89f);
+        Settings = new WatermarkSettings();
+
+        if (option != null)
+        {
+            Settings.FromImageGenerateOption(option);
+        }
+
         ExifInfo = exifInfo;
 
         UpdatePreviewText();
         UpdateColorBrushes();
+
+        // 监听 Settings 属性变化
+        _currentSettings = Settings;
+        _currentSettings.PropertyChanged += OnSettingsPropertyChanged;
+    }
+
+    partial void OnSettingsChanged(WatermarkSettings oldValue, WatermarkSettings newValue)
+    {
+        // 移除旧对象的监听
+        if (_currentSettings != null)
+        {
+            _currentSettings.PropertyChanged -= OnSettingsPropertyChanged;
+        }
+
+        // 监听新对象
+        if (newValue != null)
+        {
+            _currentSettings = newValue;
+            newValue.PropertyChanged += OnSettingsPropertyChanged;
+        }
     }
 
     public ICommand GetExifInfoCommand => new RelayCommand(
@@ -80,15 +119,9 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         UpdatePreviewText();
     }
 
-    partial void OnImageGenerateOptionChanged(ImageGenerateOption value)
-    {
-        UpdatePreviewText();
-        UpdateColorBrushes();
-    }
-
     partial void OnHorizontalAlignIndexChanged(int value)
     {
-        ImageGenerateOption.WatermarkHorizontalAlignment = value switch
+        Settings.WatermarkHorizontalAlignment = value switch
         {
             0 => "Left",
             1 => "Center",
@@ -97,16 +130,32 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         };
     }
 
+    private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        // 更新预览文本和颜色画笔
+        UpdatePreviewText();
+        UpdateColorBrushes();
+
+        // 自动预览
+        System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 属性变化: {e.PropertyName}, AutoPreview={AutoPreview}");
+        if (AutoPreview)
+        {
+            System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 触发 PreviewRequested 事件");
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
     private void UpdatePreviewText()
     {
-        PreviewWatermarkText = ImageGenerateOption.ParseWatermarkTemplate(ExifInfo);
+        var option = Settings.ToImageGenerateOption();
+        PreviewWatermarkText = option.ParseWatermarkTemplate(ExifInfo);
     }
 
     private void UpdateColorBrushes()
     {
-        WatermarkColorBrush = ParseColorBrush(ImageGenerateOption.WatermarkColor);
-        WatermarkShadowColorBrush = ParseColorBrush(ImageGenerateOption.WatermarkShadowColor);
-        WatermarkBorderColorBrush = ParseColorBrush(ImageGenerateOption.WatermarkBorderColor);
+        WatermarkColorBrush = ParseColorBrush(Settings.WatermarkColor);
+        WatermarkShadowColorBrush = ParseColorBrush(Settings.WatermarkShadowColor);
+        WatermarkBorderColorBrush = ParseColorBrush(Settings.WatermarkBorderColor);
     }
 
     private static IBrush? ParseColorBrush(string colorHex)

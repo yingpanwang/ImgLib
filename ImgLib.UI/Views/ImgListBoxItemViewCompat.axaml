@@ -4,79 +4,79 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodels="using:ImgLib.UI.ViewModels"
              xmlns:vmd="using:ImgLib.UI.ViewModels.Design"
-			 mc:Ignorable="d" 
-			 d:DesignWidth="400" 
-			 d:DesignHeight="250"
+				 mc:Ignorable="d"
+				 d:DesignWidth="400"
+				 d:DesignHeight="250"
              x:Class="ImgLib.UI.ImgListBoxItemViewCompat"
              x:DataType="viewmodels:ImgListItemViewModel">
  <Design.DataContext>
-	 		<vmd:Design_ImgListBoxItemViewCompatViewModel/>
+		 		<vmd:Design_ImgListBoxItemViewCompatViewModel/>
  </Design.DataContext>
-			 <!-- Card: subtle border + white bg for visibility, ListBoxItem handles hover/selected -->
-			 <Border
-				Padding="10,10"
-				MinWidth="340"
-				Background="Transparent"
-				BorderBrush="{StaticResource BorderSubtle}"
-				BorderThickness="1"
-				CornerRadius="8">
-					<Grid ColumnDefinitions="110,*" ColumnSpacing="14">
+				 <!-- Card: subtle border + white bg for visibility, ListBoxItem handles hover/selected -->
+				 <Border
+					Padding="10,10,24,10"
+					MinWidth="380"
+					Background="Transparent"
+					BorderBrush="{StaticResource BorderSubtle}"
+					BorderThickness="1"
+					CornerRadius="8">
+						<Grid ColumnDefinitions="100,*" ColumnSpacing="10">
 
-						<!-- 缩略图 -->
-						<Border
-						Width="110"
-						Height="82"
-						CornerRadius="6"
-						ClipToBounds="True"
-						Background="{StaticResource ThumbPlaceholderBg}">
+							<!-- 缩略图 -->
+							<Border
+							Width="100"
+							Height="82"
+							CornerRadius="6"
+							ClipToBounds="True"
+							Background="{StaticResource ThumbPlaceholderBg}">
 
-							<Image
-							Stretch="UniformToFill"
-							Source="{Binding ImageSource^}" />
-						</Border>
+								<Image
+								Stretch="UniformToFill"
+								Source="{Binding ImageSource^}" />
+							</Border>
 
-						<!-- 信息区 -->
-						<StackPanel
-						Grid.Column="1"
-						VerticalAlignment="Center"
-						Spacing="5">
+							<!-- 信息区 -->
+							<StackPanel
+							Grid.Column="1"
+							VerticalAlignment="Center"
+							Spacing="5">
 
-							<!-- 文件名 -->
-							<TextBlock
-							FontSize="13"
-							FontWeight="SemiBold"
-							Foreground="{StaticResource TextPrimary}"
-							Text="{Binding FileName}"
-							TextTrimming="CharacterEllipsis"
-							MaxLines="1" />
-
-							<!-- 类型 -->
-							<StackPanel Orientation="Horizontal" Spacing="6">
+								<!-- 文件名 -->
 								<TextBlock
-								FontSize="11.5"
-								Foreground="{StaticResource TextSecondary}"
-								Text="类型" />
-								<TextBlock
-								FontSize="11.5"
+								FontSize="13"
+								FontWeight="SemiBold"
 								Foreground="{StaticResource TextPrimary}"
-								Text="{Binding FileExtension}"
-								TextTrimming="CharacterEllipsis" />
-							</StackPanel>
+								Text="{Binding FileName}"
+								TextTrimming="CharacterEllipsis"
+								MaxLines="2" />
 
-							<!-- 日期 -->
-							<StackPanel Orientation="Horizontal" Spacing="6">
-								<TextBlock
-								FontSize="11.5"
-								Foreground="{StaticResource TextSecondary}"
-								Text="日期" />
-								<TextBlock
-								FontSize="11.5"
-								Foreground="{StaticResource TextPrimary}"
-								Text="{Binding FileCreationTime}"
-								TextTrimming="CharacterEllipsis" />
-							</StackPanel>
+								<!-- 类型 -->
+								<StackPanel Orientation="Horizontal" Spacing="6">
+									<TextBlock
+									FontSize="11.5"
+									Foreground="{StaticResource TextSecondary}"
+									Text="类型" />
+									<TextBlock
+									FontSize="11.5"
+									Foreground="{StaticResource TextPrimary}"
+									Text="{Binding FileExtension}"
+									TextTrimming="CharacterEllipsis" />
+								</StackPanel>
 
-						</StackPanel>
-					</Grid>
-				</Border>
+								<!-- 日期 -->
+								<StackPanel Orientation="Horizontal" Spacing="6">
+									<TextBlock
+									FontSize="11.5"
+									Foreground="{StaticResource TextSecondary}"
+									Text="日期" />
+									<TextBlock
+									FontSize="11.5"
+									Foreground="{StaticResource TextPrimary}"
+									Text="{Binding FileCreationTime}"
+									TextTrimming="CharacterEllipsis" />
+								</StackPanel>
+
+							</StackPanel>
+						</Grid>
+					</Border>
 </UserControl>

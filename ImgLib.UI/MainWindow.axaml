@@ -5,15 +5,21 @@ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 xmlns:v="using:ImgLib.UI"
+xmlns:vViews="using:ImgLib.UI.Views"
 xmlns:vm="using:ImgLib.UI.ViewModels"
 Title="ImgLib"
 d:DesignHeight="650"
 d:DesignWidth="800"
 x:DataType="vm:MainWindowViewModel"
 mc:Ignorable="d">
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
         <!-- Menu Bar -->
-        <Border DockPanel.Dock="Top"
+        <Border Grid.Row="0"
                 Background="{StaticResource SidebarBg}"
                 BorderBrush="{StaticResource BorderSubtle}"
                 BorderThickness="0,0,0,1"
@@ -21,14 +27,16 @@ mc:Ignorable="d">
             <Menu>
                 <MenuItem Header="菜单">
                     <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
+                    <Separator />
+                    <MenuItem Command="{Binding TestToastCommand}" Header="测试 Toast" />
                 </MenuItem>
             </Menu>
         </Border>
 
         <!-- Main Content -->
-        <Grid>
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="350"></ColumnDefinition>
+                <ColumnDefinition Width="2*" MinWidth="400"></ColumnDefinition>
                 <ColumnDefinition Width="1"></ColumnDefinition>
                 <ColumnDefinition Width="6*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
@@ -40,7 +48,7 @@ mc:Ignorable="d">
             </Border>
 
             <!-- Splitter -->
-            <GridSplitter Grid.Column="1" />
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" />
 
             <!-- Right: Design Area -->
             <DockPanel Grid.Column="2"
@@ -48,5 +56,15 @@ mc:Ignorable="d">
                 <v:WatermarkDesignView DataContext="{Binding WatermarkDesignViewModel}" />
             </DockPanel>
         </Grid>
-    </DockPanel>
+
+        <!-- Toast Notifications Container (Right Bottom Corner - Floating) -->
+        <Border Grid.Row="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Margin="16"
+                Background="Transparent"
+                IsHitTestVisible="False">
+            <vViews:ToastView DataContext="{Binding ToastViewModel}" IsHitTestVisible="True" />
+        </Border>
+    </Grid>
 </Window>

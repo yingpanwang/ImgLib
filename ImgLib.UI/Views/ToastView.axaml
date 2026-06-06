@@ -1,0 +1,87 @@
+<UserControl
+    x:Class="ImgLib.UI.Views.ToastView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    x:DataType="vm:ToastViewModel">
+
+    <ItemsControl ItemsSource="{Binding Messages}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <StackPanel Orientation="Vertical" Spacing="8" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="vm:ToastMessage">
+                <Border
+                    Background="{StaticResource SidebarBg}"
+                    BorderBrush="{StaticResource BorderSubtle}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="12,8,12,12"
+                    MinWidth="280"
+                    MaxWidth="400"
+                    Classes="toast"
+                    Opacity="{Binding Opacity}">
+                    <Border.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.3" />
+                        </Transitions>
+                    </Border.Transitions>
+                    <DockPanel>
+                        <!-- Close Button -->
+                        <Button
+                            DockPanel.Dock="Right"
+                            Click="OnCloseButtonClick"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="4"
+                            Height="24"
+                            Width="24"
+                            Padding="0"
+                            Margin="4,-4,-4,-4"
+                            Cursor="Hand"
+                            Classes="toast-close">
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource TextSecondary}"
+                                Text="✕"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center" />
+                        </Button>
+
+                        <!-- Content -->
+                        <DockPanel>
+                            <!-- Icon -->
+                            <Border
+                                DockPanel.Dock="Left"
+                                Background="{Binding TypeColor}"
+                                CornerRadius="4"
+                                Height="28"
+                                Width="28"
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center">
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="White"
+                                    Text="{Binding Icon}"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    FontWeight="SemiBold" />
+                            </Border>
+
+                            <!-- Message -->
+                            <TextBlock
+                                Text="{Binding Message}"
+                                TextWrapping="Wrap"
+                                Foreground="{StaticResource TextPrimary}"
+                                FontSize="13"
+                                VerticalAlignment="Center"
+                                MaxLines="3" />
+                        </DockPanel>
+                    </DockPanel>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

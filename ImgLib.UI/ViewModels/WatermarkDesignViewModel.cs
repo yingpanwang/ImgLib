@@ -33,12 +33,58 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     public partial bool IsLoading { get; set; }
 
     [ObservableProperty]
-    public partial WatermarkSettingsViewModel WatermarkSettingsViewModel { get; private set; } = new();
+    public partial WatermarkSettingsViewModel WatermarkSettingsViewModel { get; private set; }
 
     [ObservableProperty]
-    public partial HistogramViewModel HistogramViewModel { get; private set; } = new();
+    public partial HistogramViewModel HistogramViewModel { get; private set; }
+
+    public ToastViewModel? ToastViewModel { get; set; }
 
     private ImageFile? _previewImageFile;
+    private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
+
+    public WatermarkDesignViewModel()
+    {
+        WatermarkSettingsViewModel = new();
+        HistogramViewModel = new();
+    }
+
+    partial void OnWatermarkSettingsViewModelChanged(WatermarkSettingsViewModel value)
+    {
+        // 注入预览命令
+        value.PreviewCommand = SetBackgroundCommand;
+        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 注入 PreviewCommand: {SetBackgroundCommand != null}, CanExecute: {SetBackgroundCommand?.CanExecute(null)}");
+
+        // 监听自动预览事件
+        value.PreviewRequested += OnPreviewRequested;
+    }
+
+    private void OnPreviewRequested(object? sender, EventArgs e)
+    {
+        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 收到 PreviewRequested 事件");
+
+        // 取消之前的预览任务
+        _previewCancellationTokenSource?.Cancel();
+        _previewCancellationTokenSource = new System.Threading.CancellationTokenSource();
+
+        // 延迟触发预览（防抖）
+        Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(300, _previewCancellationTokenSource.Token);
+                if (!_previewCancellationTokenSource.Token.IsCancellationRequested)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 执行 SetBackground");
+                    await SetBackground();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // 预览被取消，忽略
+            }
+        }, _previewCancellationTokenSource.Token);
+    }
 
     partial void OnPreviewFilePathChanged(string? value)
     {
@@ -66,15 +112,23 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [RelayCommand]
     public async Task SetBackground()
     {
+        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 开始: PreviewImageSource={PreviewImageSource != null}, PreviewFilePath={PreviewFilePath}");
+
         if (PreviewImageSource == null || string.IsNullOrWhiteSpace(PreviewFilePath))
+        {
+            System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 提前返回: 预览条件不满足");
             return;
+        }
 
         if (_previewImageFile == null)
+        {
+            System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 提前返回: _previewImageFile 为空");
             return;
+        }
 
         using MemoryStream output = new();
 
-        ImageService.GenerateWithOptions(_previewImageFile.GetSourceStream(), output, WatermarkSettingsViewModel.ImageGenerateOption);
+        ImageService.GenerateWithOptions(_previewImageFile.GetSourceStream(), output, WatermarkSettingsViewModel.Settings.ToImageGenerateOption());
 
         output.Seek(0, SeekOrigin.Begin);
         if (output != null)
@@ -82,6 +136,12 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 PreviewImageSource = new Bitmap(output);
+                System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 预览图像已更新");
+
+                // 显示 Toast 通知
+                System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] ToastViewModel = {ToastViewModel != null}");
+                ToastViewModel?.ShowMessage("预览已更新", ToastType.Success);
+                System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] Toast 消息已添加，数量 = {ToastViewModel?.Messages.Count}");
             });
         }
     }
