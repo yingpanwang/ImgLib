@@ -16,7 +16,7 @@
 			 <Border
 				Padding="10,10"
 				MinWidth="340"
-				Background="White"
+				Background="Transparent"
 				BorderBrush="{StaticResource BorderSubtle}"
 				BorderThickness="1"
 				CornerRadius="8">

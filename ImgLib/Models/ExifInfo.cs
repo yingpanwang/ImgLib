@@ -136,6 +136,18 @@ public partial record class ExifInfo
             );
     }
 
+    /// <summary>
+    /// 在后台线程上强制加载元数据，避免后续属性访问阻塞 UI。
+    /// 多次调用是安全的（已加载则立即返回）。
+    /// </summary>
+    public async ValueTask EnsureMetadataLoadedAsync()
+    {
+        if (Metadata.IsValueCreated)
+            return;
+
+        await Task.Run(() => _ = Metadata.Value).ConfigureAwait(false);
+    }
+
     public virtual string ToJson()
     {
         return JsonSerializer.Serialize(this);

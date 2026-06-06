@@ -22,45 +22,150 @@ mc:Ignorable="d">
 		BorderBrush="{StaticResource BorderSubtle}"
 		BorderThickness="0,0,1,0"
 		Padding="0">
-			<paz:ZoomBorder
-			EnablePan="True"
-			PanButton="Left"
-			Name="ZoomBorder"
-			Stretch="None"
-			ZoomSpeed="1.2"
-			ClipToBounds="True"
-			Focusable="True"
-			VerticalAlignment="Stretch"
-			EnableGestureRotation="True"
-			IsHitTestVisible="True"
-			HorizontalAlignment="Stretch">
-				<Image
-				Margin="5,5"
-				DockPanel.Dock="Top"
-				Source="{Binding PreviewImageSource}">
-					<Image.ContextMenu>
-						<ContextMenu>
-							<!-- <MenuItem Header="旋转" >
-							<MenuItem Header="向左旋转" Command="{Binding RotateLeftCommand}"/>
-							<MenuItem Header="向右旋转" Command="{Binding RotateRightCommand}"/>
-							</MenuItem>-->
-							<MenuItem Header="重置">
-								<i:Interaction.Behaviors>
-									<EventTrigger EventName="Click">
-										<CallMethodAction MethodName="ResetMatrix" TargetObject="{Binding #ZoomBorder}"/>
-									</EventTrigger>
-								</i:Interaction.Behaviors>
-							</MenuItem>
-						</ContextMenu>
-					</Image.ContextMenu>
-					<Image.RenderTransform>
-						<RotateTransform Angle="{Binding PreviewAngle}" />
-					</Image.RenderTransform>
-				</Image>
-				<i:Interaction.Behaviors>
-					<li:ResetOnSourceChangedBehavior Source="{Binding PreviewImageSource}"/>
-				</i:Interaction.Behaviors>
-			</paz:ZoomBorder>
+			<Grid>
+				<paz:ZoomBorder
+				EnablePan="True"
+				PanButton="Left"
+				Name="ZoomBorder"
+				Stretch="None"
+				ZoomSpeed="1.2"
+				ClipToBounds="True"
+				Focusable="True"
+				VerticalAlignment="Stretch"
+				EnableGestureRotation="True"
+				IsHitTestVisible="True"
+				HorizontalAlignment="Stretch">
+					<Image
+					Margin="5,5"
+					DockPanel.Dock="Top"
+					Source="{Binding PreviewImageSource}">
+						<Image.ContextMenu>
+							<ContextMenu>
+								<!-- <MenuItem Header="旋转" >
+								<MenuItem Header="向左旋转" Command="{Binding RotateLeftCommand}"/>
+								<MenuItem Header="向右旋转" Command="{Binding RotateRightCommand}"/>
+								</MenuItem>-->
+								<MenuItem Header="重置">
+									<i:Interaction.Behaviors>
+										<EventTrigger EventName="Click">
+											<CallMethodAction MethodName="ResetMatrix" TargetObject="{Binding #ZoomBorder}"/>
+										</EventTrigger>
+									</i:Interaction.Behaviors>
+								</MenuItem>
+							</ContextMenu>
+						</Image.ContextMenu>
+						<Image.RenderTransform>
+							<RotateTransform Angle="{Binding PreviewAngle}" />
+						</Image.RenderTransform>
+					</Image>
+					<i:Interaction.Behaviors>
+						<li:ResetOnSourceChangedBehavior Source="{Binding PreviewImageSource}"/>
+					</i:Interaction.Behaviors>
+				</paz:ZoomBorder>
+
+				<!-- ═══ 悬浮直方图 (右下角) ═══ -->
+				<Border
+				IsVisible="{Binding WatermarkSettingsViewModel.ShowHistogram}"
+				Background="#E6191919"
+				BorderBrush="#40000000"
+				BorderThickness="1"
+				CornerRadius="8"
+				Padding="8"
+				Margin="12,12,12,12"
+				HorizontalAlignment="Right"
+				VerticalAlignment="Bottom"
+				Width="200"
+				Height="140">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+
+						<!-- 图例 (紧贴直方图) -->
+						<StackPanel Orientation="Horizontal" Spacing="8" Grid.Row="0" Margin="0,0,0,4">
+							<StackPanel Orientation="Horizontal" Spacing="3">
+								<Border Width="12" Height="12" Background="#FF5252" CornerRadius="2"/>
+								<TextBlock Text="R" FontSize="9" FontWeight="SemiBold" Foreground="#FF5252" VerticalAlignment="Center"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="3">
+								<Border Width="12" Height="12" Background="#69F0AE" CornerRadius="2"/>
+								<TextBlock Text="G" FontSize="9" FontWeight="SemiBold" Foreground="#69F0AE" VerticalAlignment="Center"/>
+							</StackPanel>
+							<StackPanel Orientation="Horizontal" Spacing="3">
+								<Border Width="12" Height="12" Background="#448AFF" CornerRadius="2"/>
+								<TextBlock Text="B" FontSize="9" FontWeight="SemiBold" Foreground="#448AFF" VerticalAlignment="Center"/>
+							</StackPanel>
+						</StackPanel>
+
+						<!-- 直方图绘制区域 -->
+						<Border Grid.Row="1" ClipToBounds="True">
+							<Grid>
+								<!-- 加载指示器 -->
+								<Border
+								IsVisible="{Binding WatermarkSettingsViewModel.IsHistogramLoading}"
+								Background="#40000000"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch">
+									<StackPanel
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									Spacing="4">
+										<TextBlock
+										Text="加载中..."
+										FontSize="10"
+										Foreground="#FFFFFF"
+										HorizontalAlignment="Center"/>
+										<Border
+										Width="16"
+										Height="16"
+										CornerRadius="2">
+											<Border.Background>
+												<SolidColorBrush Color="#FFFFFF">
+													<SolidColorBrush.Transform>
+														<RotateTransform Angle="45"/>
+													</SolidColorBrush.Transform>
+												</SolidColorBrush>
+											</Border.Background>
+										</Border>
+									</StackPanel>
+								</Border>
+
+								<!-- B 通道直方图 (放在底层) -->
+								<Path
+								Data="{Binding WatermarkSettingsViewModel.HistogramBPath}"
+								Fill="#100080FF"
+								Stroke="#448AFF"
+								StrokeThickness="1"
+								Opacity="0.6"
+								Stretch="Fill"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch"/>
+								<!-- G 通道直方图 -->
+								<Path
+								Data="{Binding WatermarkSettingsViewModel.HistogramGPath}"
+								Fill="#1069F0AE"
+								Stroke="#69F0AE"
+								StrokeThickness="1"
+								Opacity="0.6"
+								Stretch="Fill"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch"/>
+								<!-- R 通道直方图 (放在顶层) -->
+								<Path
+								Data="{Binding WatermarkSettingsViewModel.HistogramRPath}"
+								Fill="#10FF5252"
+								Stroke="#FF5252"
+								StrokeThickness="1"
+								Opacity="0.6"
+								Stretch="Fill"
+								HorizontalAlignment="Stretch"
+								VerticalAlignment="Stretch"/>
+							</Grid>
+						</Border>
+					</Grid>
+				</Border>
+			</Grid>
 		</Border>
 
 		<!-- ═══ Settings Panel ═══ -->

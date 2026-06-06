@@ -44,18 +44,20 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         _previewImageFile = ImageFile.GetImageFile(value!);
 
-        PreviewImageSource = new Bitmap
-            (
-            _previewImageFile.GetSourceStream()
-//@"C:\Users\Administrator\Desktop\后期临时\DSC_337020240714000102.JPG"
-//@"C:\Users\Administrator\Desktop\后期临时\DSC_1901.JPG"
-);
+        PreviewImageSource = new Bitmap(_previewImageFile.GetSourceStream());
 
-        Task.Factory.StartNew(() =>
-        {
-            NikonExifInfo exifInfo = new NikonExifInfo(_previewImageFile.Path);
-            WatermarkSettingsViewModel.ExifInfo = exifInfo;
-        }, TaskCreationOptions.LongRunning);
+        // 重用 ImageFile 已创建的 ExifInfo，包裹为 NikonExifInfo（record 拷贝构造器，零 I/O）
+        var exifInfo = _previewImageFile.Exif is NikonExifInfo nef
+            ? nef
+            : new NikonExifInfo(_previewImageFile.Exif!);
+
+        WatermarkSettingsViewModel.ExifInfo = exifInfo;
+
+        // 将图片路径传递给 ViewModel 以计算直方图
+        WatermarkSettingsViewModel.ImageFilePath = value;
+
+        // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
+        _ = exifInfo.EnsureMetadataLoadedAsync();
     }
 
     [RelayCommand]
