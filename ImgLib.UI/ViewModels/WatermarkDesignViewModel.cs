@@ -35,6 +35,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [ObservableProperty]
     public partial WatermarkSettingsViewModel WatermarkSettingsViewModel { get; private set; } = new();
 
+    [ObservableProperty]
+    public partial HistogramViewModel HistogramViewModel { get; private set; } = new();
+
     private ImageFile? _previewImageFile;
 
     partial void OnPreviewFilePathChanged(string? value)
@@ -53,8 +56,8 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         WatermarkSettingsViewModel.ExifInfo = exifInfo;
 
-        // 将图片路径传递给 ViewModel 以计算直方图
-        WatermarkSettingsViewModel.ImageFilePath = value;
+        // 将图片路径传递给直方图 ViewModel 以计算直方图
+        HistogramViewModel.ImageFilePath = value;
 
         // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
         _ = exifInfo.EnsureMetadataLoadedAsync();
