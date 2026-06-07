@@ -50,6 +50,118 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial float PreviewMaxPercent { get; set; } = 50f;
 
+    // ═══ 圆角预设 ═══
+    private static readonly float[] CornerRadiusPresets = { 0, 15, 45, 80, 120 };
+
+    [ObservableProperty]
+    public partial int CornerRadiusPresetIndex { get; set; } = 2;
+
+    [ObservableProperty]
+    public partial bool IsCornerRadiusCustom { get; set; }
+
+    partial void OnCornerRadiusPresetIndexChanged(int value)
+    {
+        if (value >= 0 && value < CornerRadiusPresets.Length)
+        {
+            IsCornerRadiusCustom = false;
+            Settings.CornerRadius = CornerRadiusPresets[value];
+        }
+        else
+        {
+            IsCornerRadiusCustom = true;
+        }
+    }
+
+    // ═══ 虚化预设 ═══
+    private static readonly float[] BlurSigmaPresets = { 0, 10, 25, 50, 80 };
+
+    [ObservableProperty]
+    public partial int BlurSigmaPresetIndex { get; set; } = 2;
+
+    [ObservableProperty]
+    public partial bool IsBlurSigmaCustom { get; set; }
+
+    partial void OnBlurSigmaPresetIndexChanged(int value)
+    {
+        if (value >= 0 && value < BlurSigmaPresets.Length)
+        {
+            IsBlurSigmaCustom = false;
+            Settings.BlurSigma = BlurSigmaPresets[value];
+        }
+        else
+        {
+            IsBlurSigmaCustom = true;
+        }
+    }
+
+    // ═══ 阴影偏移预设 ═══
+    private static readonly (float X, float Y)[] ShadowOffsetPresets =
+        { (0, 0), (20, 20), (50, 50), (80, 80) };
+
+    [ObservableProperty]
+    public partial int ShadowOffsetPresetIndex { get; set; } = 2;
+
+    [ObservableProperty]
+    public partial bool IsShadowOffsetCustom { get; set; }
+
+    partial void OnShadowOffsetPresetIndexChanged(int value)
+    {
+        if (value >= 0 && value < ShadowOffsetPresets.Length)
+        {
+            IsShadowOffsetCustom = false;
+            (Settings.ShadowOffsetX, Settings.ShadowOffsetY) = ShadowOffsetPresets[value];
+        }
+        else
+        {
+            IsShadowOffsetCustom = true;
+        }
+    }
+
+    // ═══ 文字阴影偏移预设 ═══
+    private static readonly (float X, float Y)[] TextShadowOffsetPresets =
+        { (0, 0), (1, 1), (2, 2), (4, 4), (8, 8) };
+
+    [ObservableProperty]
+    public partial int TextShadowOffsetPresetIndex { get; set; } = 2;
+
+    [ObservableProperty]
+    public partial bool IsTextShadowOffsetCustom { get; set; }
+
+    partial void OnTextShadowOffsetPresetIndexChanged(int value)
+    {
+        if (value >= 0 && value < TextShadowOffsetPresets.Length)
+        {
+            IsTextShadowOffsetCustom = false;
+            (Settings.WatermarkShadowOffsetX, Settings.WatermarkShadowOffsetY) = TextShadowOffsetPresets[value];
+        }
+        else
+        {
+            IsTextShadowOffsetCustom = true;
+        }
+    }
+
+    // ═══ 文字阴影模糊预设 ═══
+    private static readonly float[] TextShadowSigmaPresets = { 0, 2, 5, 10, 15 };
+
+    [ObservableProperty]
+    public partial int TextShadowSigmaPresetIndex { get; set; } = 2;
+
+    [ObservableProperty]
+    public partial bool IsTextShadowSigmaCustom { get; set; }
+
+    partial void OnTextShadowSigmaPresetIndexChanged(int value)
+    {
+        if (value >= 0 && value < TextShadowSigmaPresets.Length)
+        {
+            IsTextShadowSigmaCustom = false;
+            Settings.WatermarkShadowSigma = TextShadowSigmaPresets[value];
+        }
+        else
+        {
+            IsTextShadowSigmaCustom = true;
+        }
+    }
+
     // 水印预览文本
     [ObservableProperty]
     public partial string PreviewWatermarkText { get; private set; } = string.Empty;
@@ -103,6 +215,9 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         // 监听 Settings 属性变化
         _currentSettings = Settings;
         _currentSettings.PropertyChanged += OnSettingsPropertyChanged;
+
+        // 根据当前设置值初始化预设索引
+        InitializePresetIndices();
     }
 
     partial void OnSettingsChanged(WatermarkSettings oldValue, WatermarkSettings newValue)
@@ -118,6 +233,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             _currentSettings = newValue;
             newValue.PropertyChanged += OnSettingsPropertyChanged;
+            InitializePresetIndices();
         }
     }
 
@@ -232,6 +348,55 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             return new SolidColorBrush(Colors.White);
         }
+    }
+
+    /// <summary>
+    /// 根据当前 Settings 值检测匹配的预设，初始化预设索引和自定义模式标志
+    /// </summary>
+    private void InitializePresetIndices()
+    {
+        // 圆角
+        int crIdx = Array.IndexOf(CornerRadiusPresets, Settings.CornerRadius);
+        CornerRadiusPresetIndex = crIdx >= 0 ? crIdx : CornerRadiusPresets.Length;
+        IsCornerRadiusCustom = crIdx < 0;
+
+        // 虚化
+        int bsIdx = Array.IndexOf(BlurSigmaPresets, Settings.BlurSigma);
+        BlurSigmaPresetIndex = bsIdx >= 0 ? bsIdx : BlurSigmaPresets.Length;
+        IsBlurSigmaCustom = bsIdx < 0;
+
+        // 阴影偏移 (需要同时匹配 X 和 Y)
+        int soIdx = -1;
+        for (int i = 0; i < ShadowOffsetPresets.Length; i++)
+        {
+            if (Math.Abs(ShadowOffsetPresets[i].X - Settings.ShadowOffsetX) < 0.01f &&
+                Math.Abs(ShadowOffsetPresets[i].Y - Settings.ShadowOffsetY) < 0.01f)
+            {
+                soIdx = i;
+                break;
+            }
+        }
+        ShadowOffsetPresetIndex = soIdx >= 0 ? soIdx : ShadowOffsetPresets.Length;
+        IsShadowOffsetCustom = soIdx < 0;
+
+        // 文字阴影偏移
+        int tsoIdx = -1;
+        for (int i = 0; i < TextShadowOffsetPresets.Length; i++)
+        {
+            if (Math.Abs(TextShadowOffsetPresets[i].X - Settings.WatermarkShadowOffsetX) < 0.01f &&
+                Math.Abs(TextShadowOffsetPresets[i].Y - Settings.WatermarkShadowOffsetY) < 0.01f)
+            {
+                tsoIdx = i;
+                break;
+            }
+        }
+        TextShadowOffsetPresetIndex = tsoIdx >= 0 ? tsoIdx : TextShadowOffsetPresets.Length;
+        IsTextShadowOffsetCustom = tsoIdx < 0;
+
+        // 文字阴影模糊
+        int tssIdx = Array.IndexOf(TextShadowSigmaPresets, Settings.WatermarkShadowSigma);
+        TextShadowSigmaPresetIndex = tssIdx >= 0 ? tssIdx : TextShadowSigmaPresets.Length;
+        IsTextShadowSigmaCustom = tssIdx < 0;
     }
 
     private static Color ParseColor(string colorHex)

@@ -38,8 +38,26 @@ mc:Ignorable="d">
                         FontSize="12"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
-                        <TextBox
-                        Text="{Binding Settings.CornerRadius, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{Binding CornerRadiusPresetIndex, Mode=TwoWay}">
+                            <ComboBoxItem>直角 (0)</ComboBoxItem>
+                            <ComboBoxItem>轻微圆角 (15)</ComboBoxItem>
+                            <ComboBoxItem>标准圆角 (45)</ComboBoxItem>
+                            <ComboBoxItem>大圆角 (80)</ComboBoxItem>
+                            <ComboBoxItem>超大圆角 (120)</ComboBoxItem>
+                            <ComboBoxItem>自定义...</ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Spacing="5" IsVisible="{Binding IsCornerRadiusCustom}">
+                            <NumericUpDown
+                            Increment="5"
+                            Minimum="0"
+                            Maximum="300"
+                            FormatString="F0"
+                            Value="{Binding Settings.CornerRadius, Mode=TwoWay}" />
+                            <TextBlock
+                            Text="圆角半径（像素），0=直角"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- 虚化Blur值 -->
@@ -49,30 +67,72 @@ mc:Ignorable="d">
                         FontSize="12"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
-                        <TextBox
-                        Text="{Binding Settings.BlurSigma, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{Binding BlurSigmaPresetIndex, Mode=TwoWay}">
+                            <ComboBoxItem>无虚化 (0)</ComboBoxItem>
+                            <ComboBoxItem>轻微虚化 (10)</ComboBoxItem>
+                            <ComboBoxItem>标准虚化 (25)</ComboBoxItem>
+                            <ComboBoxItem>强虚化 (50)</ComboBoxItem>
+                            <ComboBoxItem>极强虚化 (80)</ComboBoxItem>
+                            <ComboBoxItem>自定义...</ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Spacing="5" IsVisible="{Binding IsBlurSigmaCustom}">
+                            <NumericUpDown
+                            Increment="5"
+                            Minimum="0"
+                            Maximum="200"
+                            FormatString="F0"
+                            Value="{Binding Settings.BlurSigma, Mode=TwoWay}" />
+                            <TextBlock
+                            Text="高斯模糊 Sigma 值，0=无虚化，值越大背景越模糊"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
                     </StackPanel>
 
-                    <!-- 阴影偏移值 X -->
+                    <!-- 阴影偏移 -->
                     <StackPanel Spacing="5">
                         <TextBlock
-                        Text="阴影偏移值 X"
+                        Text="阴影偏移"
                         FontSize="12"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
-                        <TextBox
-                        Text="{Binding Settings.ShadowOffsetX, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <!-- 阴影偏移值 Y -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                        Text="阴影偏移值 Y"
-                        FontSize="12"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource TextSecondary}" />
-                        <TextBox
-                        Text="{Binding Settings.ShadowOffsetY, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{Binding ShadowOffsetPresetIndex, Mode=TwoWay}">
+                            <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
+                            <ComboBoxItem>右下微偏 (20, 20)</ComboBoxItem>
+                            <ComboBoxItem>右下标准 (50, 50)</ComboBoxItem>
+                            <ComboBoxItem>右下远偏 (80, 80)</ComboBoxItem>
+                            <ComboBoxItem>自定义...</ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Spacing="8" IsVisible="{Binding IsShadowOffsetCustom}">
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                Text="X 偏移（像素）"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="5"
+                                Minimum="-200"
+                                Maximum="200"
+                                FormatString="F0"
+                                Value="{Binding Settings.ShadowOffsetX, Mode=TwoWay}" />
+                            </StackPanel>
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                Text="Y 偏移（像素）"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="5"
+                                Minimum="-200"
+                                Maximum="200"
+                                FormatString="F0"
+                                Value="{Binding Settings.ShadowOffsetY, Mode=TwoWay}" />
+                            </StackPanel>
+                            <TextBlock
+                            Text="正=右/下，负=左/上"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- 显示直方图 -->
@@ -324,32 +384,51 @@ mc:Ignorable="d">
             <ScrollViewer Padding="12,8">
                 <StackPanel Spacing="14">
 
-                    <!-- 阴影偏移 X -->
+                    <!-- 文字阴影偏移 -->
                     <StackPanel Spacing="5">
                         <TextBlock
-                        Text="阴影偏移 X"
+                        Text="阴影偏移"
                         FontSize="12"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                        Increment="1"
-                        Maximum="20"
-                        Minimum="-20"
-                        Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <!-- 阴影偏移 Y -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                        Text="阴影偏移 Y"
-                        FontSize="12"
-                        FontWeight="Medium"
-                        Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                        Increment="1"
-                        Maximum="20"
-                        Minimum="-20"
-                        Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{Binding TextShadowOffsetPresetIndex, Mode=TwoWay}">
+                            <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
+                            <ComboBoxItem>右下微偏 (1, 1)</ComboBoxItem>
+                            <ComboBoxItem>右下标准 (2, 2)</ComboBoxItem>
+                            <ComboBoxItem>右下明显 (4, 4)</ComboBoxItem>
+                            <ComboBoxItem>右下远偏 (8, 8)</ComboBoxItem>
+                            <ComboBoxItem>自定义...</ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Spacing="8" IsVisible="{Binding IsTextShadowOffsetCustom}">
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                Text="X 偏移"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="1"
+                                Minimum="-20"
+                                Maximum="20"
+                                FormatString="F0"
+                                Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
+                            </StackPanel>
+                            <StackPanel Spacing="3">
+                                <TextBlock
+                                Text="Y 偏移"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="1"
+                                Minimum="-20"
+                                Maximum="20"
+                                FormatString="F0"
+                                Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
+                            </StackPanel>
+                            <TextBlock
+                            Text="正=右/下，负=左/上"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- 阴影模糊半径 -->
@@ -359,11 +438,26 @@ mc:Ignorable="d">
                         FontSize="12"
                         FontWeight="Medium"
                         Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                        Increment="1"
-                        Maximum="20"
-                        Minimum="0"
-                        Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
+                        <ComboBox SelectedIndex="{Binding TextShadowSigmaPresetIndex, Mode=TwoWay}">
+                            <ComboBoxItem>无模糊 (0)</ComboBoxItem>
+                            <ComboBoxItem>轻微模糊 (2)</ComboBoxItem>
+                            <ComboBoxItem>标准模糊 (5)</ComboBoxItem>
+                            <ComboBoxItem>较强模糊 (10)</ComboBoxItem>
+                            <ComboBoxItem>强模糊 (15)</ComboBoxItem>
+                            <ComboBoxItem>自定义...</ComboBoxItem>
+                        </ComboBox>
+                        <StackPanel Spacing="5" IsVisible="{Binding IsTextShadowSigmaCustom}">
+                            <NumericUpDown
+                            Increment="1"
+                            Minimum="0"
+                            Maximum="20"
+                            FormatString="F0"
+                            Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
+                            <TextBlock
+                            Text="阴影模糊半径，0=无模糊"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
                     </StackPanel>
 
                     <!-- 阴影颜色 -->
