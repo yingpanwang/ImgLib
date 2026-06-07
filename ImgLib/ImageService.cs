@@ -33,9 +33,22 @@ public sealed partial class ImageService
         if (isPreview && options?.EnablePreviewDownsampling == true)
         {
             int maxDimension = Math.Max(original.Width, original.Height);
-            if (maxDimension > options.PreviewMaxDimension)
+            int targetDimension;
+
+            if (options.UsePreviewPercentMode)
             {
-                float downsampleScale = (float)options.PreviewMaxDimension / maxDimension;
+                // 按百分比计算目标边长
+                targetDimension = (int)(maxDimension * options.PreviewMaxPercent / 100f);
+            }
+            else
+            {
+                // 按固定像素值
+                targetDimension = options.PreviewMaxDimension;
+            }
+
+            if (maxDimension > targetDimension)
+            {
+                float downsampleScale = (float)targetDimension / maxDimension;
                 int resizedWidth = (int)(original.Width * downsampleScale);
                 int resizedHeight = (int)(original.Height * downsampleScale);
 
@@ -130,6 +143,10 @@ public sealed partial class ImageService
             if (string.IsNullOrWhiteSpace(watermarkText))
                 watermarkText = "NIKON Z 6_2";
 
+            // 按换行符分割为多行
+            string[] lines = watermarkText.Split('\n');
+            int lineCount = lines.Length;
+
             // 解析颜色
             SKColor textColor = ParseColor(opts.WatermarkColor);
             SKColor shadowColor = ParseColor(opts.WatermarkShadowColor);
@@ -138,29 +155,85 @@ public sealed partial class ImageService
             float fontSize = Math.Max(12, height * opts.WatermarkFontSizeRatio);
 
             using var typeface = SKTypeface.Default;
-
-            // 先用临时画笔测量文本宽度（不带阴影效果，避免干扰测量）
             using var measurePaint = new SKPaint { IsAntialias = true };
             SKFont wFont = new(typeface, fontSize) { Embolden = opts.WatermarkBold };
-            float textWidth = wFont.MeasureText(watermarkText, measurePaint);
-            float textHeight = wFont.Metrics.CapHeight;
+
+            // 测量所有行，找到最长行宽度
+            float maxLineWidth = 0;
+            foreach (string line in lines)
+            {
+                float lineWidth = string.IsNullOrEmpty(line) ? 0 : wFont.MeasureText(line, measurePaint);
+                if (lineWidth > maxLineWidth) maxLineWidth = lineWidth;
+            }
+
+            // 行高：使用字体推荐行距 × 行间距系数
+            float fontLineHeight = -wFont.Metrics.Ascent + wFont.Metrics.Descent + wFont.Metrics.Leading;
+            float lineHeight = fontLineHeight * opts.WatermarkLineSpacing;
+            // 精确字形边界：Ascent 为负值表示基线以上距离，Descent 为基线以下
+            float ascentAbove = -wFont.Metrics.Ascent;  // 基线→字形顶部
+            float descentBelow = wFont.Metrics.Descent; // 基线→字形底部
+
+            // 计算水印可用区域
+            float watermarkAreaTop = y + newHeight;
+            float watermarkAreaHeight = height - watermarkAreaTop;
+            float maxAvailableWidth = width - 40;
+            float maxAvailableHeight = watermarkAreaHeight - 20; // 上下各留10px边距
+
+            // 计算当前文本块总高度（精确到字形边界）
+            float CalcBlockHeight()
+            {
+                return lineCount > 1
+                    ? ascentAbove + (lineCount - 1) * lineHeight + descentBelow
+                    : ascentAbove + descentBelow;
+            }
 
             // 自动缩小字体以适应图片宽度（左右各留20px边距）
-            float maxAvailableWidth = width - 40;
-            if (textWidth > maxAvailableWidth && maxAvailableWidth > 0)
+            bool needRemeasure = false;
+            if (maxLineWidth > maxAvailableWidth && maxAvailableWidth > 0)
             {
-                float scaleRatio = maxAvailableWidth / textWidth;
+                float scaleRatio = maxAvailableWidth / maxLineWidth;
                 fontSize *= scaleRatio;
+                needRemeasure = true;
+            }
+
+            // 自动缩放适应高度（当开关启用且文本块超出可用区域时）
+            if (opts.WatermarkAutoFitFont)
+            {
+                float currentBlockHeight = CalcBlockHeight();
+                if (currentBlockHeight > maxAvailableHeight && maxAvailableHeight > 0)
+                {
+                    float heightScale = maxAvailableHeight / currentBlockHeight;
+                    // 同时参考宽度约束，取较小的缩放比
+                    if (maxLineWidth > maxAvailableWidth && maxAvailableWidth > 0)
+                        heightScale = Math.Min(heightScale, maxAvailableWidth / maxLineWidth);
+                    fontSize *= heightScale;
+                    needRemeasure = true;
+                }
+            }
+
+            if (needRemeasure)
+            {
                 fontSize = Math.Max(12, fontSize); // 最小字体12px
 
                 // 使用调整后的字体大小重建字体
                 wFont.Dispose();
                 wFont = new SKFont(typeface, fontSize) { Embolden = opts.WatermarkBold };
 
-                // 重新测量文本尺寸
-                textWidth = wFont.MeasureText(watermarkText, measurePaint);
-                textHeight = wFont.Metrics.CapHeight;
+                // 重新测量所有行
+                maxLineWidth = 0;
+                foreach (string line in lines)
+                {
+                    float lineWidth = string.IsNullOrEmpty(line) ? 0 : wFont.MeasureText(line, measurePaint);
+                    if (lineWidth > maxLineWidth) maxLineWidth = lineWidth;
+                }
+                fontLineHeight = -wFont.Metrics.Ascent + wFont.Metrics.Descent + wFont.Metrics.Leading;
+                lineHeight = fontLineHeight * opts.WatermarkLineSpacing;
+                ascentAbove = -wFont.Metrics.Ascent;
+                descentBelow = wFont.Metrics.Descent;
             }
+
+            // 计算文本块总高度（精确到字形上下边界）
+            float totalBlockHeight = CalcBlockHeight();
 
             using var wPaint = new SKPaint
             {
@@ -174,46 +247,40 @@ public sealed partial class ImageService
                     shadowColor)
             };
 
-            // 计算水印位置
-            float watermarkAreaTop = y + newHeight;
-            float watermarkAreaHeight = height - watermarkAreaTop;
+            // 垂直位置（从底部算起，控制文本块中心在可用区域中的位置）
+            float blockCenterY = watermarkAreaTop + watermarkAreaHeight * (1 - opts.WatermarkVerticalPosition);
+            float blockTop = blockCenterY - totalBlockHeight / 2f;
 
-            // 垂直位置（从底部算起）
-            float availableHeight = watermarkAreaHeight;
-            float yOffset = availableHeight * (1 - opts.WatermarkVerticalPosition);
+            // 首行基线 Y：块顶部 + 字形上伸距离（基线在 ascentAbove 下方）
+            float firstLineBaselineY = blockTop + ascentAbove;
 
             // 水平对齐
             float textX;
+            SKTextAlign textAlign;
             if (opts.WatermarkHorizontalAlignment.Equals("Left", StringComparison.OrdinalIgnoreCase))
             {
                 textX = destRect.Left + 20;
+                textAlign = SKTextAlign.Left;
             }
             else if (opts.WatermarkHorizontalAlignment.Equals("Right", StringComparison.OrdinalIgnoreCase))
             {
                 textX = destRect.Right - 20;
+                textAlign = SKTextAlign.Right;
             }
             else
             {
                 textX = destRect.MidX;
+                textAlign = SKTextAlign.Center;
             }
 
-            float textY = watermarkAreaTop + yOffset + textHeight / 2;
-
-            // 绘制水印文本
-            if (opts.WatermarkHorizontalAlignment.Equals("Left", StringComparison.OrdinalIgnoreCase))
+            // 逐行绘制水印文本
+            for (int i = 0; i < lineCount; i++)
             {
-                canvas.DrawText(watermarkText, textX, textY, SKTextAlign.Left, wFont, wPaint);
-            }
-            else if (opts.WatermarkHorizontalAlignment.Equals("Right", StringComparison.OrdinalIgnoreCase))
-            {
-                canvas.DrawText(watermarkText, textX, textY, SKTextAlign.Right, wFont, wPaint);
-            }
-            else
-            {
-                canvas.DrawText(watermarkText, textX, textY, SKTextAlign.Center, wFont, wPaint);
+                float lineY = firstLineBaselineY + i * lineHeight;
+                canvas.DrawText(lines[i], textX, lineY, textAlign, wFont, wPaint);
             }
 
-            // 调试：绘制水印边框
+            // 调试：绘制水印边框（覆盖整个文本块）
             if (opts.ShowWatermarkBorder)
             {
                 using var borderPaint = new SKPaint
@@ -224,26 +291,25 @@ public sealed partial class ImageService
                     IsAntialias = true
                 };
 
-                // 计算水印边框矩形
                 float borderPadding = 10;
                 float borderLeft, borderRight;
-                float borderTop = textY - textHeight / 2 - borderPadding;
-                float borderBottom = textY + textHeight / 2 + borderPadding;
+                float borderTop = blockTop - borderPadding;
+                float borderBottom = blockTop + totalBlockHeight + borderPadding;
 
                 if (opts.WatermarkHorizontalAlignment.Equals("Left", StringComparison.OrdinalIgnoreCase))
                 {
                     borderLeft = textX - borderPadding;
-                    borderRight = textX + textWidth + borderPadding;
+                    borderRight = textX + maxLineWidth + borderPadding;
                 }
                 else if (opts.WatermarkHorizontalAlignment.Equals("Right", StringComparison.OrdinalIgnoreCase))
                 {
-                    borderLeft = textX - textWidth - borderPadding;
+                    borderLeft = textX - maxLineWidth - borderPadding;
                     borderRight = textX + borderPadding;
                 }
                 else
                 {
-                    borderLeft = textX - textWidth / 2 - borderPadding;
-                    borderRight = textX + textWidth / 2 + borderPadding;
+                    borderLeft = textX - maxLineWidth / 2 - borderPadding;
+                    borderRight = textX + maxLineWidth / 2 + borderPadding;
                 }
 
                 var borderRect = new SKRect(borderLeft, borderTop, borderRight, borderBottom);

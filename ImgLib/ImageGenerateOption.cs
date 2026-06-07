@@ -52,6 +52,16 @@ public class ImageGenerateOption
     public bool WatermarkBold { get; set; } = true;
 
     /// <summary>
+    /// 水印行间距系数（1.0=标准行距，>1.0 增大间距，<1.0 缩小间距）
+    /// </summary>
+    public float WatermarkLineSpacing { get; set; } = 1.2f;
+
+    /// <summary>
+    /// 是否启用自动缩放字体以适应水印区域（当文本块高度超出可用区域时自动缩小）
+    /// </summary>
+    public bool WatermarkAutoFitFont { get; set; } = false;
+
+    /// <summary>
     /// 水印文字阴影偏移 X
     /// </summary>
     public float WatermarkShadowOffsetX { get; set; } = 2f;
@@ -104,9 +114,19 @@ public class ImageGenerateOption
     public bool EnablePreviewDownsampling { get; set; } = true;
 
     /// <summary>
-    /// 预览降采样最大边长（像素），默认 1200
+    /// 预览降采样模式：true=按百分比，false=按固定像素值
+    /// </summary>
+    public bool UsePreviewPercentMode { get; set; } = false;
+
+    /// <summary>
+    /// 预览降采样最大边长（像素），默认 1200（仅在固定像素模式生效）
     /// </summary>
     public int PreviewMaxDimension { get; set; } = 1200;
+
+    /// <summary>
+    /// 预览降采样百分比（相对于原始图片最大边长），默认 50%（仅在百分比模式生效）
+    /// </summary>
+    public float PreviewMaxPercent { get; set; } = 50f;
 }
 
 public static class ImageGenerateOptionExtensions

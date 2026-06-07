@@ -109,6 +109,12 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
         _ = exifInfo.EnsureMetadataLoadedAsync();
+
+        // 如果开启了自动预览，切换图片时自动重新生成预览
+        if (WatermarkSettingsViewModel.AutoPreview)
+        {
+            OnPreviewRequested(this, EventArgs.Empty);
+        }
     }
 
     [RelayCommand]
@@ -133,7 +139,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         // 传递预览标志和降采样参数
         var options = WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
         options.EnablePreviewDownsampling = WatermarkSettingsViewModel.EnablePreviewDownsampling;
+        options.UsePreviewPercentMode = WatermarkSettingsViewModel.UsePreviewPercentMode;
         options.PreviewMaxDimension = WatermarkSettingsViewModel.PreviewMaxDimension;
+        options.PreviewMaxPercent = WatermarkSettingsViewModel.PreviewMaxPercent;
 
         ImageService.GenerateWithOptions(
             _previewImageFile.GetSourceStream(),

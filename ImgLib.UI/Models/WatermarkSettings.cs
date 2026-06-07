@@ -80,6 +80,20 @@ public class WatermarkSettings : INotifyPropertyChanged
         set { _watermarkBold = value; OnPropertyChanged(); }
     }
 
+    private float _watermarkLineSpacing = 1.2f;
+    public float WatermarkLineSpacing
+    {
+        get => _watermarkLineSpacing;
+        set { _watermarkLineSpacing = value; OnPropertyChanged(); }
+    }
+
+    private bool _watermarkAutoFitFont = false;
+    public bool WatermarkAutoFitFont
+    {
+        get => _watermarkAutoFitFont;
+        set { _watermarkAutoFitFont = value; OnPropertyChanged(); }
+    }
+
     private float _watermarkShadowOffsetX = 2f;
     public float WatermarkShadowOffsetX
     {
@@ -152,11 +166,25 @@ public class WatermarkSettings : INotifyPropertyChanged
         set { _enablePreviewDownsampling = value; OnPropertyChanged(); }
     }
 
+    private bool _usePreviewPercentMode = false;
+    public bool UsePreviewPercentMode
+    {
+        get => _usePreviewPercentMode;
+        set { _usePreviewPercentMode = value; OnPropertyChanged(); }
+    }
+
     private int _previewMaxDimension = 1200;
     public int PreviewMaxDimension
     {
         get => _previewMaxDimension;
         set { _previewMaxDimension = value; OnPropertyChanged(); }
+    }
+
+    private float _previewMaxPercent = 50f;
+    public float PreviewMaxPercent
+    {
+        get => _previewMaxPercent;
+        set { _previewMaxPercent = value; OnPropertyChanged(); }
     }
 
     /// <summary>
@@ -174,6 +202,8 @@ public class WatermarkSettings : INotifyPropertyChanged
         WatermarkColor = option.WatermarkColor;
         WatermarkFontSizeRatio = option.WatermarkFontSizeRatio;
         WatermarkBold = option.WatermarkBold;
+        WatermarkLineSpacing = option.WatermarkLineSpacing;
+        WatermarkAutoFitFont = option.WatermarkAutoFitFont;
         WatermarkShadowOffsetX = option.WatermarkShadowOffsetX;
         WatermarkShadowOffsetY = option.WatermarkShadowOffsetY;
         WatermarkShadowSigma = option.WatermarkShadowSigma;
@@ -184,7 +214,9 @@ public class WatermarkSettings : INotifyPropertyChanged
         WatermarkBorderColor = option.WatermarkBorderColor;
         WatermarkBorderWidth = option.WatermarkBorderWidth;
         EnablePreviewDownsampling = option.EnablePreviewDownsampling;
+        UsePreviewPercentMode = option.UsePreviewPercentMode;
         PreviewMaxDimension = option.PreviewMaxDimension;
+        PreviewMaxPercent = option.PreviewMaxPercent;
     }
 
     /// <summary>
@@ -203,6 +235,8 @@ public class WatermarkSettings : INotifyPropertyChanged
             WatermarkColor = WatermarkColor,
             WatermarkFontSizeRatio = WatermarkFontSizeRatio,
             WatermarkBold = WatermarkBold,
+            WatermarkLineSpacing = WatermarkLineSpacing,
+            WatermarkAutoFitFont = WatermarkAutoFitFont,
             WatermarkShadowOffsetX = WatermarkShadowOffsetX,
             WatermarkShadowOffsetY = WatermarkShadowOffsetY,
             WatermarkShadowSigma = WatermarkShadowSigma,
@@ -213,7 +247,9 @@ public class WatermarkSettings : INotifyPropertyChanged
             WatermarkBorderColor = WatermarkBorderColor,
             WatermarkBorderWidth = WatermarkBorderWidth,
             EnablePreviewDownsampling = EnablePreviewDownsampling,
-            PreviewMaxDimension = PreviewMaxDimension
+            UsePreviewPercentMode = UsePreviewPercentMode,
+            PreviewMaxDimension = PreviewMaxDimension,
+            PreviewMaxPercent = PreviewMaxPercent
         };
     }
 

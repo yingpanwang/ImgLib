@@ -107,20 +107,60 @@ mc:Ignorable="d">
                         </StackPanel>
 
                         <StackPanel Spacing="5" Margin="24,0,0,0" IsEnabled="{Binding EnablePreviewDownsampling}">
-                            <TextBlock
-                            Text="预览最大边长 (像素)"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                            <NumericUpDown
-                            Increment="200"
-                            Maximum="4000"
-                            Minimum="400"
-                            Value="{Binding PreviewMaxDimension, Mode=TwoWay}" />
-                            <TextBlock
-                            Text="值越小预览越快，但画质降低"
-                            FontSize="10"
-                            Foreground="{StaticResource TextTertiary}" />
+                            <!-- 降采样模式切换 -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock
+                                Text="固定像素值"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}"
+                                VerticalAlignment="Center" />
+                                <ToggleSwitch
+                                IsChecked="{Binding UsePreviewPercentMode, Mode=TwoWay}"
+                                OffContent=""
+                                OnContent="" />
+                                <TextBlock
+                                Text="百分比"
+                                FontSize="11"
+                                Foreground="{StaticResource TextSecondary}"
+                                VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- 固定像素值输入 (非百分比模式) -->
+                            <StackPanel Spacing="5" IsVisible="{Binding UsePreviewPercentMode, Converter={x:Static BoolConverters.Not}}">
+                                <TextBlock
+                                Text="预览最大边长 (像素)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="200"
+                                Maximum="4000"
+                                Minimum="400"
+                                Value="{Binding PreviewMaxDimension, Mode=TwoWay}" />
+                                <TextBlock
+                                Text="值越小预览越快，但画质降低"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- 百分比输入 (百分比模式) -->
+                            <StackPanel Spacing="5" IsVisible="{Binding UsePreviewPercentMode}">
+                                <TextBlock
+                                Text="预览百分比 (相对于原图最长边)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown
+                                Increment="5"
+                                Maximum="100"
+                                Minimum="10"
+                                FormatString="F0"
+                                Value="{Binding PreviewMaxPercent, Mode=TwoWay}" />
+                                <TextBlock
+                                Text="百分比越低预览越快，但画质降低"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
 
@@ -198,6 +238,40 @@ mc:Ignorable="d">
                         Foreground="{StaticResource TextPrimary}"
                         VerticalAlignment="Center" />
                     </StackPanel>
+
+                    <!-- 行间距 -->
+                    <StackPanel Spacing="5">
+                        <TextBlock
+                        Text="行间距系数"
+                        FontSize="12"
+                        FontWeight="Medium"
+                        Foreground="{StaticResource TextSecondary}" />
+                        <NumericUpDown
+                        Increment="0.1"
+                        Maximum="3.0"
+                        Minimum="0.5"
+                        FormatString="F1"
+                        Value="{Binding Settings.WatermarkLineSpacing, Mode=TwoWay}" />
+                        <TextBlock
+                        Text="1.0=标准行距，大于1.0增大间距（仅多行生效）"
+                        FontSize="10"
+                        Foreground="{StaticResource TextTertiary}" />
+                    </StackPanel>
+
+                    <!-- 自动缩放适应 -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <CheckBox IsChecked="{Binding Settings.WatermarkAutoFitFont, Mode=TwoWay}" />
+                        <TextBlock
+                        Text="自动缩放适应区域"
+                        FontSize="12.5"
+                        Foreground="{StaticResource TextPrimary}"
+                        VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock
+                    Text="当文本块高度超出水印区域时自动缩小字体以适应"
+                    FontSize="10"
+                    Foreground="{StaticResource TextTertiary}"
+                    Margin="24,0,0,0" />
 
                     <!-- 水平对齐 -->
                     <StackPanel Spacing="5">

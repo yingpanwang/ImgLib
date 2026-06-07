@@ -38,9 +38,17 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial bool EnablePreviewDownsampling { get; set; } = true;
 
-    // 预览降采样最大边长
+    // 预览降采样模式：true=按百分比，false=按固定像素值
+    [ObservableProperty]
+    public partial bool UsePreviewPercentMode { get; set; } = false;
+
+    // 预览降采样最大边长（像素，固定模式）
     [ObservableProperty]
     public partial int PreviewMaxDimension { get; set; } = 1200;
+
+    // 预览降采样百分比（百分比模式）
+    [ObservableProperty]
+    public partial float PreviewMaxPercent { get; set; } = 50f;
 
     // 水印预览文本
     [ObservableProperty]
@@ -57,6 +65,14 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     // 水印边框颜色画笔
     [ObservableProperty]
     public partial IBrush? WatermarkBorderColorBrush { get; private set; }
+
+    // 水印行间距系数
+    [ObservableProperty]
+    public partial float WatermarkLineSpacing { get; set; } = 1.2f;
+
+    // 自动缩放字体以适应水印区域
+    [ObservableProperty]
+    public partial bool WatermarkAutoFitFont { get; set; } = false;
 
     // 水平对齐索引
     [ObservableProperty]
@@ -151,9 +167,27 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         }
     }
 
+    partial void OnUsePreviewPercentModeChanged(bool value)
+    {
+        // 切换降采样模式时触发预览
+        if (AutoPreview)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
     partial void OnPreviewMaxDimensionChanged(int value)
     {
         // 降采样参数变化时触发预览
+        if (AutoPreview)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    partial void OnPreviewMaxPercentChanged(float value)
+    {
+        // 百分比参数变化时触发预览
         if (AutoPreview)
         {
             PreviewRequested?.Invoke(this, EventArgs.Empty);
