@@ -1,74 +1,74 @@
 <UserControl
-x:Class="ImgLib.UI.ImgListBoxView"
-xmlns="https://github.com/avaloniaui"
-xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-xmlns:v="using:ImgLib.UI"
-xmlns:vm="using:ImgLib.UI.ViewModels"
-xmlns:vmd="using:ImgLib.UI.ViewModels.Design"
-d:DesignHeight="650"
-d:DesignWidth="450"
-x:DataType="vm:ImgListBoxViewModel"
-mc:Ignorable="d">
-	<Design.DataContext>
-		<vmd:Design_ImgListBoxViewModel />
-	</Design.DataContext>
-	<UserControl.Styles>
-		<!-- Empty state -->
-		<Style Selector="ListBox:empty">
-			<Setter Property="Template">
-				<ControlTemplate>
-					<Border
-					Background="Transparent">
-						<StackPanel
-						HorizontalAlignment="Center"
-						VerticalAlignment="Center"
-						Spacing="8">
-							<TextBlock
-							HorizontalAlignment="Center"
-							FontSize="28"
-							Foreground="{StaticResource TextTertiary}"
-							Text="📂" />
-							<TextBlock
-							HorizontalAlignment="Center"
-							FontSize="13"
-							Foreground="{StaticResource TextTertiary}"
-							Text="暂无图片" />
-							<TextBlock
-							HorizontalAlignment="Center"
-							FontSize="11"
-							Foreground="{StaticResource TextTertiary}"
-							Text="通过菜单打开图片目录" />
-						</StackPanel>
-					</Border>
-				</ControlTemplate>
-			</Setter>
-		</Style>
-	</UserControl.Styles>
+    x:Class="ImgLib.UI.ImgListBoxView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="using:ImgLib.UI"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    xmlns:vmd="using:ImgLib.UI.ViewModels.Design"
+    d:DesignHeight="650"
+    d:DesignWidth="450"
+    x:DataType="vm:ImgListBoxViewModel"
+    mc:Ignorable="d">
+    <Design.DataContext>
+        <vmd:Design_ImgListBoxViewModel />
+    </Design.DataContext>
+    <UserControl.Styles>
+        <!-- Empty state -->
+        <Style Selector="ListBox:empty">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border
+                        Background="Transparent">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="28"
+                                Foreground="{StaticResource TextTertiary}"
+                                Text="📂" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource TextTertiary}"
+                                Text="暂无图片" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="11"
+                                Foreground="{StaticResource TextTertiary}"
+                                Text="通过菜单打开图片目录" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
 
-	<DockPanel Margin="0,8,0,0">
-		<!-- List Header -->
-		<Border DockPanel.Dock="Top"
-				Padding="14,6,14,10">
-			<TextBlock Text="图片列表"
-					   FontSize="14"
-					   FontWeight="SemiBold"
-					   Foreground="{StaticResource TextPrimary}" />
-		</Border>
+    <DockPanel Margin="0,8,0,0">
+        <!-- List Header -->
+        <Border DockPanel.Dock="Top"
+                Padding="14,6,14,10">
+            <TextBlock Text="{Binding HeaderText}"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource TextPrimary}" />
+        </Border>
 
-		<ListBox
-		Name="l"
-		Padding="4,0"
-		ItemsSource="{Binding ImgListItems}"
-		SelectedItem="{Binding SelectedImgItem, Mode=TwoWay}">
-			<ListBox.ItemTemplate>
-				<DataTemplate DataType="vm:ImgListItemViewModel">
-					<v:ImgListBoxItemViewCompat/>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-	</DockPanel>
+        <ListBox
+            Name="l"
+            Padding="4,0"
+            ItemsSource="{Binding ImgListItems}"
+            SelectedItem="{Binding SelectedImgItem, Mode=TwoWay}"
+            ScrollViewer.ScrollChanged="OnScrollChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="vm:ImgListItemViewModel">
+                    <v:ImgListBoxItemViewCompat/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
 
 </UserControl>

@@ -52,7 +52,7 @@ public class WatermarkSettings : INotifyPropertyChanged
     }
 
     // ═══ 水印文本参数 ═══
-    private string _watermarkTemplate = "{相机型号} | {镜头型号} | f/{光圈} | ISO {ISO} | {快门}";
+    private string _watermarkTemplate = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
     public string WatermarkTemplate
     {
         get => _watermarkTemplate;

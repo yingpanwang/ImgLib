@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using ImgLib;
 using ImgLib.Models;
 using ImgLib.UI.Models;
+using ImgLib.UI.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -33,6 +34,10 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     // 自动预览开关
     [ObservableProperty]
     public partial bool AutoPreview { get; set; } = false;
+
+    // 自动预览触发间隔（毫秒），避免频繁刷新
+    [ObservableProperty]
+    public partial int AutoPreviewIntervalMs { get; set; } = 300;
 
     // 启用预览降采样
     [ObservableProperty]
@@ -190,6 +195,12 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial int HorizontalAlignIndex { get; set; } = 1;
 
+    // ═══ EXIF 字段选择 ═══
+    /// <summary>
+    /// 可选的 EXIF 字段列表（从配置文件加载显示名称映射）
+    /// </summary>
+    public ObservableCollection<ExifFieldItem> ExifFieldItems { get; } = new();
+
     // 预览命令（由外部注入）
     public ICommand? PreviewCommand { get; set; }
 
@@ -209,6 +220,8 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
         ExifInfo = exifInfo;
 
+        LoadExifFieldItems();
+
         UpdatePreviewText();
         UpdateColorBrushes();
 
@@ -218,6 +231,19 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
         // 根据当前设置值初始化预设索引
         InitializePresetIndices();
+    }
+
+    /// <summary>
+    /// 从配置文件加载 EXIF 字段项
+    /// </summary>
+    private void LoadExifFieldItems()
+    {
+        var mappings = ExifFieldConfigService.LoadMappings();
+        ExifFieldItems.Clear();
+        foreach (var kvp in mappings)
+        {
+            ExifFieldItems.Add(new ExifFieldItem(kvp.Key, kvp.Value));
+        }
     }
 
     partial void OnSettingsChanged(WatermarkSettings oldValue, WatermarkSettings newValue)
@@ -453,4 +479,29 @@ public struct ExifInfoNode
         Value = value;
         Children = children;
     }
+}
+
+/// <summary>
+/// 可选的 EXIF 字段项，供右键菜单选择插入到模板。
+/// Key = ExifInfo 属性名（如 "Model"），Placeholder = {"{Key}"}，DisplayName 来自配置文件。
+/// </summary>
+public class ExifFieldItem
+{
+    /// <summary>ExifInfo 属性名，如 "Model"、"FNumber"</summary>
+    public string Key { get; }
+
+    /// <summary>模板占位符，如 "{Model}"</summary>
+    public string Placeholder { get; }
+
+    /// <summary>显示名称，来自配置文件映射，如 "相机型号"</summary>
+    public string DisplayName { get; }
+
+    public ExifFieldItem(string key, string displayName)
+    {
+        Key = key;
+        DisplayName = displayName;
+        Placeholder = $"{{{key}}}";
+    }
+
+    public override string ToString() => $"{DisplayName}  →  {Placeholder}";
 }

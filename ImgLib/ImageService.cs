@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ImgLib.Models;
 using SkiaSharp;
 
@@ -140,8 +141,8 @@ public sealed partial class ImageService
                 : opts.WatermarkTemplate;
 
             // 如果没有模板内容，使用默认
-            if (string.IsNullOrWhiteSpace(watermarkText))
-                watermarkText = "NIKON Z 6_2";
+            // if (string.IsNullOrWhiteSpace(watermarkText))
+            //     watermarkText = "NIKON Z 6_2";
 
             // 按换行符分割为多行
             string[] lines = watermarkText.Split('\n');

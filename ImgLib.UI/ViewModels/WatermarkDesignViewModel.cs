@@ -16,14 +16,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [ObservableProperty]
     public partial double PreviewAngle { get; private set; }
 
-    public ICommand RotateLeftCommand => new RelayCommand(
-            () => PreviewAngle -= 90
-        );
-
-    public ICommand RotateRightCommand => new RelayCommand(
-            () => PreviewAngle += 90
-        );
-
     //[ObservableProperty]
     //public partial ImageGenerateOption ImageGenerateOption { get; private set; } = new ImageGenerateOption(0.89f);
 
@@ -71,7 +63,10 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         {
             try
             {
-                await Task.Delay(300, _previewCancellationTokenSource.Token);
+                var intervalMs = WatermarkSettingsViewModel.AutoPreviewIntervalMs;
+                // 确保间隔不小于 50ms，避免过于频繁的预览刷新
+                if (intervalMs < 50) intervalMs = 50;
+                await Task.Delay(intervalMs, _previewCancellationTokenSource.Token);
                 if (!_previewCancellationTokenSource.Token.IsCancellationRequested)
                 {
                     System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 执行 SetBackground");
@@ -91,6 +86,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             return;
 
         _previewImageFile = ImageFile.GetImageFile(value!);
+
+        // 切换图片时重置旋转角度
+        PreviewAngle = 0;
 
         PreviewImageSource = new Bitmap(_previewImageFile.GetSourceStream());
 

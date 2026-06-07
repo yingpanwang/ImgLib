@@ -3,6 +3,7 @@ using MetadataExtractor.Formats.Exif;
 using System.Text.Json;
 
 namespace ImgLib.Models;
+
 public partial record class ExifInfo
 {
     /// <summary>
@@ -146,6 +147,32 @@ public partial record class ExifInfo
             return;
 
         await Task.Run(() => _ = Metadata.Value).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// 返回水印模板占位符 → 值的映射字典。
+    /// Key 为 ExifInfo 属性名（不含 {} 包裹），Value 为对应字段的描述字符串。
+    /// 子类可 override 扩展品牌专用字段。
+    /// </summary>
+    public virtual IReadOnlyDictionary<string, string?> GetTemplateReplacements()
+    {
+        return new Dictionary<string, string?>
+        {
+            ["Make"] = Make,
+            ["Model"] = Model,
+            ["LensMake"] = LensMake,
+            ["LensModel"] = LensModel,
+            ["FNumber"] = FNumber,
+            ["ISO"] = ISO,
+            ["FocalLength"] = FocalLength,
+            ["FocalLengthIn35mmFormat"] = FocalLengthIn35mmFormat,
+            ["ExposureTime"] = ExposureTime,
+            ["DateTimeOriginal"] = DateTimeOriginal,
+            ["ExposureCompensation"] = ExposureCompensation,
+            ["WhiteBalance"] = WhiteBalance,
+            ["ExposureProgram"] = ExposureProgram,
+            ["MeteringMode"] = MeteringMode,
+        }.AsReadOnly();
     }
 
     public virtual string ToJson()

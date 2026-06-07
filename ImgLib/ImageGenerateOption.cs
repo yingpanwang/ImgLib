@@ -30,11 +30,11 @@ public class ImageGenerateOption
 
     // ═══ 水印文本参数 ═══
     /// <summary>
-    /// 水印文本模板，支持 EXIF 变量替换
-    /// 可用变量: {相机型号}, {镜头型号}, {光圈}, {ISO}, {焦距}, {快门}, {时间}
-    /// 示例: "{相机型号} | {镜头型号} | f/{光圈} | ISO {ISO} | {快门}"
+    /// 水印文本模板，支持 EXIF 变量替换。
+    /// 可用变量示例: {Model}, {LensModel}, {FNumber}, {ISO}, {FocalLength}, {ExposureTime}, {DateTimeOriginal}
+    /// 默认: "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}"
     /// </summary>
-    public string WatermarkTemplate { get; set; } = "{相机型号} | {镜头型号} | f/{光圈} | ISO {ISO} | {快门}";
+    public string WatermarkTemplate { get; set; } = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
 
     /// <summary>
     /// 水印文本颜色（十六进制格式，如 #FFFFFF）
@@ -132,7 +132,9 @@ public class ImageGenerateOption
 public static class ImageGenerateOptionExtensions
 {
     /// <summary>
-    /// 解析水印模板，替换 EXIF 变量
+    /// 解析水印模板，替换 EXIF 变量。
+    /// 占位符使用 ExifInfo 属性名，如 {Model}、{FNumber}、{ISO} 等。
+    /// 字段解析委托给 <see cref="ExifInfo.GetTemplateReplacements"/>，各子类扩展品牌专用字段。
     /// </summary>
     public static string ParseWatermarkTemplate(this ImageGenerateOption option, ExifInfo? exifInfo)
     {
@@ -141,28 +143,9 @@ public static class ImageGenerateOptionExtensions
 
         string result = option.WatermarkTemplate;
 
-        // EXIF 变量映射
-        var replacements = new Dictionary<string, string?>
+        foreach (var kvp in exifInfo.GetTemplateReplacements())
         {
-            { "{相机型号}", exifInfo.Model },
-            { "{镜头型号}", exifInfo.LensModel },
-            { "{光圈}", exifInfo.FNumber },
-            { "{ISO}", exifInfo.ISO },
-            { "{焦距}", exifInfo.FocalLength },
-            { "{等效焦距}", exifInfo.FocalLengthIn35mmFormat },
-            { "{快门}", exifInfo.ExposureTime },
-            { "{时间}", exifInfo.DateTimeOriginal },
-            { "{曝光补偿}", exifInfo.ExposureCompensation },
-            { "{白平衡}", exifInfo.WhiteBalance },
-            { "{拍摄模式}", exifInfo.ExposureProgram },
-            { "{测光模式}", exifInfo.MeteringMode },
-            { "{制造商}", exifInfo.Make },
-            { "{镜头制造商}", exifInfo.LensMake },
-        };
-
-        foreach (var kvp in replacements)
-        {
-            result = result.Replace(kvp.Key, kvp.Value ?? "N/A");
+            result = result.Replace($"{{{kvp.Key}}}", kvp.Value ?? "N/A");
         }
 
         return result;
