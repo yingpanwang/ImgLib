@@ -10,7 +10,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        _vm = new MainWindowViewModel(GetTopLevel(this)!.StorageProvider);
+        _vm = new MainWindowViewModel(GetTopLevel(this)!.StorageProvider)
+        {
+            ParentWindow = this
+        };
 
         DataContext = _vm;
 

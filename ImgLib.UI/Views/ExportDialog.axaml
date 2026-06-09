@@ -1,0 +1,182 @@
+<Window
+    x:Class="ImgLib.UI.Views.ExportDialog"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    Title="选择导出图片"
+    Width="740"
+    Height="560"
+    MinWidth="500"
+    MinHeight="360"
+    WindowStartupLocation="CenterOwner"
+    CanResize="True"
+    x:DataType="vm:ExportDialogViewModel">
+
+    <Window.Styles>
+        <!-- 缩略图卡片 ToggleButton 样式 -->
+        <Style Selector="ToggleButton.thumb-card">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="4" />
+            <Style Selector="^:checked">
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                <Setter Property="Background" Value="{StaticResource SelectedBg}" />
+            </Style>
+            <Style Selector="^:pointerover">
+                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+            </Style>
+        </Style>
+
+        <!-- 选中对勾标记 -->
+        <Style Selector="Border.check-mark">
+            <Setter Property="IsVisible" Value="False" />
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Margin" Value="4" />
+            <Style Selector="^:visible">
+                <!-- 父级 ToggleButton:checked 时显示 -->
+            </Style>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- ═══ 顶部标题栏 ═══ -->
+        <Border
+            Grid.Row="0"
+            Padding="20,16,20,12"
+            Background="{StaticResource SidebarBg}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="0,0,0,1">
+            <DockPanel>
+                <!-- 全选切换 -->
+                <ToggleButton
+                    DockPanel.Dock="Right"
+                    IsChecked="{Binding IsAllSelected}"
+                    Command="{Binding ToggleSelectAllCommand}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="8,4"
+                    Cursor="Hand"
+                    FontSize="13"
+                    Foreground="{StaticResource TextPrimary}"
+                    Content="全选" />
+
+                <!-- 标题 + 状态 -->
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource TextPrimary}"
+                        Text="选择要导出的图片" />
+                    <TextBlock
+                        Text="{Binding StatusText}"
+                        FontSize="12"
+                        Foreground="{StaticResource TextSecondary}"
+                        Margin="0,4,0,0" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══ 缩略图网格 ═══ -->
+        <ScrollViewer Grid.Row="1" Padding="12">
+            <ItemsControl ItemsSource="{Binding Items}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:ExportDialogItemViewModel">
+                        <ToggleButton
+                            IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                            Classes="thumb-card"
+                            Width="150"
+                            Height="140">
+                            <Grid RowDefinitions="100,Auto">
+                                <!-- 缩略图区域 -->
+                                <Border
+                                    Grid.Row="0"
+                                    CornerRadius="4"
+                                    ClipToBounds="True"
+                                    Background="{StaticResource ThumbPlaceholderBg}">
+                                    <Image
+                                        Stretch="UniformToFill"
+                                        Source="{Binding Thumbnail^}" />
+                                </Border>
+
+                                <!-- 选中对勾（右上角） -->
+                                <Border
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Grid.Row="0"
+                                    Width="20" Height="20"
+                                    CornerRadius="10"
+                                    Margin="4"
+                                    IsVisible="{Binding $parent[ToggleButton].IsChecked}"
+                                    Background="{StaticResource AccentBrush}">
+                                    <TextBlock
+                                        Text="✓"
+                                        FontSize="11"
+                                        Foreground="White"
+                                        FontWeight="Bold"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsVisible="{Binding $parent[ToggleButton].IsChecked}" />
+                                </Border>
+
+                                <!-- 文件名 -->
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Text="{Binding FileName}"
+                                    FontSize="11"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    TextTrimming="CharacterEllipsis"
+                                    TextWrapping="NoWrap"
+                                    Margin="2,4,2,0"
+                                    HorizontalAlignment="Center" />
+                            </Grid>
+                        </ToggleButton>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ═══ 底部操作栏 ═══ -->
+        <Border
+            Grid.Row="2"
+            Padding="20,12"
+            Background="{StaticResource SidebarBg}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="0,1,0,0">
+            <DockPanel>
+                <!-- 导出按钮 -->
+                <Button
+                    DockPanel.Dock="Right"
+                    Click="OnConfirmClick"
+                    Classes="primary"
+                    Padding="24,8"
+                    Margin="12,0,0,0">
+                    <TextBlock>
+                        <Run Text="导出 (" />
+                        <Run Text="{Binding SelectedCount}" />
+                        <Run Text=")" />
+                    </TextBlock>
+                </Button>
+
+                <!-- 取消按钮 -->
+                <Button
+                    DockPanel.Dock="Right"
+                    Click="OnCancelClick"
+                    Classes="secondary"
+                    Padding="24,8"
+                    Content="取消" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

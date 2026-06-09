@@ -3,6 +3,8 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
 using ImgLib.UI.Services;
+using ImgLib.WatermarkPipeline;
+using SkiaSharp;
 using System.IO;
 using System.Windows.Input;
 
@@ -131,6 +133,8 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 提前返回: _previewImageFile 为空");
             return;
         }
+        await SetBackgroundWithPipeline();
+        return;
 
         using MemoryStream output = new();
 
@@ -163,13 +167,99 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         }
     }
 
-    public async Task Left()
+    /// <summary>
+    /// 使用 WatermarkPipeline（访客模式）生成水印预览。
+    /// 与 <see cref="SetBackground"/> 功能等价，但通过管线命令 + 访客渲染器实现。
+    /// </summary>
+    public async Task SetBackgroundWithPipeline()
     {
+        if (PreviewImageSource == null || string.IsNullOrWhiteSpace(PreviewFilePath))
+            return;
+
+        if (_previewImageFile == null)
+            return;
+
+        using MemoryStream output = new();
+
+        var options = WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
+        options.EnablePreviewDownsampling = WatermarkSettingsViewModel.EnablePreviewDownsampling;
+        options.UsePreviewPercentMode = WatermarkSettingsViewModel.UsePreviewPercentMode;
+        options.PreviewMaxDimension = WatermarkSettingsViewModel.PreviewMaxDimension;
+        options.PreviewMaxPercent = WatermarkSettingsViewModel.PreviewMaxPercent;
+
+        // ── 管线方式 ──
+        using var inputStream = _previewImageFile.GetSourceStream();
+        using var original = SKBitmap.Decode(inputStream);
+        if (original == null)
+            throw new InvalidOperationException("无法解码图像");
+
+        // 预览降采样
+        using var workingBitmap = ApplyPreviewDownsampling(original, options);
+
+        int w = workingBitmap.Width;
+        int h = workingBitmap.Height;
+
+        using var surface = SKSurface.Create(new SKImageInfo(w, h));
+        var canvas = surface.Canvas;
+
+        // 构建渲染上下文
+        var ctx = new WatermarkRenderContext(
+            canvas, original, workingBitmap, w, h,
+            options.Scale,
+            WatermarkSettingsViewModel.ExifInfo);
+
+        // 从 ImageGenerateOption 构建管线 → 执行
+        var pipeline = WatermarkPipelineRunner.FromOptions(options);
+
+        
+        pipeline.Execute(ctx);
+
+        // 编码输出
+        using var image = surface.Snapshot();
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+        data.SaveTo(output);
+
+        output.Seek(0, SeekOrigin.Begin);
+        if (output.Length > 0)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                PreviewImageSource?.Dispose();
+                PreviewImageSource = new Bitmap(output);
+            });
+        }
     }
 
-    public Task Load()
+    /// <summary>预览降采样（从原始 ImageService 逻辑提取）</summary>
+    private static SKBitmap ApplyPreviewDownsampling(SKBitmap original, ImageGenerateOption options)
     {
-        return Task.CompletedTask;
+        if (!options.EnablePreviewDownsampling)
+            return original;
+
+        bool isPercent = options.UsePreviewPercentMode;
+
+        return ImageService.DownsampleImage
+               (
+                   original,
+                   value: isPercent ? options.PreviewMaxPercent : options.PreviewMaxDimension,
+                   isPercent
+               );
+
+        // int maxDimension = Math.Max(original.Width, original.Height);
+        // int targetDimension = options.UsePreviewPercentMode
+        //     ? (int)(maxDimension * options.PreviewMaxPercent / 100f)
+        //     : options.PreviewMaxDimension;
+
+        // if (maxDimension <= targetDimension)
+        //     return original;
+
+        // float scale = (float)targetDimension / maxDimension;
+        // int rw = (int)(original.Width * scale);
+        // int rh = (int)(original.Height * scale);
+
+        // return original.Resize(
+        //     new SKImageInfo(rw, rh),
+        //     new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
     }
 
     public void Reset()

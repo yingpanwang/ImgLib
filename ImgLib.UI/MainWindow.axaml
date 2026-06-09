@@ -28,6 +28,9 @@ mc:Ignorable="d">
                 <MenuItem Header="菜单">
                     <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
                     <Separator />
+                    <MenuItem Command="{Binding ExportCurrentCommand}" Header="导出当前图片" />
+                    <MenuItem Command="{Binding ExportBatchCommand}" Header="批量导出" />
+                    <Separator />
                     <MenuItem Command="{Binding TestToastCommand}" Header="测试 Toast" />
                 </MenuItem>
             </Menu>
@@ -57,14 +60,18 @@ mc:Ignorable="d">
             </DockPanel>
         </Grid>
 
-        <!-- Toast Notifications Container (Right Bottom Corner - Floating) -->
+        <!-- Floating Panels (Right Bottom Corner) -->
         <Border Grid.Row="1"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Margin="16"
-                Background="Transparent"
-                IsHitTestVisible="False">
-            <vViews:ToastView DataContext="{Binding ToastViewModel}" IsHitTestVisible="True" />
+                Background="{x:Null}">
+            <StackPanel Spacing="8">
+                <!-- Export Progress -->
+                <vViews:ExportProgressView DataContext="{Binding ExportProgressViewModel}" />
+                <!-- Toast Notifications -->
+                <vViews:ToastView DataContext="{Binding ToastViewModel}" />
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

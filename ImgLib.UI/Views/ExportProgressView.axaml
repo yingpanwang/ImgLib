@@ -1,0 +1,116 @@
+<UserControl
+    x:Class="ImgLib.UI.Views.ExportProgressView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    x:DataType="vm:ExportProgressViewModel">
+
+    <Border
+        IsVisible="{Binding IsVisible}"
+        Background="{StaticResource SidebarBg}"
+        BorderBrush="{StaticResource BorderSubtle}"
+        BorderThickness="1"
+        CornerRadius="8"
+        Padding="16,12"
+        MinWidth="320"
+        MaxWidth="420"
+        BoxShadow="0 4 16 #40000000">
+        <DockPanel>
+            <!-- 顶栏：标题 + 关闭按钮 -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                <!-- 关闭按钮（导出中隐藏） -->
+                <Button
+                    DockPanel.Dock="Right"
+                    Command="{Binding DismissCommand}"
+                    IsVisible="{Binding !IsExporting}"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="4"
+                    Height="24"
+                    Width="24"
+                    Padding="0"
+                    Cursor="Hand">
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource TextSecondary}"
+                        Text="✕"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center" />
+                </Button>
+
+                <!-- 标题 -->
+                <TextBlock
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource TextPrimary}"
+                    Text="图片导出"
+                    VerticalAlignment="Center" />
+            </DockPanel>
+
+            <!-- 进度条 -->
+            <ProgressBar
+                DockPanel.Dock="Top"
+                Minimum="0"
+                Maximum="1"
+                Value="{Binding Progress}"
+                Height="6"
+                CornerRadius="3"
+                Margin="0,0,0,8" />
+
+            <!-- 状态信息 -->
+            <StackPanel DockPanel.Dock="Bottom" Spacing="4">
+                <!-- 状态文本 -->
+                <TextBlock
+                    Text="{Binding StatusText}"
+                    FontSize="12"
+                    Foreground="{StaticResource TextSecondary}" />
+
+                <!-- 当前文件名 -->
+                <TextBlock
+                    IsVisible="{Binding IsExporting}"
+                    Text="{Binding CurrentFileName}"
+                    FontSize="11"
+                    Foreground="{StaticResource TextTertiary}"
+                    TextWrapping="NoWrap"
+                    TextTrimming="CharacterEllipsis" />
+
+                <!-- 底部操作栏 -->
+                <DockPanel Margin="0,6,0,0">
+                    <!-- 取消按钮 -->
+                    <Button
+                        DockPanel.Dock="Right"
+                        Command="{Binding CancelExportCommand}"
+                        IsVisible="{Binding IsExporting}"
+                        Background="#40EF4444"
+                        BorderThickness="0"
+                        CornerRadius="4"
+                        Padding="12,4"
+                        Cursor="Hand"
+                        Height="28">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="#EF4444"
+                            Text="取消" />
+                    </Button>
+
+                    <!-- 成功/失败计数 -->
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="#10B981">
+                            <Run Text="✓ " />
+                            <Run Text="{Binding CompletedCount}" />
+                        </TextBlock>
+                        <TextBlock
+                            IsVisible="{Binding HasFailures}"
+                            FontSize="12"
+                            Foreground="#EF4444">
+                            <Run Text="✕ " />
+                            <Run Text="{Binding FailedCount}" />
+                        </TextBlock>
+                    </StackPanel>
+                </DockPanel>
+            </StackPanel>
+        </DockPanel>
+    </Border>
+</UserControl>

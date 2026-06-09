@@ -28,6 +28,12 @@ public partial class ImgListBoxViewModel : ViewModelBase
     [ObservableProperty]
     public partial ImgListItemViewModel? SelectedImgItem { get; set; }
 
+    /// <summary>当前目录下所有图片文件路径（供导出等批量操作使用）</summary>
+    public IReadOnlyList<string>? AllFilePaths => _allPaths;
+
+    /// <summary>列表中是否有图片</summary>
+    public bool HasItems => _allPaths is { Count: > 0 };
+
     /// <summary>是否还有更多条目可加载</summary>
     public bool HasMoreItems => _allPaths is not null && _loadedCount < _allPaths.Count;
 
