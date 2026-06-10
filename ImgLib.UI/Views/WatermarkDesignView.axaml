@@ -24,7 +24,7 @@
             BorderBrush="{StaticResource BorderSubtle}"
             BorderThickness="0,0,1,0"
             Padding="0">
-            <Grid>
+            <Grid Name="PreviewGrid">
                 <paz:ZoomBorder
                     EnablePan="True"
                     PanButton="Left"
@@ -69,19 +69,31 @@
                     </i:Interaction.Behaviors>
                 </paz:ZoomBorder>
 
-                <!-- ═══ 悬浮直方图 (右下角) ═══ -->
+                <!-- ═══ 悬浮直方图 (可拖拽) ═══ -->
                 <Border
-                    IsVisible="{Binding WatermarkSettingsViewModel.ShowHistogram}"
+                    Name="HistogramOverlay"
+                    IsVisible="{Binding PreviewSettingsViewModel.ShowHistogram}"
                     Background="#E6191919"
                     BorderBrush="#40000000"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="8"
-                    Margin="12,12,12,12"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
+                    Margin="12"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
                     Width="200"
-                    Height="140">
+                    Height="140"
+                    Cursor="Hand"
+                    ZIndex="10"
+                    PointerPressed="OnHistogramPointerPressed"
+                    PointerMoved="OnHistogramPointerMoved"
+                    PointerReleased="OnHistogramPointerReleased"
+                    PointerCaptureLost="OnHistogramPointerReleased">
+                    <Border.RenderTransform>
+                        <TranslateTransform
+                            X="{Binding HistogramTranslateX}"
+                            Y="{Binding HistogramTranslateY}" />
+                    </Border.RenderTransform>
                     <v:HistogramView DataContext="{Binding HistogramViewModel}" />
                 </Border>
 

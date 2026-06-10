@@ -24,21 +24,9 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial ExifInfo? ExifInfo { set; get; }
 
-    // 控制是否显示直方图
-    [ObservableProperty]
-    public partial bool ShowHistogram { get; set; } = false;
-
     // 图片基础信息
     [ObservableProperty]
     public partial ImgFileDescViewModel ImageInfo { get; set; } = new();
-
-    // // 自动预览开关
-    // [ObservableProperty]
-    // public partial bool AutoPreview { get; set; } = false;
-
-    // // 自动预览触发间隔（毫秒），避免频繁刷新
-    // [ObservableProperty]
-    // public partial int AutoPreviewIntervalMs { get; set; } = 300;
 
     // ═══ 圆角预设 ═══
     private static readonly float[] CornerRadiusPresets = { 0, 15, 45, 80, 120 };
@@ -283,7 +271,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         UpdatePreviewText();
         UpdateColorBrushes();
 
-        var previewSettings = SystemSettingsService.Load().PreviewSettings;
+        var previewSettings = SystemSettingsService.Current.PreviewSettings;
         // 自动预览
         System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 属性变化: {e.PropertyName}, AutoPreview={previewSettings.AutoPreview}");
         if (previewSettings.AutoPreview)

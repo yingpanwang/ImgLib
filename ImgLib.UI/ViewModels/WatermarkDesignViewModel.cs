@@ -3,8 +3,10 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
 using ImgLib.UI.Services;
+using ImgLib.UI.Views;
 using ImgLib.WatermarkPipeline;
 using SkiaSharp;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
 
@@ -35,10 +37,32 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     public partial HistogramViewModel HistogramViewModel { get; private set; }
 
     /// <summary>
+    /// 预览设置视图模型
+    /// </summary>
+    [ObservableProperty]
+    public partial PreviewSettingsViewModel PreviewSettingsViewModel { get; set; }
+
+    /// <summary>
     /// 设置面板是否展开（收起/展开）
     /// </summary>
     [ObservableProperty]
     public partial bool IsSettingsPanelExpanded { get; set; }
+
+    /// <summary>预览时是否显示直方图（与 <see cref="PreviewSettingsViewModel.ShowHistogram"/> 同步）</summary>
+    // [ObservableProperty]
+    // public partial bool ShowHistogram { get; set; }
+
+    /// <summary>直方图 X 方向平移偏移量（用于拖拽定位）</summary>
+    [ObservableProperty]
+    public partial double HistogramTranslateX { get; set; }
+
+    /// <summary>直方图 Y 方向平移偏移量（用于拖拽定位）</summary>
+    [ObservableProperty]
+    public partial double HistogramTranslateY { get; set; }
+
+    /// <summary>直方图是否正在被拖拽</summary>
+    [ObservableProperty]
+    public partial bool IsDraggingHistogram { get; set; }
 
     private ImageFile? _previewImageFile;
     private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
@@ -48,7 +72,24 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         WatermarkSettingsViewModel = new();
         HistogramViewModel = new();
         IsSettingsPanelExpanded = true;
+
+        // 引用系统设置单例，后续设置对话框 Save() 时自动同步
+        PreviewSettingsViewModel = SystemSettingsService.Current.PreviewSettings;
+        //ShowHistogram = PreviewSettingsViewModel.ShowHistogram;
+
+        // 监听预览设置变化，同步到本地属性
+        // PreviewSettingsViewModel.PropertyChanged += OnPreviewSettingsChanged;
     }
+
+    // private void OnPreviewSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    // {
+    //     switch (e.PropertyName)
+    //     {
+    //         case nameof(PreviewSettingsViewModel.ShowHistogram):
+    //             ShowHistogram = PreviewSettingsViewModel.ShowHistogram;
+    //             break;
+    //     }
+    // }
 
     [RelayCommand]
     private void ToggleSettingsPanel()
@@ -79,21 +120,24 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         {
             try
             {
-                var settings = SystemSettingsService.Load();
-                var intervalMs = settings.PreviewSettings.AutoPreviewIntervalMs;
+                var intervalMs = SystemSettingsService.Current.PreviewSettings.AutoPreviewIntervalMs;
 
                 // 确保间隔不小于 50ms，避免过于频繁的预览刷新
-                if (intervalMs < 50) intervalMs = 50;
+                if (intervalMs < 50)
+                    intervalMs = 50;
+
                 await Task.Delay(intervalMs, _previewCancellationTokenSource.Token);
+
                 if (!_previewCancellationTokenSource.Token.IsCancellationRequested)
                 {
                     System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 执行 SetBackground");
-                    await SetBackground();
+                    await SetBackgroundWithPipeline();
                 }
             }
             catch (TaskCanceledException)
             {
                 // 预览被取消，忽略
+                Debug.WriteLine($"预览取消:{PreviewFilePath}");
             }
         }, _previewCancellationTokenSource.Token);
     }
@@ -126,14 +170,14 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
         _ = exifInfo.EnsureMetadataLoadedAsync();
 
-        var settings = SystemSettingsService.Load();
         // 如果开启了自动预览，切换图片时自动重新生成预览
-        if (settings.PreviewSettings.AutoPreview)
+        if (SystemSettingsService.Current.PreviewSettings.AutoPreview)
         {
             OnPreviewRequested(this, EventArgs.Empty);
         }
     }
 
+    [Obsolete("使用管道方法")]
     [RelayCommand]
     public async Task SetBackground()
     {
@@ -150,8 +194,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 提前返回: _previewImageFile 为空");
             return;
         }
-        await SetBackgroundWithPipeline();
-        return;
 
         using MemoryStream output = new();
 
@@ -278,6 +320,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     public void Dispose()
     {
+        //PreviewSettingsViewModel.PropertyChanged -= OnPreviewSettingsChanged;
         Reset();
     }
 }

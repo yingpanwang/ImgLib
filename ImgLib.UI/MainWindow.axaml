@@ -1,19 +1,20 @@
 <Window
-x:Class="ImgLib.UI.MainWindow"
-xmlns="https://github.com/avaloniaui"
-xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-xmlns:v="using:ImgLib.UI"
-xmlns:vViews="using:ImgLib.UI.Views"
-xmlns:vm="using:ImgLib.UI.ViewModels"
-Title="ImgLib"
-d:DesignHeight="650"
-d:DesignWidth="800"
-x:DataType="vm:MainWindowViewModel"
-mc:Ignorable="d">
+    x:Class="ImgLib.UI.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:v="using:ImgLib.UI"
+    xmlns:vViews="using:ImgLib.UI.Views"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    Title="ImgLib"
+    d:DesignHeight="650"
+    d:DesignWidth="800"
+    x:DataType="vm:MainWindowViewModel"
+    mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -35,11 +36,14 @@ mc:Ignorable="d">
                     <Separator />
                     <MenuItem Command="{Binding TestToastCommand}" Header="测试 Toast" />
                 </MenuItem>
+                <MenuItem Header="导出">
+                    <MenuItem Command="{Binding ExportBatchCommand}" Header="批量导出" />
+                </MenuItem>
             </Menu>
         </Border>
 
         <!-- Main Content -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MinWidth="400"></ColumnDefinition>
                 <ColumnDefinition Width="1"></ColumnDefinition>
@@ -63,7 +67,7 @@ mc:Ignorable="d">
         </Grid>
 
         <!-- Floating Panels (Right Bottom Corner) -->
-        <Border Grid.Row="1"
+        <Border Grid.Row="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Margin="16"

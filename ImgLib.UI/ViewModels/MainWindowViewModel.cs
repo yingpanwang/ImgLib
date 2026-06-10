@@ -64,7 +64,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
     }
 
     /// <summary>
-    /// 批量导出：弹出缩略图选择对话框 → 用户勾选 → 选择输出目录 → 并行导出
+    /// 批量导出：选择输出目录 → 弹出缩略图选择对话框 → 用户勾选 → 并行导出
     /// </summary>
     [RelayCommand]
     public async Task ExportBatchAsync()
@@ -82,17 +82,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             return;
         }
 
-        // 1. 弹出缩略图选择对话框
-        var dialogVm = new ExportDialogViewModel();
-        dialogVm.Initialize(allPaths);
-
-        var dialog = new ExportDialog { DataContext = dialogVm };
-        var selectedPaths = await dialog.ShowDialog<IReadOnlyList<string>?>(ParentWindow);
-
-        if (selectedPaths == null || selectedPaths.Count == 0)
-            return; // 用户取消或未选择任何图片
-
-        // 2. 选择输出目录
+        // 1. 先选择输出目录
         var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             AllowMultiple = false,
@@ -103,6 +93,16 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             return;
 
         var outputDir = folders[0].Path.LocalPath;
+
+        // 2. 弹出缩略图选择对话框
+        var dialogVm = new ExportDialogViewModel();
+        dialogVm.Initialize(allPaths);
+
+        var dialog = new ExportDialog { DataContext = dialogVm };
+        var selectedPaths = await dialog.ShowDialog<IReadOnlyList<string>?>(ParentWindow);
+
+        if (selectedPaths == null || selectedPaths.Count == 0)
+            return; // 用户取消或未选择任何图片
 
         // 3. 获取当前水印设置
         var options = WatermarkDesignViewModel.WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
@@ -282,9 +282,6 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             ToastService.ShowError("无法打开设置窗口：主窗口未初始化");
             return;
         }
-
-        // 加载已保存的系统设置
-        var savedSettings = SystemSettingsService.Load();
 
         var settingsVm = new SettingsWindowViewModel();
 

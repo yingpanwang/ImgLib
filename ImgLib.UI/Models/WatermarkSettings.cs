@@ -225,7 +225,7 @@ public class WatermarkSettings : INotifyPropertyChanged
     /// </summary>
     public ImgLib.ImageGenerateOption ToImageGenerateOption()
     {
-        var systemSettings = SystemSettingsService.Load();
+        var systemSettings = SystemSettingsService.Current;
         var previewSettings = systemSettings.PreviewSettings;
         return new ImgLib.ImageGenerateOption(Scale)
         {
