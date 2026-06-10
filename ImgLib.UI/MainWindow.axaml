@@ -31,6 +31,8 @@ mc:Ignorable="d">
                     <MenuItem Command="{Binding ExportCurrentCommand}" Header="导出当前图片" />
                     <MenuItem Command="{Binding ExportBatchCommand}" Header="批量导出" />
                     <Separator />
+                    <MenuItem Command="{Binding OpenSettingsCommand}" Header="设置 ⚙" />
+                    <Separator />
                     <MenuItem Command="{Binding TestToastCommand}" Header="测试 Toast" />
                 </MenuItem>
             </Menu>

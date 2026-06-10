@@ -14,11 +14,12 @@
     d:DesignWidth="800"
     x:DataType="vm:WatermarkDesignViewModel"
     mc:Ignorable="d">
-    <Grid ColumnDefinitions="65*,35*" RowDefinitions="*">
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="*">
 
         <!-- ═══ Image Preview Area ═══ -->
         <Border
             Grid.Row="0"
+            Grid.Column="0"
             Background="#FAFAFA"
             BorderBrush="{StaticResource BorderSubtle}"
             BorderThickness="0,0,1,0"
@@ -83,18 +84,58 @@
                     Height="140">
                     <v:HistogramView DataContext="{Binding HistogramViewModel}" />
                 </Border>
+
+                <!-- ═══ 收起/展开设置面板按钮 ═══ -->
+                <Button
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Width="28"
+                    Height="80"
+                    Margin="0,0,0,0"
+                    Padding="0"
+                    Background="#E9060606"
+                    BorderBrush="#25000000"
+                    BorderThickness="1,1,0,1"
+                    CornerRadius="6,0,0,6"
+                    Cursor="Hand"
+                    Command="{Binding ToggleSettingsPanelCommand}"
+                    ToolTip.Tip="收起设置面板">
+                    <Panel>
+                        <!-- 展开状态：显示 ❮ 表示可收起 -->
+                        <TextBlock
+                            Text="❮"
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondary}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            IsVisible="{Binding IsSettingsPanelExpanded}" />
+                        <!-- 收起状态：显示 ❯ 表示可展开 -->
+                        <TextBlock
+                            Text="水印设置"
+                            FontSize="14"
+                            Foreground="{StaticResource TextSecondary}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            TextWrapping="Wrap"
+                            IsVisible="{Binding IsSettingsPanelExpanded, Converter={x:Static BoolConverters.Not}}" />
+                    </Panel>
+                </Button>
             </Grid>
         </Border>
 
-        <!-- ═══ Settings Panel ═══ -->
+        <!-- ═══ Settings Panel (可收起) ═══ -->
         <Border
             Grid.Row="0"
             Grid.Column="1"
+            IsVisible="{Binding IsSettingsPanelExpanded}"
             Background="{StaticResource PanelBg}"
-            Padding="0">
+            Padding="5"
+            Width="380"
+            MinWidth="320"
+            MaxWidth="480">
             <ScrollViewer>
                 <v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" DockPanel.Dock="Bottom" />
             </ScrollViewer>
         </Border>
     </Grid>
-			</UserControl>
+</UserControl>

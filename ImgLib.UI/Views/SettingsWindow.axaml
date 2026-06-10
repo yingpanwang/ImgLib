@@ -1,0 +1,237 @@
+<Window
+    x:Class="ImgLib.UI.Views.SettingsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    Title="设置"
+    Width="520"
+    Height="520"
+    MinWidth="420"
+    MinHeight="400"
+    WindowStartupLocation="CenterOwner"
+    CanResize="True"
+    d:DesignHeight="520"
+    d:DesignWidth="520"
+    x:DataType="vm:SettingsWindowViewModel"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="*,Auto">
+        <TabControl Grid.Row="0" Padding="0" Margin="0,8,0,0">
+
+            <!-- ═══ 系统设置 Tab ═══ -->
+            <TabItem Header="系统设置">
+                <ScrollViewer Padding="16,12">
+                    <StackPanel Spacing="16">
+
+                        <!-- 默认输出格式 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="默认输出格式"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding SystemSettings.DefaultOutputFormatIndex, Mode=TwoWay}">
+                                <ComboBoxItem>JPEG (*.jpg)</ComboBoxItem>
+                                <ComboBoxItem>PNG (*.png)</ComboBoxItem>
+                            </ComboBox>
+                            <TextBlock
+                                Text="批量导出时使用的默认图片格式"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
+
+                        <!-- JPEG 质量 -->
+                        <StackPanel Spacing="5" IsVisible="{Binding SystemSettings.DefaultOutputFormatIndex, Converter={x:Static BoolConverters.Not}}">
+                            <TextBlock
+                                Text="JPEG 质量 (1-100)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <NumericUpDown
+                                Increment="5"
+                                Maximum="100"
+                                Minimum="10"
+                                FormatString="F0"
+                                Value="{Binding SystemSettings.JpegQuality, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="值越大画质越高，文件越大（仅 JPEG 格式生效）"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
+
+                        <Separator />
+
+                        <!-- 缩略图缓存 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="缩略图缓存"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <TextBlock
+                                Text="{Binding ThumbnailCachePath}"
+                                FontSize="11"
+                                Foreground="{StaticResource TextPrimary}"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Text="缩略图文件缓存在上述目录，可手动删除以释放磁盘空间"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ 预览设置 Tab ═══ -->
+            <TabItem Header="预览设置">
+                <ScrollViewer Padding="16,12">
+                    <StackPanel Spacing="14">
+
+                        <!-- 显示直方图 -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <CheckBox IsChecked="{Binding SystemSettings.PreviewSettings.ShowHistogram, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="显示直方图"
+                                FontSize="12.5"
+                                Foreground="{StaticResource TextPrimary}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock
+                            Text="在预览图像右下角显示 RGB 直方图"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}"
+                            Margin="24,0,0,0" />
+
+                        <Separator />
+
+                        <!-- 自动预览 -->
+                        <StackPanel Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox IsChecked="{Binding SystemSettings.PreviewSettings.AutoPreview, Mode=TwoWay}" />
+                                <TextBlock
+                                    Text="自动预览"
+                                    FontSize="12.5"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock
+                                Text="参数变化后自动刷新预览图像"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}"
+                                Margin="24,0,0,0" />
+                        </StackPanel>
+
+                        <!-- 预览触发间隔 -->
+                        <StackPanel Spacing="5" IsVisible="{Binding SystemSettings.PreviewSettings.AutoPreview}">
+                            <TextBlock
+                                Text="预览触发间隔 (ms)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <NumericUpDown
+                                Increment="100"
+                                Maximum="5000"
+                                Minimum="50"
+                                FormatString="F0"
+                                Value="{Binding SystemSettings.PreviewSettings.AutoPreviewIntervalMs, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="参数变化后等待指定毫秒再触发预览，值越小响应越快但更频繁"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
+
+                        <Separator />
+
+                        <!-- 预览降采样 -->
+                        <StackPanel Spacing="5">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox IsChecked="{Binding SystemSettings.PreviewSettings.EnablePreviewDownsampling, Mode=TwoWay}" />
+                                <TextBlock
+                                    Text="启用预览降采样"
+                                    FontSize="12.5"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock
+                                Text="降低预览图像分辨率以提升渲染速度"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}"
+                                Margin="24,0,0,0" />
+
+                            <StackPanel Spacing="5" Margin="24,0,0,0" IsEnabled="{Binding SystemSettings.PreviewSettings.EnablePreviewDownsampling}">
+                                <!-- 降采样模式切换 -->
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock
+                                        Text="固定像素值"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}"
+                                        VerticalAlignment="Center" />
+                                    <ToggleSwitch
+                                        IsChecked="{Binding SystemSettings.PreviewSettings.UsePreviewPercentMode, Mode=TwoWay}"
+                                        OffContent=""
+                                        OnContent="" />
+                                    <TextBlock
+                                        Text="百分比"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}"
+                                        VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <!-- 固定像素值输入 -->
+                                <StackPanel Spacing="5" IsVisible="{Binding SystemSettings.PreviewSettings.UsePreviewPercentMode, Converter={x:Static BoolConverters.Not}}">
+                                    <TextBlock
+                                        Text="预览最大边长 (像素)"
+                                        FontSize="12"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="200"
+                                        Maximum="4000"
+                                        Minimum="400"
+                                        Value="{Binding SystemSettings.PreviewSettings.PreviewMaxDimension, Mode=TwoWay}" />
+                                    <TextBlock
+                                        Text="值越小预览越快，但画质降低"
+                                        FontSize="10"
+                                        Foreground="{StaticResource TextTertiary}" />
+                                </StackPanel>
+
+                                <!-- 百分比输入 -->
+                                <StackPanel Spacing="5" IsVisible="{Binding SystemSettings.PreviewSettings.UsePreviewPercentMode}">
+                                    <TextBlock
+                                        Text="预览百分比 (相对于原图最长边)"
+                                        FontSize="12"
+                                        FontWeight="Medium"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="5"
+                                        Maximum="100"
+                                        Minimum="10"
+                                        FormatString="F0"
+                                        Value="{Binding SystemSettings.PreviewSettings.PreviewMaxPercent, Mode=TwoWay}" />
+                                    <TextBlock
+                                        Text="百分比越低预览越快，但画质降低"
+                                        FontSize="10"
+                                        Foreground="{StaticResource TextTertiary}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ═══ 关闭按钮 ═══ -->
+        <Button
+            Grid.Row="1"
+            Classes="secondary"
+            Margin="16,12,16,16"
+            HorizontalAlignment="Right"
+            Content="关闭"
+            Click="OnCloseClick" />
+    </Grid>
+</Window>

@@ -30,8 +30,15 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [ObservableProperty]
     public partial WatermarkSettingsViewModel WatermarkSettingsViewModel { get; private set; }
 
+
     [ObservableProperty]
     public partial HistogramViewModel HistogramViewModel { get; private set; }
+
+    /// <summary>
+    /// 设置面板是否展开（收起/展开）
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsSettingsPanelExpanded { get; set; }
 
     private ImageFile? _previewImageFile;
     private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
@@ -40,6 +47,13 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     {
         WatermarkSettingsViewModel = new();
         HistogramViewModel = new();
+        IsSettingsPanelExpanded = true;
+    }
+
+    [RelayCommand]
+    private void ToggleSettingsPanel()
+    {
+        IsSettingsPanelExpanded = !IsSettingsPanelExpanded;
     }
 
     partial void OnWatermarkSettingsViewModelChanged(WatermarkSettingsViewModel value)
@@ -65,7 +79,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         {
             try
             {
-                var intervalMs = WatermarkSettingsViewModel.AutoPreviewIntervalMs;
+                var settings = SystemSettingsService.Load();
+                var intervalMs = settings.PreviewSettings.AutoPreviewIntervalMs;
+
                 // 确保间隔不小于 50ms，避免过于频繁的预览刷新
                 if (intervalMs < 50) intervalMs = 50;
                 await Task.Delay(intervalMs, _previewCancellationTokenSource.Token);
@@ -110,8 +126,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
         _ = exifInfo.EnsureMetadataLoadedAsync();
 
+        var settings = SystemSettingsService.Load();
         // 如果开启了自动预览，切换图片时自动重新生成预览
-        if (WatermarkSettingsViewModel.AutoPreview)
+        if (settings.PreviewSettings.AutoPreview)
         {
             OnPreviewRequested(this, EventArgs.Empty);
         }
@@ -140,10 +157,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
         // 传递预览标志和降采样参数
         var options = WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
-        options.EnablePreviewDownsampling = WatermarkSettingsViewModel.EnablePreviewDownsampling;
-        options.UsePreviewPercentMode = WatermarkSettingsViewModel.UsePreviewPercentMode;
-        options.PreviewMaxDimension = WatermarkSettingsViewModel.PreviewMaxDimension;
-        options.PreviewMaxPercent = WatermarkSettingsViewModel.PreviewMaxPercent;
 
         ImageService.GenerateWithOptions(
             _previewImageFile.GetSourceStream(),
@@ -182,10 +195,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         using MemoryStream output = new();
 
         var options = WatermarkSettingsViewModel.Settings.ToImageGenerateOption();
-        options.EnablePreviewDownsampling = WatermarkSettingsViewModel.EnablePreviewDownsampling;
-        options.UsePreviewPercentMode = WatermarkSettingsViewModel.UsePreviewPercentMode;
-        options.PreviewMaxDimension = WatermarkSettingsViewModel.PreviewMaxDimension;
-        options.PreviewMaxPercent = WatermarkSettingsViewModel.PreviewMaxPercent;
 
         // ── 管线方式 ──
         using var inputStream = _previewImageFile.GetSourceStream();
@@ -211,7 +220,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         // 从 ImageGenerateOption 构建管线 → 执行
         var pipeline = WatermarkPipelineRunner.FromOptions(options);
 
-        
+
         pipeline.Execute(ctx);
 
         // 编码输出

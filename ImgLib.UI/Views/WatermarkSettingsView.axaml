@@ -10,583 +10,476 @@
     d:DesignWidth="800"
     x:DataType="vm:WatermarkSettingsViewModel"
     mc:Ignorable="d">
-    <TabControl Padding="0" Margin="0,4,0,0">
+    <Grid RowDefinitions="*,Auto">
+        <TabControl Grid.Row="0" Padding="0" Margin="0,4,0,0">
+            <!-- ═══ 图像设置 Tab ═══ -->
+            <TabItem Header="图像设置">
+                <ScrollViewer Padding="12,8">
+                    <StackPanel Spacing="14">
 
-        <!-- ═══ 图像设置 Tab ═══ -->
-        <TabItem Header="图像设置">
-            <ScrollViewer Padding="12,8">
-                <StackPanel Spacing="14">
-
-                    <!-- 中心缩放比例 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="中心缩放比例"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="0.05"
-                            Maximum="1"
-                            Minimum="0.5"
-                            Value="{Binding Settings.Scale, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <!-- 圆角 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="圆角"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding CornerRadiusPresetIndex, Mode=TwoWay}">
-                            <ComboBoxItem>直角 (0)</ComboBoxItem>
-                            <ComboBoxItem>轻微圆角 (15)</ComboBoxItem>
-                            <ComboBoxItem>标准圆角 (45)</ComboBoxItem>
-                            <ComboBoxItem>大圆角 (80)</ComboBoxItem>
-                            <ComboBoxItem>超大圆角 (120)</ComboBoxItem>
-                            <ComboBoxItem>自定义...</ComboBoxItem>
-                        </ComboBox>
-                        <StackPanel Spacing="5" IsVisible="{Binding IsCornerRadiusCustom}">
+                        <!-- 中心缩放比例 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="中心缩放比例"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
                             <NumericUpDown
-                                Increment="5"
-                                Minimum="0"
-                                Maximum="300"
-                                FormatString="F0"
-                                Value="{Binding Settings.CornerRadius, Mode=TwoWay}" />
-                            <TextBlock
-                                Text="圆角半径（像素），0=直角"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
+                                Increment="0.05"
+                                Maximum="1"
+                                Minimum="0.5"
+                                Value="{Binding Settings.Scale, Mode=TwoWay}" />
                         </StackPanel>
-                    </StackPanel>
 
-                    <!-- 虚化Blur值 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="虚化 Blur 值"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding BlurSigmaPresetIndex, Mode=TwoWay}">
-                            <ComboBoxItem>无虚化 (0)</ComboBoxItem>
-                            <ComboBoxItem>轻微虚化 (10)</ComboBoxItem>
-                            <ComboBoxItem>标准虚化 (25)</ComboBoxItem>
-                            <ComboBoxItem>强虚化 (50)</ComboBoxItem>
-                            <ComboBoxItem>极强虚化 (80)</ComboBoxItem>
-                            <ComboBoxItem>自定义...</ComboBoxItem>
-                        </ComboBox>
-                        <StackPanel Spacing="5" IsVisible="{Binding IsBlurSigmaCustom}">
-                            <NumericUpDown
-                                Increment="5"
-                                Minimum="0"
-                                Maximum="200"
-                                FormatString="F0"
-                                Value="{Binding Settings.BlurSigma, Mode=TwoWay}" />
+                        <!-- 圆角 -->
+                        <StackPanel Spacing="5">
                             <TextBlock
-                                Text="高斯模糊 Sigma 值，0=无虚化，值越大背景越模糊"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 阴影偏移 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="阴影偏移"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding ShadowOffsetPresetIndex, Mode=TwoWay}">
-                            <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
-                            <ComboBoxItem>右下微偏 (20, 20)</ComboBoxItem>
-                            <ComboBoxItem>右下标准 (50, 50)</ComboBoxItem>
-                            <ComboBoxItem>右下远偏 (80, 80)</ComboBoxItem>
-                            <ComboBoxItem>自定义...</ComboBoxItem>
-                        </ComboBox>
-                        <StackPanel Spacing="8" IsVisible="{Binding IsShadowOffsetCustom}">
-                            <StackPanel Spacing="3">
-                                <TextBlock
-                                    Text="X 偏移（像素）"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}" />
+                                Text="圆角"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding CornerRadiusPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>直角 (0)</ComboBoxItem>
+                                <ComboBoxItem>轻微圆角 (15)</ComboBoxItem>
+                                <ComboBoxItem>标准圆角 (45)</ComboBoxItem>
+                                <ComboBoxItem>大圆角 (80)</ComboBoxItem>
+                                <ComboBoxItem>超大圆角 (120)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="5" IsVisible="{Binding IsCornerRadiusCustom}">
                                 <NumericUpDown
                                     Increment="5"
-                                    Minimum="-200"
-                                    Maximum="200"
+                                    Minimum="0"
+                                    Maximum="300"
                                     FormatString="F0"
-                                    Value="{Binding Settings.ShadowOffsetX, Mode=TwoWay}" />
-                            </StackPanel>
-                            <StackPanel Spacing="3">
+                                    Value="{Binding Settings.CornerRadius, Mode=TwoWay}" />
                                 <TextBlock
-                                    Text="Y 偏移（像素）"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}" />
-                                <NumericUpDown
-                                    Increment="5"
-                                    Minimum="-200"
-                                    Maximum="200"
-                                    FormatString="F0"
-                                    Value="{Binding Settings.ShadowOffsetY, Mode=TwoWay}" />
-                            </StackPanel>
-                            <TextBlock
-                                Text="正=右/下，负=左/上"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 显示直方图 -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding ShowHistogram, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="显示直方图"
-                            FontSize="12.5"
-                            Foreground="{StaticResource TextPrimary}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <!-- 自动预览 -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CheckBox IsChecked="{Binding AutoPreview, Mode=TwoWay}" />
-                            <TextBlock
-                                Text="自动预览"
-                                FontSize="12.5"
-                                Foreground="{StaticResource TextPrimary}"
-                                VerticalAlignment="Center" />
-
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 预览触发间隔 -->
-                    <StackPanel Spacing="5" IsVisible="{Binding AutoPreview}">
-                        <TextBlock
-                            Text="预览触发间隔 (ms)"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="100"
-                            Maximum="5000"
-                            Minimum="50"
-                            FormatString="F0"
-                            Value="{Binding AutoPreviewIntervalMs, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="参数变化后等待指定毫秒再触发预览，值越小响应越快但更频繁"
-                            FontSize="10"
-                            Foreground="{StaticResource TextTertiary}" />
-                    </StackPanel>
-
-                    <!-- 预览降采样 -->
-                    <StackPanel Spacing="5">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CheckBox IsChecked="{Binding EnablePreviewDownsampling, Mode=TwoWay}" />
-                            <TextBlock
-                                Text="启用预览降采样"
-                                FontSize="12.5"
-                                Foreground="{StaticResource TextPrimary}"
-                                VerticalAlignment="Center" />
-                        </StackPanel>
-
-                        <StackPanel Spacing="5" Margin="24,0,0,0" IsEnabled="{Binding EnablePreviewDownsampling}">
-                            <!-- 降采样模式切换 -->
-                            <StackPanel Orientation="Horizontal" Spacing="10">
-                                <TextBlock
-                                    Text="固定像素值"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}"
-                                    VerticalAlignment="Center" />
-                                <ToggleSwitch
-                                    IsChecked="{Binding UsePreviewPercentMode, Mode=TwoWay}"
-                                    OffContent=""
-                                    OnContent="" />
-                                <TextBlock
-                                    Text="百分比"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}"
-                                    VerticalAlignment="Center" />
-                            </StackPanel>
-
-                            <!-- 固定像素值输入 (非百分比模式) -->
-                            <StackPanel Spacing="5" IsVisible="{Binding UsePreviewPercentMode, Converter={x:Static BoolConverters.Not}}">
-                                <TextBlock
-                                    Text="预览最大边长 (像素)"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource TextSecondary}" />
-                                <NumericUpDown
-                                    Increment="200"
-                                    Maximum="4000"
-                                    Minimum="400"
-                                    Value="{Binding PreviewMaxDimension, Mode=TwoWay}" />
-                                <TextBlock
-                                    Text="值越小预览越快，但画质降低"
-                                    FontSize="10"
-                                    Foreground="{StaticResource TextTertiary}" />
-                            </StackPanel>
-
-                            <!-- 百分比输入 (百分比模式) -->
-                            <StackPanel Spacing="5" IsVisible="{Binding UsePreviewPercentMode}">
-                                <TextBlock
-                                    Text="预览百分比 (相对于原图最长边)"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="{StaticResource TextSecondary}" />
-                                <NumericUpDown
-                                    Increment="5"
-                                    Maximum="100"
-                                    Minimum="10"
-                                    FormatString="F0"
-                                    Value="{Binding PreviewMaxPercent, Mode=TwoWay}" />
-                                <TextBlock
-                                    Text="百分比越低预览越快，但画质降低"
+                                    Text="圆角半径（像素），0=直角"
                                     FontSize="10"
                                     Foreground="{StaticResource TextTertiary}" />
                             </StackPanel>
                         </StackPanel>
+
+                        <!-- 虚化Blur值 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="虚化 Blur 值"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding BlurSigmaPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无虚化 (0)</ComboBoxItem>
+                                <ComboBoxItem>轻微虚化 (10)</ComboBoxItem>
+                                <ComboBoxItem>标准虚化 (25)</ComboBoxItem>
+                                <ComboBoxItem>强虚化 (50)</ComboBoxItem>
+                                <ComboBoxItem>极强虚化 (80)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="5" IsVisible="{Binding IsBlurSigmaCustom}">
+                                <NumericUpDown
+                                    Increment="5"
+                                    Minimum="0"
+                                    Maximum="200"
+                                    FormatString="F0"
+                                    Value="{Binding Settings.BlurSigma, Mode=TwoWay}" />
+                                <TextBlock
+                                    Text="高斯模糊 Sigma 值，0=无虚化，值越大背景越模糊"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 阴影偏移 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="阴影偏移"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding ShadowOffsetPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
+                                <ComboBoxItem>右下微偏 (20, 20)</ComboBoxItem>
+                                <ComboBoxItem>右下标准 (50, 50)</ComboBoxItem>
+                                <ComboBoxItem>右下远偏 (80, 80)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="8" IsVisible="{Binding IsShadowOffsetCustom}">
+                                <StackPanel Spacing="3">
+                                    <TextBlock
+                                        Text="X 偏移（像素）"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="5"
+                                        Minimum="-200"
+                                        Maximum="200"
+                                        FormatString="F0"
+                                        Value="{Binding Settings.ShadowOffsetX, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Spacing="3">
+                                    <TextBlock
+                                        Text="Y 偏移（像素）"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="5"
+                                        Minimum="-200"
+                                        Maximum="200"
+                                        FormatString="F0"
+                                        Value="{Binding Settings.ShadowOffsetY, Mode=TwoWay}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Text="正=右/下，负=左/上"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
                     </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                    <!-- 预览更改按钮 -->
-                    <Button
-                        Classes="primary"
-                        Command="{Binding PreviewCommand}"
-                        Content="预览更改" />
+            <!-- ═══ 水印文本 Tab ═══ -->
+            <TabItem Header="水印文本">
+                <ScrollViewer Padding="12,8">
+                    <StackPanel Spacing="14">
 
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
+                        <!-- 文本模板 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="文本模板"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <TextBlock
+                                Text="在文本框中右键选择 EXIF 字段插入，也可手动编辑模板"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}"
+                                Margin="0,0,0,4" />
 
-        <!-- ═══ 水印文本 Tab ═══ -->
-        <TabItem Header="水印文本">
-            <ScrollViewer Padding="12,8">
-                <StackPanel Spacing="14">
+                            <TextBox
+                                Name="TemplateTextBox"
+                                Text="{Binding Settings.WatermarkTemplate, Mode=TwoWay}"
+                                AcceptsReturn="True"
+                                TextWrapping="Wrap"
+                                MinHeight="150"
+                                VerticalContentAlignment="Top" />
+                        </StackPanel>
 
-                    <!-- 文本模板 -->
-                    <StackPanel Spacing="5">
+                        <!-- 预览文本 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="预览"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <Border Background="#F5F5F5" Padding="8,4" CornerRadius="4">
+                                <TextBlock
+                                    Text="{Binding PreviewWatermarkText}"
+                                    FontSize="11"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    TextWrapping="Wrap" />
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 字体大小比例 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="字体大小比例 (0.01-0.1)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <NumericUpDown
+                                Increment="0.005"
+                                Maximum="0.1"
+                                Minimum="0.01"
+                                FormatString="F3"
+                                Value="{Binding Settings.WatermarkFontSizeRatio, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <!-- 字体加粗 -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <CheckBox IsChecked="{Binding Settings.WatermarkBold, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="字体加粗"
+                                FontSize="12.5"
+                                Foreground="{StaticResource TextPrimary}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- 行间距 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="行间距系数"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <NumericUpDown
+                                Increment="0.1"
+                                Maximum="3.0"
+                                Minimum="0.5"
+                                FormatString="F1"
+                                Value="{Binding Settings.WatermarkLineSpacing, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="1.0=标准行距，大于1.0增大间距（仅多行生效）"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+                        </StackPanel>
+
+                        <!-- 自动缩放适应 -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <CheckBox IsChecked="{Binding Settings.WatermarkAutoFitFont, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="自动缩放适应区域"
+                                FontSize="12.5"
+                                Foreground="{StaticResource TextPrimary}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
                         <TextBlock
-                            Text="文本模板"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock
-                            Text="在文本框中右键选择 EXIF 字段插入，也可手动编辑模板"
+                            Text="当文本块高度超出水印区域时自动缩小字体以适应"
                             FontSize="10"
                             Foreground="{StaticResource TextTertiary}"
-                            Margin="0,0,0,4" />
+                            Margin="24,0,0,0" />
 
-                        <TextBox
-                            Name="TemplateTextBox"
-                            Text="{Binding Settings.WatermarkTemplate, Mode=TwoWay}"
-                            AcceptsReturn="True"
-                            TextWrapping="Wrap"
-                            MinHeight="150"
-                            VerticalContentAlignment="Top" />
-                    </StackPanel>
-
-                    <!-- 预览文本 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="预览"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <Border Background="#F5F5F5" Padding="8,4" CornerRadius="4">
+                        <!-- 水平对齐 -->
+                        <StackPanel Spacing="5">
                             <TextBlock
-                                Text="{Binding PreviewWatermarkText}"
-                                FontSize="11"
+                                Text="水平对齐"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding HorizontalAlignIndex, Mode=TwoWay}">
+                                <ComboBoxItem Content="Left"/>
+                                <ComboBoxItem Content="Center"/>
+                                <ComboBoxItem Content="Right"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- 垂直位置 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="垂直位置 (0=底部, 1=顶部)"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <NumericUpDown
+                                Increment="0.1"
+                                Maximum="1"
+                                Minimum="0"
+                                FormatString="F1"
+                                Value="{Binding Settings.WatermarkVerticalPosition, Mode=TwoWay}" />
+                        </StackPanel>
+
+                        <!-- 文字颜色 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="文字颜色"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Text="{Binding Settings.WatermarkColor, Mode=TwoWay}" MinWidth="80"/>
+                                <Border Width="24" Height="24" Background="{Binding WatermarkColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ 文字阴影 Tab ═══ -->
+            <TabItem Header="文字阴影">
+                <ScrollViewer Padding="12,8">
+                    <StackPanel Spacing="14">
+
+                        <!-- 文字阴影偏移 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="阴影偏移"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding TextShadowOffsetPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
+                                <ComboBoxItem>右下微偏 (1, 1)</ComboBoxItem>
+                                <ComboBoxItem>右下标准 (2, 2)</ComboBoxItem>
+                                <ComboBoxItem>右下明显 (4, 4)</ComboBoxItem>
+                                <ComboBoxItem>右下远偏 (8, 8)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="8" IsVisible="{Binding IsTextShadowOffsetCustom}">
+                                <StackPanel Spacing="3">
+                                    <TextBlock
+                                        Text="X 偏移"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="1"
+                                        Minimum="-20"
+                                        Maximum="20"
+                                        FormatString="F0"
+                                        Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Spacing="3">
+                                    <TextBlock
+                                        Text="Y 偏移"
+                                        FontSize="11"
+                                        Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown
+                                        Increment="1"
+                                        Minimum="-20"
+                                        Maximum="20"
+                                        FormatString="F0"
+                                        Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Text="正=右/下，负=左/上"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 阴影模糊半径 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="阴影模糊半径"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding TextShadowSigmaPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无模糊 (0)</ComboBoxItem>
+                                <ComboBoxItem>轻微模糊 (2)</ComboBoxItem>
+                                <ComboBoxItem>标准模糊 (5)</ComboBoxItem>
+                                <ComboBoxItem>较强模糊 (10)</ComboBoxItem>
+                                <ComboBoxItem>强模糊 (15)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="5" IsVisible="{Binding IsTextShadowSigmaCustom}">
+                                <NumericUpDown
+                                    Increment="1"
+                                    Minimum="0"
+                                    Maximum="20"
+                                    FormatString="F0"
+                                    Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
+                                <TextBlock
+                                    Text="阴影模糊半径，0=无模糊"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 阴影颜色 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="阴影颜色"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Text="{Binding Settings.WatermarkShadowColor, Mode=TwoWay}" MinWidth="80"/>
+                                <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ═══ 调试选项 Tab ═══ -->
+            <TabItem Header="调试选项">
+                <ScrollViewer Padding="12,8">
+                    <StackPanel Spacing="14">
+
+                        <!-- 显示水印边框 -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <CheckBox IsChecked="{Binding Settings.ShowWatermarkBorder, Mode=TwoWay}" />
+                            <TextBlock
+                                Text="显示水印边框"
+                                FontSize="12.5"
                                 Foreground="{StaticResource TextPrimary}"
-                                TextWrapping="Wrap" />
-                        </Border>
-                    </StackPanel>
-
-                    <!-- 字体大小比例 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="字体大小比例 (0.01-0.1)"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="0.005"
-                            Maximum="0.1"
-                            Minimum="0.01"
-                            FormatString="F3"
-                            Value="{Binding Settings.WatermarkFontSizeRatio, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <!-- 字体加粗 -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding Settings.WatermarkBold, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="字体加粗"
-                            FontSize="12.5"
-                            Foreground="{StaticResource TextPrimary}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <!-- 行间距 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="行间距系数"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="0.1"
-                            Maximum="3.0"
-                            Minimum="0.5"
-                            FormatString="F1"
-                            Value="{Binding Settings.WatermarkLineSpacing, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="1.0=标准行距，大于1.0增大间距（仅多行生效）"
-                            FontSize="10"
-                            Foreground="{StaticResource TextTertiary}" />
-                    </StackPanel>
-
-                    <!-- 自动缩放适应 -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding Settings.WatermarkAutoFitFont, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="自动缩放适应区域"
-                            FontSize="12.5"
-                            Foreground="{StaticResource TextPrimary}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
-                    <TextBlock
-                        Text="当文本块高度超出水印区域时自动缩小字体以适应"
-                        FontSize="10"
-                        Foreground="{StaticResource TextTertiary}"
-                        Margin="24,0,0,0" />
-
-                    <!-- 水平对齐 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="水平对齐"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding HorizontalAlignIndex, Mode=TwoWay}">
-                            <ComboBoxItem Content="Left"/>
-                            <ComboBoxItem Content="Center"/>
-                            <ComboBoxItem Content="Right"/>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <!-- 垂直位置 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="垂直位置 (0=底部, 1=顶部)"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="0.1"
-                            Maximum="1"
-                            Minimum="0"
-                            FormatString="F1"
-                            Value="{Binding Settings.WatermarkVerticalPosition, Mode=TwoWay}" />
-                    </StackPanel>
-
-                    <!-- 文字颜色 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="文字颜色"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding Settings.WatermarkColor, Mode=TwoWay}" MinWidth="80"/>
-                            <Border Width="24" Height="24" Background="{Binding WatermarkColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                                VerticalAlignment="Center" />
                         </StackPanel>
-                    </StackPanel>
 
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-
-        <!-- ═══ 文字阴影 Tab ═══ -->
-        <TabItem Header="文字阴影">
-            <ScrollViewer Padding="12,8">
-                <StackPanel Spacing="14">
-
-                    <!-- 文字阴影偏移 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="阴影偏移"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding TextShadowOffsetPresetIndex, Mode=TwoWay}">
-                            <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
-                            <ComboBoxItem>右下微偏 (1, 1)</ComboBoxItem>
-                            <ComboBoxItem>右下标准 (2, 2)</ComboBoxItem>
-                            <ComboBoxItem>右下明显 (4, 4)</ComboBoxItem>
-                            <ComboBoxItem>右下远偏 (8, 8)</ComboBoxItem>
-                            <ComboBoxItem>自定义...</ComboBoxItem>
-                        </ComboBox>
-                        <StackPanel Spacing="8" IsVisible="{Binding IsTextShadowOffsetCustom}">
-                            <StackPanel Spacing="3">
-                                <TextBlock
-                                    Text="X 偏移"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}" />
-                                <NumericUpDown
-                                    Increment="1"
-                                    Minimum="-20"
-                                    Maximum="20"
-                                    FormatString="F0"
-                                    Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
-                            </StackPanel>
-                            <StackPanel Spacing="3">
-                                <TextBlock
-                                    Text="Y 偏移"
-                                    FontSize="11"
-                                    Foreground="{StaticResource TextSecondary}" />
-                                <NumericUpDown
-                                    Increment="1"
-                                    Minimum="-20"
-                                    Maximum="20"
-                                    FormatString="F0"
-                                    Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
-                            </StackPanel>
+                        <!-- 边框颜色 -->
+                        <StackPanel Spacing="5">
                             <TextBlock
-                                Text="正=右/下，负=左/上"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
+                                Text="边框颜色"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Text="{Binding Settings.WatermarkBorderColor, Mode=TwoWay}" MinWidth="80"/>
+                                <Border Width="24" Height="24" Background="{Binding WatermarkBorderColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
 
-                    <!-- 阴影模糊半径 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="阴影模糊半径"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <ComboBox SelectedIndex="{Binding TextShadowSigmaPresetIndex, Mode=TwoWay}">
-                            <ComboBoxItem>无模糊 (0)</ComboBoxItem>
-                            <ComboBoxItem>轻微模糊 (2)</ComboBoxItem>
-                            <ComboBoxItem>标准模糊 (5)</ComboBoxItem>
-                            <ComboBoxItem>较强模糊 (10)</ComboBoxItem>
-                            <ComboBoxItem>强模糊 (15)</ComboBoxItem>
-                            <ComboBoxItem>自定义...</ComboBoxItem>
-                        </ComboBox>
-                        <StackPanel Spacing="5" IsVisible="{Binding IsTextShadowSigmaCustom}">
+                        <!-- 边框宽度 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock
+                                Text="边框宽度"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
                             <NumericUpDown
                                 Increment="1"
-                                Minimum="0"
-                                Maximum="20"
-                                FormatString="F0"
-                                Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
-                            <TextBlock
-                                Text="阴影模糊半径，0=无模糊"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
+                                Maximum="10"
+                                Minimum="1"
+                                Value="{Binding Settings.WatermarkBorderWidth, Mode=TwoWay}" />
                         </StackPanel>
+
                     </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-                    <!-- 阴影颜色 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="阴影颜色"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding Settings.WatermarkShadowColor, Mode=TwoWay}" MinWidth="80"/>
-                            <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
-                        </StackPanel>
-                    </StackPanel>
+            <!-- ═══ 图片信息 Tab ═══ -->
+            <TabItem Header="图片信息">
+                <ScrollViewer Padding="12,8">
+                    <v:ImgFileDescView DataContext="{Binding ImageInfo}" />
+                </ScrollViewer>
+            </TabItem>
 
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
+            <!-- ═══ Exif信息 Tab ═══ -->
+            <TabItem Header="Exif信息">
+                <DockPanel Margin="12,8">
+                    <Button
+                        DockPanel.Dock="Bottom"
+                        Classes="secondary"
+                        Content="获取 Exif 信息"
+                        Command="{Binding GetExifInfoCommand}"
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0" />
 
-        <!-- ═══ 调试选项 Tab ═══ -->
-        <TabItem Header="调试选项">
-            <ScrollViewer Padding="12,8">
-                <StackPanel Spacing="14">
+                    <TreeView ItemsSource="{Binding ExifInfoTree}" DockPanel.Dock="Top">
+                        <TreeView.ItemTemplate>
+                            <TreeDataTemplate ItemsSource="{Binding Children}">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <TextBlock
+                                        Text="{Binding Name}"
+                                        Foreground="{StaticResource TextSecondary}"
+                                        FontSize="12" />
+                                    <TextBlock
+                                        Text=":"
+                                        Foreground="{StaticResource TextTertiary}"
+                                        FontSize="12" />
+                                    <TextBlock
+                                        Text="{Binding Value}"
+                                        Foreground="{StaticResource TextPrimary}"
+                                        FontSize="12" />
+                                </StackPanel>
+                            </TreeDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
 
-                    <!-- 显示水印边框 -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <CheckBox IsChecked="{Binding Settings.ShowWatermarkBorder, Mode=TwoWay}" />
-                        <TextBlock
-                            Text="显示水印边框"
-                            FontSize="12.5"
-                            Foreground="{StaticResource TextPrimary}"
-                            VerticalAlignment="Center" />
-                    </StackPanel>
+        <!-- ═══ 预览更改按钮 (始终可见) ═══ -->
+        <Button
+            Grid.Row="1"
+            Classes="primary"
+            Margin="12,8,12,12"
+            Command="{Binding PreviewCommand}"
+            Content="预览更改" />
 
-                    <!-- 边框颜色 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="边框颜色"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBox Text="{Binding Settings.WatermarkBorderColor, Mode=TwoWay}" MinWidth="80"/>
-                            <Border Width="24" Height="24" Background="{Binding WatermarkBorderColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <!-- 边框宽度 -->
-                    <StackPanel Spacing="5">
-                        <TextBlock
-                            Text="边框宽度"
-                            FontSize="12"
-                            FontWeight="Medium"
-                            Foreground="{StaticResource TextSecondary}" />
-                        <NumericUpDown
-                            Increment="1"
-                            Maximum="10"
-                            Minimum="1"
-                            Value="{Binding Settings.WatermarkBorderWidth, Mode=TwoWay}" />
-                    </StackPanel>
-
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-
-        <!-- ═══ 图片信息 Tab ═══ -->
-        <TabItem Header="图片信息">
-            <ScrollViewer Padding="12,8">
-                <v:ImgFileDescView DataContext="{Binding ImageInfo}" />
-            </ScrollViewer>
-        </TabItem>
-
-        <!-- ═══ Exif信息 Tab ═══ -->
-        <TabItem Header="Exif信息">
-            <DockPanel Margin="12,8">
-                <Button
-                    DockPanel.Dock="Bottom"
-                    Classes="secondary"
-                    Content="获取 Exif 信息"
-                    Command="{Binding GetExifInfoCommand}"
-                    HorizontalAlignment="Left"
-                    Margin="0,10,0,0" />
-
-                <TreeView ItemsSource="{Binding ExifInfoTree}" DockPanel.Dock="Top">
-                    <TreeView.ItemTemplate>
-                        <TreeDataTemplate ItemsSource="{Binding Children}">
-                            <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock
-                                    Text="{Binding Name}"
-                                    Foreground="{StaticResource TextSecondary}"
-                                    FontSize="12" />
-                                <TextBlock
-                                    Text=":"
-                                    Foreground="{StaticResource TextTertiary}"
-                                    FontSize="12" />
-                                <TextBlock
-                                    Text="{Binding Value}"
-                                    Foreground="{StaticResource TextPrimary}"
-                                    FontSize="12" />
-                            </StackPanel>
-                        </TreeDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-            </DockPanel>
-        </TabItem>
-    </TabControl>
+    </Grid>
 </UserControl>

@@ -17,6 +17,11 @@ public static class ThumbnailCacheService
         "ImgLib",
         "thumbnails");
 
+    /// <summary>
+    /// 缩略图缓存目录路径
+    /// </summary>
+    public static string CacheDirectory => CacheDir;
+
     private static string CacheKey(string filePath, DateTime lastWriteTimeUtc)
     {
         var raw = $"{filePath}|{lastWriteTimeUtc.Ticks}";

@@ -275,6 +275,29 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
     }
 
     [RelayCommand]
+    public async Task OpenSettingsAsync()
+    {
+        if (ParentWindow == null)
+        {
+            ToastService.ShowError("无法打开设置窗口：主窗口未初始化");
+            return;
+        }
+
+        // 加载已保存的系统设置
+        var savedSettings = SystemSettingsService.Load();
+
+        var settingsVm = new SettingsWindowViewModel();
+
+        var window = new SettingsWindow { DataContext = settingsVm };
+        await window.ShowDialog(ParentWindow);
+        ;
+        SystemSettingsService.Save(settingsVm.Capture());
+
+        // 同步到运行时 WatermarkSettings（用户可能在对话框中修改了预览设置）
+        //settingsVm.SyncToWatermarkSettings();
+    }
+
+    [RelayCommand]
     public void TestToast()
     {
         _toastViewModel.ShowMessage("测试通知", ToastType.Info);

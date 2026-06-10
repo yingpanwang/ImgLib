@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using ImgLib.UI.Services;
 
 namespace ImgLib.UI.Models;
 
@@ -158,34 +159,34 @@ public class WatermarkSettings : INotifyPropertyChanged
         set { _watermarkBorderWidth = value; OnPropertyChanged(); }
     }
 
-    // ═══ 预览相关参数 ═══
-    private bool _enablePreviewDownsampling = true;
-    public bool EnablePreviewDownsampling
-    {
-        get => _enablePreviewDownsampling;
-        set { _enablePreviewDownsampling = value; OnPropertyChanged(); }
-    }
+    // // ═══ 预览相关参数 ═══
+    // private bool _enablePreviewDownsampling = true;
+    // public bool EnablePreviewDownsampling
+    // {
+    //     get => _enablePreviewDownsampling;
+    //     set { _enablePreviewDownsampling = value; OnPropertyChanged(); }
+    // }
 
-    private bool _usePreviewPercentMode = false;
-    public bool UsePreviewPercentMode
-    {
-        get => _usePreviewPercentMode;
-        set { _usePreviewPercentMode = value; OnPropertyChanged(); }
-    }
+    // private bool _usePreviewPercentMode = false;
+    // public bool UsePreviewPercentMode
+    // {
+    //     get => _usePreviewPercentMode;
+    //     set { _usePreviewPercentMode = value; OnPropertyChanged(); }
+    // }
 
-    private int _previewMaxDimension = 1200;
-    public int PreviewMaxDimension
-    {
-        get => _previewMaxDimension;
-        set { _previewMaxDimension = value; OnPropertyChanged(); }
-    }
+    // private int _previewMaxDimension = 1200;
+    // public int PreviewMaxDimension
+    // {
+    //     get => _previewMaxDimension;
+    //     set { _previewMaxDimension = value; OnPropertyChanged(); }
+    // }
 
-    private float _previewMaxPercent = 50f;
-    public float PreviewMaxPercent
-    {
-        get => _previewMaxPercent;
-        set { _previewMaxPercent = value; OnPropertyChanged(); }
-    }
+    // private float _previewMaxPercent = 50f;
+    // public float PreviewMaxPercent
+    // {
+    //     get => _previewMaxPercent;
+    //     set { _previewMaxPercent = value; OnPropertyChanged(); }
+    // }
 
     /// <summary>
     /// 从 ImageGenerateOption 复制值
@@ -213,10 +214,10 @@ public class WatermarkSettings : INotifyPropertyChanged
         ShowWatermarkBorder = option.ShowWatermarkBorder;
         WatermarkBorderColor = option.WatermarkBorderColor;
         WatermarkBorderWidth = option.WatermarkBorderWidth;
-        EnablePreviewDownsampling = option.EnablePreviewDownsampling;
-        UsePreviewPercentMode = option.UsePreviewPercentMode;
-        PreviewMaxDimension = option.PreviewMaxDimension;
-        PreviewMaxPercent = option.PreviewMaxPercent;
+        // EnablePreviewDownsampling = option.EnablePreviewDownsampling;
+        // UsePreviewPercentMode = option.UsePreviewPercentMode;
+        // PreviewMaxDimension = option.PreviewMaxDimension;
+        // PreviewMaxPercent = option.PreviewMaxPercent;
     }
 
     /// <summary>
@@ -224,6 +225,8 @@ public class WatermarkSettings : INotifyPropertyChanged
     /// </summary>
     public ImgLib.ImageGenerateOption ToImageGenerateOption()
     {
+        var systemSettings = SystemSettingsService.Load();
+        var previewSettings = systemSettings.PreviewSettings;
         return new ImgLib.ImageGenerateOption(Scale)
         {
             CornerRadius = CornerRadius,
@@ -246,10 +249,10 @@ public class WatermarkSettings : INotifyPropertyChanged
             ShowWatermarkBorder = ShowWatermarkBorder,
             WatermarkBorderColor = WatermarkBorderColor,
             WatermarkBorderWidth = WatermarkBorderWidth,
-            EnablePreviewDownsampling = EnablePreviewDownsampling,
-            UsePreviewPercentMode = UsePreviewPercentMode,
-            PreviewMaxDimension = PreviewMaxDimension,
-            PreviewMaxPercent = PreviewMaxPercent
+            EnablePreviewDownsampling = previewSettings.EnablePreviewDownsampling,
+            UsePreviewPercentMode = previewSettings.UsePreviewPercentMode,
+            PreviewMaxDimension = previewSettings.PreviewMaxDimension,
+            PreviewMaxPercent = previewSettings.PreviewMaxPercent
         };
     }
 

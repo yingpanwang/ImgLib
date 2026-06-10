@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Windows.Input;
 using System.Text;
+using System.ComponentModel;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -31,29 +32,13 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial ImgFileDescViewModel ImageInfo { get; set; } = new();
 
-    // 自动预览开关
-    [ObservableProperty]
-    public partial bool AutoPreview { get; set; } = false;
+    // // 自动预览开关
+    // [ObservableProperty]
+    // public partial bool AutoPreview { get; set; } = false;
 
-    // 自动预览触发间隔（毫秒），避免频繁刷新
-    [ObservableProperty]
-    public partial int AutoPreviewIntervalMs { get; set; } = 300;
-
-    // 启用预览降采样
-    [ObservableProperty]
-    public partial bool EnablePreviewDownsampling { get; set; } = true;
-
-    // 预览降采样模式：true=按百分比，false=按固定像素值
-    [ObservableProperty]
-    public partial bool UsePreviewPercentMode { get; set; } = false;
-
-    // 预览降采样最大边长（像素，固定模式）
-    [ObservableProperty]
-    public partial int PreviewMaxDimension { get; set; } = 1200;
-
-    // 预览降采样百分比（百分比模式）
-    [ObservableProperty]
-    public partial float PreviewMaxPercent { get; set; } = 50f;
+    // // 自动预览触发间隔（毫秒），避免频繁刷新
+    // [ObservableProperty]
+    // public partial int AutoPreviewIntervalMs { get; set; } = 300;
 
     // ═══ 圆角预设 ═══
     private static readonly float[] CornerRadiusPresets = { 0, 15, 45, 80, 120 };
@@ -183,14 +168,6 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial IBrush? WatermarkBorderColorBrush { get; private set; }
 
-    // 水印行间距系数
-    [ObservableProperty]
-    public partial float WatermarkLineSpacing { get; set; } = 1.2f;
-
-    // 自动缩放字体以适应水印区域
-    [ObservableProperty]
-    public partial bool WatermarkAutoFitFont { get; set; } = false;
-
     // 水平对齐索引
     [ObservableProperty]
     public partial int HorizontalAlignIndex { get; set; } = 1;
@@ -300,51 +277,16 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         };
     }
 
-    partial void OnEnablePreviewDownsamplingChanged(bool value)
-    {
-        // 启用/禁用预览降采样时触发预览
-        if (AutoPreview)
-        {
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    partial void OnUsePreviewPercentModeChanged(bool value)
-    {
-        // 切换降采样模式时触发预览
-        if (AutoPreview)
-        {
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    partial void OnPreviewMaxDimensionChanged(int value)
-    {
-        // 降采样参数变化时触发预览
-        if (AutoPreview)
-        {
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
-    partial void OnPreviewMaxPercentChanged(float value)
-    {
-        // 百分比参数变化时触发预览
-        if (AutoPreview)
-        {
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
     private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         // 更新预览文本和颜色画笔
         UpdatePreviewText();
         UpdateColorBrushes();
 
+        var previewSettings = SystemSettingsService.Load().PreviewSettings;
         // 自动预览
-        System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 属性变化: {e.PropertyName}, AutoPreview={AutoPreview}");
-        if (AutoPreview)
+        System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 属性变化: {e.PropertyName}, AutoPreview={previewSettings.AutoPreview}");
+        if (previewSettings.AutoPreview)
         {
             System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 触发 PreviewRequested 事件");
             PreviewRequested?.Invoke(this, EventArgs.Empty);
