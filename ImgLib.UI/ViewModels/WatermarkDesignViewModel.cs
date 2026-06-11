@@ -247,6 +247,12 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         // 预览降采样
         using var workingBitmap = ApplyPreviewDownsampling(original, options);
 
+        if (workingBitmap == null)
+        {
+            ToastService.ShowWarning("获取降采样预览图失败!");
+            return;
+        }
+
         int w = workingBitmap.Width;
         int h = workingBitmap.Height;
 

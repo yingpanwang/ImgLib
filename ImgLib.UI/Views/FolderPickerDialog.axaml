@@ -1,0 +1,80 @@
+<Window
+    x:Class="ImgLib.UI.Views.FolderPickerDialog"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    Title="打开目录"
+    Width="520"
+    Height="180"
+    MinWidth="420"
+    MinHeight="160"
+    WindowStartupLocation="CenterOwner"
+    CanResize="False"
+    ShowInTaskbar="False"
+    x:DataType="vm:OpenFolderDialogViewModel">
+
+    <Grid RowDefinitions="Auto,Auto"
+          Margin="20,16">
+
+        <!-- ═══ 路径输入行 ═══ -->
+        <StackPanel Grid.Row="0" Spacing="8">
+            <TextBlock
+                FontSize="13"
+                FontWeight="Medium"
+                Foreground="{StaticResource TextPrimary}"
+                Text="选择图片文件夹路径" />
+
+            <DockPanel>
+                <!-- 文件夹路径文本框 -->
+                <TextBox
+                    Text="{Binding DisplayFolderPath, Mode=TwoWay}"
+                    Watermark="例如：C:\Users\Pictures  或粘贴路径"
+                    ToolTip.Tip="{Binding FolderPath}"
+                    GotFocus="OnTextBoxGotFocus"
+                    LostFocus="OnTextBoxLostFocus"
+                    FontSize="13"
+                    VerticalAlignment="Center" />
+
+                <!-- 文件夹浏览按钮 -->
+                <Button
+                    DockPanel.Dock="Right"
+                    Command="{Binding BrowseFolderCommand}"
+                    Width="36"
+                    Height="36"
+                    Margin="8,0,0,0"
+                    Padding="0"
+                    ToolTip.Tip="浏览文件夹"
+                    Cursor="Hand"
+                    Background="Transparent"
+                    BorderBrush="{StaticResource InputBorder}"
+                    BorderThickness="1"
+                    CornerRadius="6">
+                    <TextBlock
+                        Text="📂"
+                        FontSize="18"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center" />
+                </Button>
+            </DockPanel>
+        </StackPanel>
+
+        <!-- ═══ 底部按钮 ═══ -->
+        <DockPanel Grid.Row="1" Margin="0,20,0,0">
+            <Button
+                DockPanel.Dock="Right"
+                Click="OnConfirmClick"
+                Classes="primary"
+                Padding="24,8"
+                Margin="8,0,0,0"
+                IsEnabled="{Binding FolderPath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Content="打开" />
+
+            <Button
+                DockPanel.Dock="Right"
+                Click="OnCancelClick"
+                Classes="secondary"
+                Padding="24,8"
+                Content="取消" />
+        </DockPanel>
+    </Grid>
+</Window>

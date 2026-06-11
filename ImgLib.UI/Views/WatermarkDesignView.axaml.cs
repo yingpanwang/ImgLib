@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Input;
+using ImgLib.UI.Services;
 using ImgLib.UI.ViewModels;
 
 namespace ImgLib.UI;
@@ -13,6 +15,10 @@ public partial class WatermarkDesignView : UserControl
     private double _initialTranslateY;
     private bool _initialPositionSet;
     private IPointer? _capturedPointer;
+
+    const double histogramWidth = 200;
+    const double histogramHeight = 140;
+    const double margin = 12;
 
     public WatermarkDesignView()
     {
@@ -47,11 +53,6 @@ public partial class WatermarkDesignView : UserControl
         if (grid.Bounds.Width <= 0 || grid.Bounds.Height <= 0)
             return;
 
-        // 直方图尺寸 200x140，保留 12px 边距
-        const double histogramWidth = 200;
-        const double histogramHeight = 140;
-        const double margin = 12;
-
         vm.HistogramTranslateX = grid.Bounds.Width - histogramWidth - margin * 2;
         vm.HistogramTranslateY = grid.Bounds.Height - histogramHeight - margin * 2;
         _initialPositionSet = true;
@@ -67,9 +68,6 @@ public partial class WatermarkDesignView : UserControl
         _initialPositionSet = false;
         if (DataContext is WatermarkDesignViewModel vm && PreviewGrid.Bounds.Width > 0)
         {
-            const double histogramWidth = 200;
-            const double histogramHeight = 140;
-            const double margin = 12;
 
             vm.HistogramTranslateX = PreviewGrid.Bounds.Width - histogramWidth - margin * 2;
             vm.HistogramTranslateY = PreviewGrid.Bounds.Height - histogramHeight - margin * 2;
@@ -104,8 +102,27 @@ public partial class WatermarkDesignView : UserControl
         var deltaX = point.X - _dragStartX;
         var deltaY = point.Y - _dragStartY;
 
-        vm.HistogramTranslateX = _initialTranslateX + deltaX;
-        vm.HistogramTranslateY = _initialTranslateY + deltaY;
+        var transX = _initialTranslateX + deltaX;
+        var transY = _initialTranslateY + deltaY;
+
+
+        if (transX <= 0 && transX + (histogramWidth / 2) < 0)
+        {
+            EndDrag();
+            ToastService.ShowInfo("直方图拖动位置超出限制");
+            return;
+        }
+        else if (transX >= PreviewGrid.Bounds.Width - (histogramWidth / 2))
+        {
+            EndDrag();
+            ToastService.ShowInfo("直方图拖动位置超出限制");
+            return;
+        }
+
+        vm.HistogramTranslateX = transX;
+        vm.HistogramTranslateY = transY;
+
+        Debug.WriteLine($"直方图坐标 ({transX},{transY})");
     }
 
     public void OnHistogramPointerReleased(object? sender, PointerReleasedEventArgs e)

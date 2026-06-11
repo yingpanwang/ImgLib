@@ -47,15 +47,20 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
     [RelayCommand]
     public async Task OpenRootFolder()
     {
-        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
+        if (ParentWindow == null)
         {
-            AllowMultiple = false,
-        });
+            ToastService.ShowError("无法打开文件夹对话框：主窗口未初始化");
+            return;
+        }
 
-        if (folders == null || folders.Count == 0)
+        var dialogVm = new OpenFolderDialogViewModel(storageProvider);
+        var dialog = new FolderPickerDialog { DataContext = dialogVm };
+        var folderPath = await dialog.ShowDialog<string?>(ParentWindow);
+
+        if (string.IsNullOrWhiteSpace(folderPath))
             return;
 
-        CurrentRootFolder = folders[0].Path.LocalPath;
+        CurrentRootFolder = folderPath;
     }
 
     partial void OnCurrentRootFolderChanged(string value)
@@ -83,16 +88,12 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
         }
 
         // 1. 先选择输出目录
-        var folders = await storageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "选择导出目录",
-        });
+        var folderDialogVm = new OpenFolderDialogViewModel(storageProvider);
+        var folderDialog = new FolderPickerDialog { DataContext = folderDialogVm };
+        var outputDir = await folderDialog.ShowDialog<string?>(ParentWindow);
 
-        if (folders == null || folders.Count == 0)
+        if (string.IsNullOrWhiteSpace(outputDir))
             return;
-
-        var outputDir = folders[0].Path.LocalPath;
 
         // 2. 弹出缩略图选择对话框
         var dialogVm = new ExportDialogViewModel();
