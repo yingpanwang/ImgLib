@@ -17,12 +17,10 @@ public partial class WatermarkSettingsView : UserControl
     private void OnDataContextChanged(object? sender, System.EventArgs e)
     {
         // 取消旧 ViewModel 的订阅
-        if (_viewModel != null)
-        {
-            _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
-        }
+        _viewModel?.PropertyChanged -= OnViewModelPropertyChanged;
 
-        if (DataContext is not WatermarkSettingsViewModel vm) return;
+        if (DataContext is not WatermarkSettingsViewModel vm)
+            return;
 
         _viewModel = vm;
         vm.PropertyChanged += OnViewModelPropertyChanged;
@@ -32,7 +30,7 @@ public partial class WatermarkSettingsView : UserControl
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        // ExifInfo 变化时（切换图片）重建菜单以显示新的实际值
+        // ExifInfo 变化（切换图片）重建菜单以显示新的实际值
         if (e.PropertyName == nameof(WatermarkSettingsViewModel.ExifInfo) && _viewModel != null)
         {
             BuildContextMenu(_viewModel);

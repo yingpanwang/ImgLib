@@ -4,7 +4,14 @@ namespace ImgLib.UI.ViewModels.Design;
 
 public sealed partial class Design_ImgListBoxViewModel : ImgListBoxViewModel
 {
-    public Design_ImgListBoxViewModel()
+    public Design_ImgListBoxViewModel() : this(new WatermarkDesignViewModel(
+        new WatermarkSettingsViewModel(),
+        new HistogramViewModel(),
+        new PreviewSettingsViewModel()))
+    {
+    }
+
+    public Design_ImgListBoxViewModel(WatermarkDesignViewModel wdvm) : base(wdvm)
     {
         this.Path = @"C:\Users\Administrator\Desktop\后期临时";
 

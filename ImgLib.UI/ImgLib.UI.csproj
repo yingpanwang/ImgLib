@@ -20,6 +20,7 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
     <PackageReference Include="PanAndZoom" Version="11.3.0.5" />
     <PackageReference Include="ReactiveUI" Version="20.4.1" />
     <PackageReference Include="System.Reactive" Version="6.0.1" />

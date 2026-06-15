@@ -5,19 +5,28 @@ using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
 using ImgLib.UI.Services;
 using ImgLib.UI.Views;
+using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace ImgLib.UI.ViewModels;
 
-public partial class MainWindowViewModel(IStorageProvider storageProvider) : ViewModelBase
+public partial class MainWindowViewModel(
+    IStorageProvider storageProvider,
+    IServiceProvider serviceProvider,
+    ImgListBoxViewModel imgListBoxViewModel,
+    ToastViewModel toastViewModel,
+    ExportProgressViewModel exportProgressViewModel,
+    WatermarkDesignViewModel watermarkDesignViewModel) : ViewModelBase
 {
     [ObservableProperty]
-    public partial ImgListBoxViewModel ImgListBoxViewModel { get; set; } = new();
+    public partial ImgListBoxViewModel ImgListBoxViewModel { get; set; } = imgListBoxViewModel;
 
-    private readonly ToastViewModel _toastViewModel = new();
-    private readonly ExportProgressViewModel _exportProgressViewModel = new();
-    private WatermarkDesignViewModel _watermarkDesignViewModel = null!;
+    public ToastViewModel ToastViewModel => toastViewModel;
+
+    public ExportProgressViewModel ExportProgressViewModel => exportProgressViewModel;
+
+    public WatermarkDesignViewModel WatermarkDesignViewModel => watermarkDesignViewModel;
 
     /// <summary>
     /// 主窗口引用，用于弹出对话框
@@ -26,23 +35,6 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
 
     [ObservableProperty]
     public partial string CurrentRootFolder { get; set; }
-
-    public ExportProgressViewModel ExportProgressViewModel => _exportProgressViewModel;
-
-    public WatermarkDesignViewModel WatermarkDesignViewModel
-    {
-        get
-        {
-            if (_watermarkDesignViewModel == null)
-            {
-                _watermarkDesignViewModel = new();
-                ToastService.Initialize(_toastViewModel); // 初始化全局 Toast 服务
-            }
-            return _watermarkDesignViewModel;
-        }
-    }
-
-    public ToastViewModel ToastViewModel => _toastViewModel;
 
     [RelayCommand]
     public async Task OpenRootFolder()
@@ -53,7 +45,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             return;
         }
 
-        var dialogVm = new OpenFolderDialogViewModel(storageProvider);
+        var dialogVm = serviceProvider.GetRequiredService<OpenFolderDialogViewModel>();
         var dialog = new FolderPickerDialog { DataContext = dialogVm };
         var folderPath = await dialog.ShowDialog<string?>(ParentWindow);
 
@@ -88,7 +80,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
         }
 
         // 1. 先选择输出目录
-        var folderDialogVm = new OpenFolderDialogViewModel(storageProvider);
+        var folderDialogVm = serviceProvider.GetRequiredService<OpenFolderDialogViewModel>();
         var folderDialog = new FolderPickerDialog { DataContext = folderDialogVm };
         var outputDir = await folderDialog.ShowDialog<string?>(ParentWindow);
 
@@ -96,7 +88,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             return;
 
         // 2. 弹出缩略图选择对话框
-        var dialogVm = new ExportDialogViewModel();
+        var dialogVm = serviceProvider.GetRequiredService<ExportDialogViewModel>();
         dialogVm.Initialize(allPaths);
 
         var dialog = new ExportDialog { DataContext = dialogVm };
@@ -284,7 +276,7 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
             return;
         }
 
-        var settingsVm = new SettingsWindowViewModel();
+        var settingsVm = serviceProvider.GetRequiredService<SettingsWindowViewModel>();
 
         var window = new SettingsWindow { DataContext = settingsVm };
         await window.ShowDialog(ParentWindow);
@@ -298,6 +290,6 @@ public partial class MainWindowViewModel(IStorageProvider storageProvider) : Vie
     [RelayCommand]
     public void TestToast()
     {
-        _toastViewModel.ShowMessage("测试通知", ToastType.Info);
+        toastViewModel.ShowMessage("测试通知", ToastType.Info);
     }
 }
