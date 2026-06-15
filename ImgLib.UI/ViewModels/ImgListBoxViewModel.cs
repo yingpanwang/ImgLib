@@ -42,6 +42,12 @@ public partial class ImgListBoxViewModel : ViewModelBase
         ? $"图片列表 ({_loadedCount}/{all.Count})"
         : "图片列表";
 
+    WatermarkDesignViewModel _watermarkDesignViewModel;
+    public ImgListBoxViewModel(WatermarkDesignViewModel watermarkDesignViewModel)
+    {
+        _watermarkDesignViewModel = watermarkDesignViewModel;
+    }
+
     partial void OnPathChanged(string? oldValue, string? newValue)
     {
         // 取消上一次加载
@@ -153,5 +159,11 @@ public partial class ImgListBoxViewModel : ViewModelBase
         ImgListItems?.AddRange(items);
         OnPropertyChanged(nameof(HeaderText));
         OnPropertyChanged(nameof(HasMoreItems));
+    }
+
+    partial void OnSelectedImgItemChanged(ImgListItemViewModel? value)
+    {
+        _watermarkDesignViewModel.Reset();
+        _watermarkDesignViewModel.PreviewFilePath = value!.FilePath;
     }
 }

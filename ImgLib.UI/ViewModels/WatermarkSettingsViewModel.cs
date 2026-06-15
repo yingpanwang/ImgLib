@@ -174,6 +174,10 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
     private WatermarkSettings? _currentSettings;
 
+    public WatermarkSettingsViewModel() : this(null, null)
+    {
+    }
+
     public WatermarkSettingsViewModel(ImageGenerateOption? option = null, ExifInfo? exifInfo = null)
     {
         Settings = new WatermarkSettings();

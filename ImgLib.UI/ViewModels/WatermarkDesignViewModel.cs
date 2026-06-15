@@ -67,18 +67,16 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     private ImageFile? _previewImageFile;
     private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
 
-    public WatermarkDesignViewModel()
+    public WatermarkDesignViewModel(
+        WatermarkSettingsViewModel watermarkSettingsViewModel,
+        HistogramViewModel histogramViewModel,
+        PreviewSettingsViewModel previewSettingsViewModel)
     {
-        WatermarkSettingsViewModel = new();
-        HistogramViewModel = new();
+        WatermarkSettingsViewModel = watermarkSettingsViewModel;
+        HistogramViewModel = histogramViewModel;
         IsSettingsPanelExpanded = true;
 
-        // 引用系统设置单例，后续设置对话框 Save() 时自动同步
-        PreviewSettingsViewModel = SystemSettingsService.Current.PreviewSettings;
-        //ShowHistogram = PreviewSettingsViewModel.ShowHistogram;
-
-        // 监听预览设置变化，同步到本地属性
-        // PreviewSettingsViewModel.PropertyChanged += OnPreviewSettingsChanged;
+        PreviewSettingsViewModel = previewSettingsViewModel;
     }
 
     // private void OnPreviewSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -120,7 +118,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         {
             try
             {
-                var intervalMs = SystemSettingsService.Current.PreviewSettings.AutoPreviewIntervalMs;
+                var intervalMs = PreviewSettingsViewModel.AutoPreviewIntervalMs;
 
                 // 确保间隔不小于 50ms，避免过于频繁的预览刷新
                 if (intervalMs < 50)
@@ -147,33 +145,84 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         if (string.IsNullOrEmpty(PreviewFilePath))
             return;
 
-        _previewImageFile = ImageFile.GetImageFile(value!);
+        // 取消上一次预览加载，防止快速切换时旧图覆盖新图
+        _previewCancellationTokenSource?.Cancel();
+        _previewCancellationTokenSource = new System.Threading.CancellationTokenSource();
+        var ct = _previewCancellationTokenSource.Token;
 
-        // 切换图片时重置旋转角度
+        // 切换图片时重置旋转角度（轻量操作，可在 UI 线程）
         PreviewAngle = 0;
 
-        PreviewImageSource = new Bitmap(_previewImageFile.GetSourceStream());
+        // 异步加载预览图，避免全分辨率解码阻塞 UI 线程
+        _ = LoadPreviewAsync(value!, ct);
+    }
 
-        // 更新图片基础信息面板
-        WatermarkSettingsViewModel.ImageInfo.UpdateFromFile(value!);
+    /// <summary>
+    /// 后台加载预览图片：ImageFile 创建 + Bitmap 解码均在后台线程，
+    /// 仅属性赋值回到 UI 线程，消除选中切换时的卡顿。
+    /// </summary>
+    private async Task LoadPreviewAsync(string filePath, System.Threading.CancellationToken ct)
+    {
+        IsLoading = true;
 
-        // 重用 ImageFile 已创建的 ExifInfo，包裹为 NikonExifInfo（record 拷贝构造器，零 I/O）
-        var exifInfo = _previewImageFile.Exif is NikonExifInfo nef
-            ? nef
-            : new NikonExifInfo(_previewImageFile.Exif!);
-
-        WatermarkSettingsViewModel.ExifInfo = exifInfo;
-
-        // 将图片路径传递给直方图 ViewModel 以计算直方图
-        HistogramViewModel.ImageFilePath = value;
-
-        // 在后台线程预热 Lazy<Metadata>，这样 UI 绑定后续访问属性时不会阻塞
-        _ = exifInfo.EnsureMetadataLoadedAsync();
-
-        // 如果开启了自动预览，切换图片时自动重新生成预览
-        if (SystemSettingsService.Current.PreviewSettings.AutoPreview)
+        try
         {
-            OnPreviewRequested(this, EventArgs.Empty);
+            // Phase 1: 后台线程执行文件 I/O + 全分辨率解码
+            var (imageFile, bitmap) = await Task.Run(() =>
+            {
+                ct.ThrowIfCancellationRequested();
+
+                var imgFile = ImageFile.GetImageFile(filePath);
+                var bmp = new Bitmap(imgFile.GetSourceStream());
+
+                ct.ThrowIfCancellationRequested();
+                return (imgFile, bmp);
+            }, ct);
+
+            // Phase 2: UI 线程更新绑定属性
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                if (ct.IsCancellationRequested)
+                    return;
+
+                _previewImageFile = imageFile;
+
+                PreviewImageSource?.Dispose();
+                PreviewImageSource = bitmap;
+
+                // 更新图片基础信息面板
+                WatermarkSettingsViewModel.ImageInfo.UpdateFromFile(filePath);
+
+                // 重用 ImageFile 已创建的 ExifInfo
+                var exifInfo = _previewImageFile.Exif is NikonExifInfo nef
+                    ? nef
+                    : new NikonExifInfo(_previewImageFile.Exif!);
+
+                WatermarkSettingsViewModel.ExifInfo = exifInfo;
+
+                // 将图片路径传递给直方图 ViewModel 以计算直方图
+                HistogramViewModel.ImageFilePath = filePath;
+
+                // 在后台线程预热 Lazy<Metadata>
+                _ = exifInfo.EnsureMetadataLoadedAsync();
+
+                IsLoading = false;
+
+                // 如果开启了自动预览，切换图片时自动重新生成预览
+                if (PreviewSettingsViewModel.AutoPreview)
+                {
+                    OnPreviewRequested(this, EventArgs.Empty);
+                }
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            // 被新的选择取消，静默处理
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[LoadPreviewAsync] 加载预览失败: {filePath}, {ex.Message}");
+            await Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
         }
     }
 
