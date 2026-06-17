@@ -37,120 +37,11 @@ public class ImageGenerateOption
 
     /// <summary>
     /// 获取有效的水印文本项列表。
-    /// 若 <see cref="WatermarkTexts"/> 非空则直接返回；否则将旧的单水印属性包装为单元素列表。
     /// </summary>
     public List<WatermarkTextItem> GetEffectiveWatermarkTexts()
     {
-        if (WatermarkTexts.Count > 0)
-            return WatermarkTexts;
-
-        // 向后兼容：将旧的扁平属性包装为单个 WatermarkTextItem
-        if (!string.IsNullOrWhiteSpace(WatermarkTemplate))
-        {
-            return new List<WatermarkTextItem>
-            {
-                new WatermarkTextItem
-                {
-                    Template = WatermarkTemplate,
-                    ColorHex = WatermarkColor,
-                    FontSizeRatio = WatermarkFontSizeRatio,
-                    Bold = WatermarkBold,
-                    LineSpacing = WatermarkLineSpacing,
-                    AutoFitFont = WatermarkAutoFitFont,
-                    VerticalPosition = WatermarkVerticalPosition,
-                    HorizontalAlignment = WatermarkHorizontalAlignment,
-                    ShadowOffsetX = WatermarkShadowOffsetX,
-                    ShadowOffsetY = WatermarkShadowOffsetY,
-                    ShadowSigma = WatermarkShadowSigma,
-                    ShadowColorHex = WatermarkShadowColor,
-                    ShowBorder = ShowWatermarkBorder,
-                    BorderColorHex = WatermarkBorderColor,
-                    BorderWidth = WatermarkBorderWidth,
-                }
-            };
-        }
-
-        return new List<WatermarkTextItem>();
+        return WatermarkTexts;
     }
-
-    // ═══ 水印文本参数（单水印，向后兼容） ═══
-    /// <summary>
-    /// 水印文本模板，支持 EXIF 变量替换。
-    /// 可用变量示例: {Model}, {LensModel}, {FNumber}, {ISO}, {FocalLength}, {ExposureTime}, {DateTimeOriginal}
-    /// 默认: "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}"
-    /// </summary>
-    public string WatermarkTemplate { get; set; } = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
-
-    /// <summary>
-    /// 水印文本颜色（十六进制格式，如 #FFFFFF）
-    /// </summary>
-    public string WatermarkColor { get; set; } = "#FFFFFF";
-
-    /// <summary>
-    /// 水印字体大小（相对于图片高度的百分比，0.01-0.1）
-    /// </summary>
-    public float WatermarkFontSizeRatio { get; set; } = 0.03f;
-
-    /// <summary>
-    /// 水印是否加粗
-    /// </summary>
-    public bool WatermarkBold { get; set; } = true;
-
-    /// <summary>
-    /// 水印行间距系数（1.0=标准行距，>1.0 增大间距，<1.0 缩小间距）
-    /// </summary>
-    public float WatermarkLineSpacing { get; set; } = 1.2f;
-
-    /// <summary>
-    /// 是否启用自动缩放字体以适应水印区域（当文本块高度超出可用区域时自动缩小）
-    /// </summary>
-    public bool WatermarkAutoFitFont { get; set; } = false;
-
-    /// <summary>
-    /// 水印文字阴影偏移 X
-    /// </summary>
-    public float WatermarkShadowOffsetX { get; set; } = 2f;
-
-    /// <summary>
-    /// 水印文字阴影偏移 Y
-    /// </summary>
-    public float WatermarkShadowOffsetY { get; set; } = 2f;
-
-    /// <summary>
-    /// 水印文字阴影模糊半径
-    /// </summary>
-    public float WatermarkShadowSigma { get; set; } = 5f;
-
-    /// <summary>
-    /// 水印文字阴影颜色（十六进制格式）
-    /// </summary>
-    public string WatermarkShadowColor { get; set; } = "#80000000";
-
-    /// <summary>
-    /// 水印垂直位置（相对于底部，0-1，0为底部，1为顶部）
-    /// </summary>
-    public float WatermarkVerticalPosition { get; set; } = 0.5f;
-
-    /// <summary>
-    /// 水印水平对齐（Left, Center, Right）
-    /// </summary>
-    public string WatermarkHorizontalAlignment { get; set; } = "Center";
-
-    // ═══ 调试参数 ═══
-    /// <summary>
-    /// 是否显示水印边框（调试用）
-    /// </summary>
-    public bool ShowWatermarkBorder { get; set; } = false;
-
-    /// <summary>
-    /// 水印边框颜色（十六进制格式）
-    /// </summary>
-    public string WatermarkBorderColor { get; set; } = "#00FF00";
-
-    /// <summary>
-    /// 水印边框宽度
-    /// </summary>
-    public float WatermarkBorderWidth { get; set; } = 2f;
 
     // ═══ 预览相关参数 ═══
     /// <summary>
@@ -174,25 +65,3 @@ public class ImageGenerateOption
     public float PreviewMaxPercent { get; set; } = 50f;
 }
 
-public static class ImageGenerateOptionExtensions
-{
-    /// <summary>
-    /// 解析水印模板，替换 EXIF 变量。
-    /// 占位符使用 ExifInfo 属性名，如 {Model}、{FNumber}、{ISO} 等。
-    /// 字段解析委托给 <see cref="ExifInfo.GetTemplateReplacements"/>，各子类扩展品牌专用字段。
-    /// </summary>
-    public static string ParseWatermarkTemplate(this ImageGenerateOption option, ExifInfo? exifInfo)
-    {
-        if (exifInfo == null)
-            return option.WatermarkTemplate;
-
-        string result = option.WatermarkTemplate;
-
-        foreach (var kvp in exifInfo.GetTemplateReplacements())
-        {
-            result = result.Replace($"{{{kvp.Key}}}", kvp.Value ?? "N/A");
-        }
-
-        return result;
-    }
-}

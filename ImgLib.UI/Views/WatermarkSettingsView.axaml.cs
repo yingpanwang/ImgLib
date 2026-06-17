@@ -74,8 +74,6 @@ public partial class WatermarkSettingsView : UserControl
         {
             if (vm.SelectedWatermarkText != null)
                 vm.SelectedWatermarkText.Template = string.Empty;
-            else
-                vm.Settings.WatermarkTemplate = string.Empty;
         };
         menuFlyout.Items.Add(clearItem);
 

@@ -11,7 +11,7 @@ namespace ImgLib.UI.Models;
 public class WatermarkSettings : INotifyPropertyChanged
 {
     // ═══ 多水印文本列表 ═══
-    private ObservableCollection<WatermarkTextItemSettings> _watermarkTextItems = new();
+    private ObservableCollection<WatermarkTextItemSettings> _watermarkTextItems = new() { new WatermarkTextItemSettings() };
     public ObservableCollection<WatermarkTextItemSettings> WatermarkTextItems
     {
         get => _watermarkTextItems;
@@ -61,113 +61,6 @@ public class WatermarkSettings : INotifyPropertyChanged
         set { _shadowSigma = value; OnPropertyChanged(); }
     }
 
-    // ═══ 水印文本参数 ═══
-    private string _watermarkTemplate = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
-    public string WatermarkTemplate
-    {
-        get => _watermarkTemplate;
-        set { _watermarkTemplate = value; OnPropertyChanged(); }
-    }
-
-    private string _watermarkColor = "#FFFFFF";
-    public string WatermarkColor
-    {
-        get => _watermarkColor;
-        set { _watermarkColor = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkFontSizeRatio = 0.03f;
-    public float WatermarkFontSizeRatio
-    {
-        get => _watermarkFontSizeRatio;
-        set { _watermarkFontSizeRatio = value; OnPropertyChanged(); }
-    }
-
-    private bool _watermarkBold = true;
-    public bool WatermarkBold
-    {
-        get => _watermarkBold;
-        set { _watermarkBold = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkLineSpacing = 1.2f;
-    public float WatermarkLineSpacing
-    {
-        get => _watermarkLineSpacing;
-        set { _watermarkLineSpacing = value; OnPropertyChanged(); }
-    }
-
-    private bool _watermarkAutoFitFont = false;
-    public bool WatermarkAutoFitFont
-    {
-        get => _watermarkAutoFitFont;
-        set { _watermarkAutoFitFont = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkShadowOffsetX = 2f;
-    public float WatermarkShadowOffsetX
-    {
-        get => _watermarkShadowOffsetX;
-        set { _watermarkShadowOffsetX = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkShadowOffsetY = 2f;
-    public float WatermarkShadowOffsetY
-    {
-        get => _watermarkShadowOffsetY;
-        set { _watermarkShadowOffsetY = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkShadowSigma = 5f;
-    public float WatermarkShadowSigma
-    {
-        get => _watermarkShadowSigma;
-        set { _watermarkShadowSigma = value; OnPropertyChanged(); }
-    }
-
-    private string _watermarkShadowColor = "#80000000";
-    public string WatermarkShadowColor
-    {
-        get => _watermarkShadowColor;
-        set { _watermarkShadowColor = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkVerticalPosition = 0.5f;
-    public float WatermarkVerticalPosition
-    {
-        get => _watermarkVerticalPosition;
-        set { _watermarkVerticalPosition = value; OnPropertyChanged(); }
-    }
-
-    private string _watermarkHorizontalAlignment = "Center";
-    public string WatermarkHorizontalAlignment
-    {
-        get => _watermarkHorizontalAlignment;
-        set { _watermarkHorizontalAlignment = value; OnPropertyChanged(); }
-    }
-
-    // ═══ 调试参数 ═══
-    private bool _showWatermarkBorder = false;
-    public bool ShowWatermarkBorder
-    {
-        get => _showWatermarkBorder;
-        set { _showWatermarkBorder = value; OnPropertyChanged(); }
-    }
-
-    private string _watermarkBorderColor = "#00FF00";
-    public string WatermarkBorderColor
-    {
-        get => _watermarkBorderColor;
-        set { _watermarkBorderColor = value; OnPropertyChanged(); }
-    }
-
-    private float _watermarkBorderWidth = 2f;
-    public float WatermarkBorderWidth
-    {
-        get => _watermarkBorderWidth;
-        set { _watermarkBorderWidth = value; OnPropertyChanged(); }
-    }
-
     // // ═══ 预览相关参数 ═══
     // private bool _enablePreviewDownsampling = true;
     // public bool EnablePreviewDownsampling
@@ -211,59 +104,18 @@ public class WatermarkSettings : INotifyPropertyChanged
 
         // 同步多水印列表
         WatermarkTextItems.Clear();
-        if (option.WatermarkTexts.Count > 0)
+        foreach (var item in option.WatermarkTexts)
         {
-            foreach (var item in option.WatermarkTexts)
-            {
-                var settings = new WatermarkTextItemSettings();
-                settings.FromWatermarkTextItem(item);
-                WatermarkTextItems.Add(settings);
-            }
-        }
-        else if (!string.IsNullOrWhiteSpace(option.WatermarkTemplate))
-        {
-            // 向后兼容：从旧单水印属性创建一项
-            var settings = new WatermarkTextItemSettings
-            {
-                Template = option.WatermarkTemplate,
-                ColorHex = option.WatermarkColor,
-                FontSizeRatio = option.WatermarkFontSizeRatio,
-                Bold = option.WatermarkBold,
-                LineSpacing = option.WatermarkLineSpacing,
-                AutoFitFont = option.WatermarkAutoFitFont,
-                VerticalPosition = option.WatermarkVerticalPosition,
-                HorizontalAlignment = option.WatermarkHorizontalAlignment,
-                ShadowOffsetX = option.WatermarkShadowOffsetX,
-                ShadowOffsetY = option.WatermarkShadowOffsetY,
-                ShadowSigma = option.WatermarkShadowSigma,
-                ShadowColorHex = option.WatermarkShadowColor,
-                ShowBorder = option.ShowWatermarkBorder,
-                BorderColorHex = option.WatermarkBorderColor,
-                BorderWidth = option.WatermarkBorderWidth,
-            };
+            var settings = new WatermarkTextItemSettings();
+            settings.FromWatermarkTextItem(item);
             WatermarkTextItems.Add(settings);
         }
 
-        // 同时保留旧单属性（向后兼容）
-        WatermarkTemplate = option.WatermarkTemplate;
-        WatermarkColor = option.WatermarkColor;
-        WatermarkFontSizeRatio = option.WatermarkFontSizeRatio;
-        WatermarkBold = option.WatermarkBold;
-        WatermarkLineSpacing = option.WatermarkLineSpacing;
-        WatermarkAutoFitFont = option.WatermarkAutoFitFont;
-        WatermarkShadowOffsetX = option.WatermarkShadowOffsetX;
-        WatermarkShadowOffsetY = option.WatermarkShadowOffsetY;
-        WatermarkShadowSigma = option.WatermarkShadowSigma;
-        WatermarkShadowColor = option.WatermarkShadowColor;
-        WatermarkVerticalPosition = option.WatermarkVerticalPosition;
-        WatermarkHorizontalAlignment = option.WatermarkHorizontalAlignment;
-        ShowWatermarkBorder = option.ShowWatermarkBorder;
-        WatermarkBorderColor = option.WatermarkBorderColor;
-        WatermarkBorderWidth = option.WatermarkBorderWidth;
-        // EnablePreviewDownsampling = option.EnablePreviewDownsampling;
-        // UsePreviewPercentMode = option.UsePreviewPercentMode;
-        // PreviewMaxDimension = option.PreviewMaxDimension;
-        // PreviewMaxPercent = option.PreviewMaxPercent;
+        // 确保至少有一个默认水印项
+        if (WatermarkTextItems.Count == 0)
+        {
+            WatermarkTextItems.Add(new WatermarkTextItemSettings());
+        }
     }
 
     /// <summary>
@@ -281,21 +133,6 @@ public class WatermarkSettings : INotifyPropertyChanged
             ShadowOffsetX = ShadowOffsetX,
             ShadowOffsetY = ShadowOffsetY,
             ShadowSigma = ShadowSigma,
-            WatermarkTemplate = WatermarkTemplate,
-            WatermarkColor = WatermarkColor,
-            WatermarkFontSizeRatio = WatermarkFontSizeRatio,
-            WatermarkBold = WatermarkBold,
-            WatermarkLineSpacing = WatermarkLineSpacing,
-            WatermarkAutoFitFont = WatermarkAutoFitFont,
-            WatermarkShadowOffsetX = WatermarkShadowOffsetX,
-            WatermarkShadowOffsetY = WatermarkShadowOffsetY,
-            WatermarkShadowSigma = WatermarkShadowSigma,
-            WatermarkShadowColor = WatermarkShadowColor,
-            WatermarkVerticalPosition = WatermarkVerticalPosition,
-            WatermarkHorizontalAlignment = WatermarkHorizontalAlignment,
-            ShowWatermarkBorder = ShowWatermarkBorder,
-            WatermarkBorderColor = WatermarkBorderColor,
-            WatermarkBorderWidth = WatermarkBorderWidth,
             EnablePreviewDownsampling = previewSettings.EnablePreviewDownsampling,
             UsePreviewPercentMode = previewSettings.UsePreviewPercentMode,
             PreviewMaxDimension = previewSettings.PreviewMaxDimension,
@@ -307,27 +144,6 @@ public class WatermarkSettings : INotifyPropertyChanged
         foreach (var item in WatermarkTextItems)
         {
             option.WatermarkTexts.Add(item.ToWatermarkTextItem());
-        }
-
-        // 向后兼容：同步第一个水印项到旧单属性
-        if (WatermarkTextItems.Count > 0)
-        {
-            var first = WatermarkTextItems[0];
-            option.WatermarkTemplate = first.Template;
-            option.WatermarkColor = first.ColorHex;
-            option.WatermarkFontSizeRatio = first.FontSizeRatio;
-            option.WatermarkBold = first.Bold;
-            option.WatermarkLineSpacing = first.LineSpacing;
-            option.WatermarkAutoFitFont = first.AutoFitFont;
-            option.WatermarkShadowOffsetX = first.ShadowOffsetX;
-            option.WatermarkShadowOffsetY = first.ShadowOffsetY;
-            option.WatermarkShadowSigma = first.ShadowSigma;
-            option.WatermarkShadowColor = first.ShadowColorHex;
-            option.WatermarkVerticalPosition = first.VerticalPosition;
-            option.WatermarkHorizontalAlignment = first.HorizontalAlignment;
-            option.ShowWatermarkBorder = first.ShowBorder;
-            option.WatermarkBorderColor = first.BorderColorHex;
-            option.WatermarkBorderWidth = first.BorderWidth;
         }
 
         return option;

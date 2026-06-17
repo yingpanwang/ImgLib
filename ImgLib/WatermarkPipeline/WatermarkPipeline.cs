@@ -185,7 +185,7 @@ public class WatermarkPipelineRunner
         // DebugBorderCommand 仅作为兜底，遍历 TextBlockLayouts 统一绘制。
         if (anyShowBorder)
         {
-            pipeline.AddDebugBorder(options.WatermarkBorderColor, options.WatermarkBorderWidth);
+            pipeline.AddDebugBorder();
         }
 
         return pipeline;

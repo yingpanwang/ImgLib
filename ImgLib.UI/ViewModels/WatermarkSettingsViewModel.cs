@@ -111,8 +111,6 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             IsTextShadowOffsetCustom = false;
             var (x, y) = TextShadowOffsetPresets[value];
-            Settings.WatermarkShadowOffsetX = x;
-            Settings.WatermarkShadowOffsetY = y;
             // 同步到选中的水印项
             if (SelectedWatermarkText != null)
             {
@@ -140,7 +138,6 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         if (value >= 0 && value < TextShadowSigmaPresets.Length)
         {
             IsTextShadowSigmaCustom = false;
-            Settings.WatermarkShadowSigma = TextShadowSigmaPresets[value];
             // 同步到选中的水印项
             if (SelectedWatermarkText != null)
                 SelectedWatermarkText.ShadowSigma = TextShadowSigmaPresets[value];
@@ -433,9 +430,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             _ => "Center"
         };
 
-        Settings.WatermarkHorizontalAlignment = alignment;
-
-        // 多水印模式：同步到选中项
+        // 同步到选中项
         if (SelectedWatermarkText != null)
             SelectedWatermarkText.HorizontalAlignment = alignment;
     }
@@ -456,15 +451,6 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
                 "Right" => 2,
                 _ => 1,
             };
-
-            // 同步到扁平属性（预设系统依赖这些）
-            Settings.WatermarkShadowOffsetX = SelectedWatermarkText.ShadowOffsetX;
-            Settings.WatermarkShadowOffsetY = SelectedWatermarkText.ShadowOffsetY;
-            Settings.WatermarkShadowSigma = SelectedWatermarkText.ShadowSigma;
-            Settings.WatermarkShadowColor = SelectedWatermarkText.ShadowColorHex;
-            Settings.ShowWatermarkBorder = SelectedWatermarkText.ShowBorder;
-            Settings.WatermarkBorderColor = SelectedWatermarkText.BorderColorHex;
-            Settings.WatermarkBorderWidth = SelectedWatermarkText.BorderWidth;
 
             InitializePresetIndices();
         }
@@ -504,9 +490,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         }
         else
         {
-            // 向后兼容
-            var option = Settings.ToImageGenerateOption();
-            PreviewWatermarkText = option.ParseWatermarkTemplate(ExifInfo);
+            PreviewWatermarkText = string.Empty;
         }
     }
 
@@ -521,9 +505,9 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         }
         else
         {
-            WatermarkColorBrush = ParseColorBrush(Settings.WatermarkColor);
-            WatermarkShadowColorBrush = ParseColorBrush(Settings.WatermarkShadowColor);
-            WatermarkBorderColorBrush = ParseColorBrush(Settings.WatermarkBorderColor);
+            WatermarkColorBrush = ParseColorBrush("#FFFFFF");
+            WatermarkShadowColorBrush = ParseColorBrush("#80000000");
+            WatermarkBorderColorBrush = ParseColorBrush("#00FF00");
         }
     }
 
@@ -569,11 +553,12 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         IsShadowOffsetCustom = soIdx < 0;
 
         // 文字阴影偏移
+        var selText = SelectedWatermarkText;
         int tsoIdx = -1;
         for (int i = 0; i < TextShadowOffsetPresets.Length; i++)
         {
-            if (Math.Abs(TextShadowOffsetPresets[i].X - Settings.WatermarkShadowOffsetX) < 0.01f &&
-                Math.Abs(TextShadowOffsetPresets[i].Y - Settings.WatermarkShadowOffsetY) < 0.01f)
+            if (Math.Abs(TextShadowOffsetPresets[i].X - (selText?.ShadowOffsetX ?? 0)) < 0.01f &&
+                Math.Abs(TextShadowOffsetPresets[i].Y - (selText?.ShadowOffsetY ?? 0)) < 0.01f)
             {
                 tsoIdx = i;
                 break;
@@ -583,7 +568,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         IsTextShadowOffsetCustom = tsoIdx < 0;
 
         // 文字阴影模糊
-        int tssIdx = Array.IndexOf(TextShadowSigmaPresets, Settings.WatermarkShadowSigma);
+        int tssIdx = Array.IndexOf(TextShadowSigmaPresets, selText?.ShadowSigma ?? 0);
         TextShadowSigmaPresetIndex = tssIdx >= 0 ? tssIdx : TextShadowSigmaPresets.Length;
         IsTextShadowSigmaCustom = tssIdx < 0;
     }
