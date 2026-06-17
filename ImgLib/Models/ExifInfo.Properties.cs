@@ -1,5 +1,3 @@
-using MetadataExtractor.Formats.Exif;
-
 namespace ImgLib.Models;
 
 public partial record class ExifInfo

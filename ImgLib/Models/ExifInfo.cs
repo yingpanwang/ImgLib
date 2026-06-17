@@ -1,7 +1,4 @@
-﻿using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
-using System.Text.Json;
-
+﻿
 namespace ImgLib.Models;
 
 /// <summary>
@@ -65,7 +62,7 @@ public partial record class ExifInfo
 
     public virtual string ToJson()
     {
-        return JsonSerializer.Serialize(this);
+        return JsonSerializer.Serialize(this, this.GetType(), ImgLibJsonContext.Default);
     }
 }
 

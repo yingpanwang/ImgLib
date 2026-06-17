@@ -524,7 +524,7 @@
 
                     <TreeView ItemsSource="{Binding ExifInfoTree}" DockPanel.Dock="Top">
                         <TreeView.ItemTemplate>
-                            <TreeDataTemplate ItemsSource="{Binding Children}">
+                            <TreeDataTemplate x:DataType="vm:ExifInfoNode" ItemsSource="{Binding Children}">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock
                                         Text="{Binding Name}"

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using ImgLib.UI;
 using ImgLib.UI.Models;
 using ImgLib.UI.ViewModels;
 
@@ -13,8 +14,6 @@ namespace ImgLib.UI.Services;
 public static class SystemSettingsService
 {
     private const string ConfigFileName = "SystemSettings.json";
-
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     private static string ConfigPath => Path.Combine(AppContext.BaseDirectory, ConfigFileName);
 
@@ -57,7 +56,7 @@ public static class SystemSettingsService
         try
         {
             var json = File.ReadAllText(ConfigPath);
-            var settings = JsonSerializer.Deserialize<SystemSettings>(json);
+            var settings = JsonSerializer.Deserialize(json, ImgLibUIJsonContext.Default.SystemSettings);
             return settings ?? SystemSettings.Default;
         }
         catch
@@ -79,7 +78,7 @@ public static class SystemSettingsService
                 Directory.CreateDirectory(dir);
 
             var tmpFile = ConfigPath + ".tmp";
-            var json = JsonSerializer.Serialize(settings, JsonOptions);
+            var json = JsonSerializer.Serialize(settings, ImgLibUIJsonContext.Default.SystemSettings);
             File.WriteAllText(tmpFile, json);
             File.Move(tmpFile, ConfigPath, overwrite: true);
 

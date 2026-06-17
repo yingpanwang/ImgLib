@@ -11,3 +11,9 @@ global using CommunityToolkit.Mvvm.ComponentModel;
 global using System;
 
 #endregion
+
+#region Avalonia 的组件
+
+global using Avalonia.Controls;
+
+#endregion

@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib;
 using ImgLib.Models;
+using ImgLib.UI;
 using ImgLib.UI.Models;
 using ImgLib.UI.Services;
 using System;
@@ -405,7 +406,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
         ExifInfoTree.Clear();
 
-        using var exifDoc = JsonSerializer.SerializeToDocument<ExifInfo>(ExifInfo);
+        using var exifDoc = JsonSerializer.SerializeToDocument(ExifInfo, ImgLibUIJsonContext.Default.ExifInfo);
 
         var es = exifDoc.RootElement.EnumerateObject();
         foreach (var item in es)
@@ -629,7 +630,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     }
 }
 
-public struct ExifInfoNode
+public partial class ExifInfoNode : ObservableObject
 {
     public string Name { get; set; }
     public string DisplayName { get; set; }

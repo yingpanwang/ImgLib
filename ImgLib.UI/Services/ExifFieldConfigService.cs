@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using ImgLib.UI;
 
 namespace ImgLib.UI.Services;
 
@@ -74,7 +75,7 @@ public static class ExifFieldConfigService
             try
             {
                 var json = File.ReadAllText(configPath);
-                var mappings = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                var mappings = JsonSerializer.Deserialize(json, ImgLibUIJsonContext.Default.DictionaryStringString);
                 if (mappings != null && mappings.Count > 0)
                 {
                     _cachedMappings = mappings;

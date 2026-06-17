@@ -1,5 +1,3 @@
-using MetadataExtractor.Formats.Exif.Makernotes;
-
 namespace ImgLib.Models;
 
 public sealed partial record class NikonExifInfo : ExifInfo
@@ -17,7 +15,7 @@ public sealed partial record class NikonExifInfo : ExifInfo
     /// </summary>
     public override IReadOnlyDictionary<string, string?> GetTemplateReplacements()
     {
-        
+
         var dict = base.GetTemplateReplacements().ToDictionary();
         dict["CameraSerialNumber"] = CameraSerialNumber;
         dict["FirmwareVersion"] = FirmwareVersion;
