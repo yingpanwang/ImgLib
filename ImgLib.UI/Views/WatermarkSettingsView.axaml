@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="using:ImgLib.UI.ViewModels"
     xmlns:v="using:ImgLib.UI"
+    xmlns:models="using:ImgLib.UI.Models"
     d:DesignHeight="450"
     d:DesignWidth="800"
     x:DataType="vm:WatermarkSettingsViewModel"
@@ -142,7 +143,79 @@
             <!-- ═══ 水印文本 Tab ═══ -->
             <TabItem Header="水印文本">
                 <ScrollViewer Padding="12,8">
-                    <StackPanel Spacing="14">
+                    <StackPanel Spacing="12">
+
+                        <!-- ═══ 水印文本列表 ═══ -->
+                        <StackPanel Spacing="6">
+                            <TextBlock
+                                Text="水印文本列表"
+                                FontSize="12"
+                                FontWeight="Medium"
+                                Foreground="{StaticResource TextSecondary}" />
+                            <TextBlock
+                                Text="可添加多条水印文本，按列表顺序从上到下绘制（列表中靠下的文字叠在上方）"
+                                FontSize="10"
+                                Foreground="{StaticResource TextTertiary}" />
+
+                            <!-- 列表 -->
+                            <ListBox
+                                ItemsSource="{Binding WatermarkTextItems}"
+                                SelectedIndex="{Binding SelectedWatermarkTextIndex, Mode=TwoWay}"
+                                MinHeight="60"
+                                MaxHeight="120">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:WatermarkTextItemSettings">
+                                        <StackPanel Orientation="Horizontal" Spacing="6" Margin="2">
+                                            <TextBlock
+                                                Text="{Binding DisplayLabel}"
+                                                FontSize="11"
+                                                VerticalAlignment="Center"
+                                                TextWrapping="NoWrap"
+                                                TextTrimming="CharacterEllipsis"
+                                                MinWidth="280" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- 操作按钮 -->
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Button
+                                    Content="+ 添加"
+                                    Classes="secondary"
+                                    Command="{Binding AddWatermarkTextCommand}"
+                                    FontSize="11"
+                                    Padding="8,4" />
+                                <Button
+                                    Content="× 删除"
+                                    Classes="secondary"
+                                    Command="{Binding RemoveWatermarkTextCommand}"
+                                    FontSize="11"
+                                    Padding="8,4" />
+                                <Button
+                                    Content="↑ 上移"
+                                    Classes="secondary"
+                                    Command="{Binding MoveWatermarkTextUpCommand}"
+                                    FontSize="11"
+                                    Padding="8,4" />
+                                <Button
+                                    Content="↓ 下移"
+                                    Classes="secondary"
+                                    Command="{Binding MoveWatermarkTextDownCommand}"
+                                    FontSize="11"
+                                    Padding="8,4" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 分隔线 -->
+                        <Border Height="1" Background="#E0E0E0" Margin="0,4" />
+
+                        <!-- ═══ 编辑选中水印 ═══ -->
+                        <TextBlock
+                            Text="编辑选中水印"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{StaticResource TextSecondary}" />
 
                         <!-- 文本模板 -->
                         <StackPanel Spacing="5">
@@ -159,10 +232,10 @@
 
                             <TextBox
                                 Name="TemplateTextBox"
-                                Text="{Binding Settings.WatermarkTemplate, Mode=TwoWay}"
+                                Text="{Binding SelectedWatermarkText.Template, Mode=TwoWay}"
                                 AcceptsReturn="True"
                                 TextWrapping="Wrap"
-                                MinHeight="150"
+                                MinHeight="120"
                                 VerticalContentAlignment="Top" />
                         </StackPanel>
 
@@ -194,12 +267,12 @@
                                 Maximum="0.1"
                                 Minimum="0.01"
                                 FormatString="F3"
-                                Value="{Binding Settings.WatermarkFontSizeRatio, Mode=TwoWay}" />
+                                Value="{Binding SelectedWatermarkText.FontSizeRatio, Mode=TwoWay}" />
                         </StackPanel>
 
                         <!-- 字体加粗 -->
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CheckBox IsChecked="{Binding Settings.WatermarkBold, Mode=TwoWay}" />
+                            <CheckBox IsChecked="{Binding SelectedWatermarkText.Bold, Mode=TwoWay}" />
                             <TextBlock
                                 Text="字体加粗"
                                 FontSize="12.5"
@@ -219,7 +292,7 @@
                                 Maximum="3.0"
                                 Minimum="0.5"
                                 FormatString="F1"
-                                Value="{Binding Settings.WatermarkLineSpacing, Mode=TwoWay}" />
+                                Value="{Binding SelectedWatermarkText.LineSpacing, Mode=TwoWay}" />
                             <TextBlock
                                 Text="1.0=标准行距，大于1.0增大间距（仅多行生效）"
                                 FontSize="10"
@@ -228,7 +301,7 @@
 
                         <!-- 自动缩放适应 -->
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CheckBox IsChecked="{Binding Settings.WatermarkAutoFitFont, Mode=TwoWay}" />
+                            <CheckBox IsChecked="{Binding SelectedWatermarkText.AutoFitFont, Mode=TwoWay}" />
                             <TextBlock
                                 Text="自动缩放适应区域"
                                 FontSize="12.5"
@@ -267,7 +340,7 @@
                                 Maximum="1"
                                 Minimum="0"
                                 FormatString="F1"
-                                Value="{Binding Settings.WatermarkVerticalPosition, Mode=TwoWay}" />
+                                Value="{Binding SelectedWatermarkText.VerticalPosition, Mode=TwoWay}" />
                         </StackPanel>
 
                         <!-- 文字颜色 -->
@@ -278,7 +351,7 @@
                                 FontWeight="Medium"
                                 Foreground="{StaticResource TextSecondary}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBox Text="{Binding Settings.WatermarkColor, Mode=TwoWay}" MinWidth="80"/>
+                                <TextBox Text="{Binding SelectedWatermarkText.ColorHex, Mode=TwoWay}" MinWidth="80"/>
                                 <Border Width="24" Height="24" Background="{Binding WatermarkColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                             </StackPanel>
                         </StackPanel>
@@ -318,7 +391,7 @@
                                         Minimum="-20"
                                         Maximum="20"
                                         FormatString="F0"
-                                        Value="{Binding Settings.WatermarkShadowOffsetX, Mode=TwoWay}" />
+                                        Value="{Binding SelectedWatermarkText.ShadowOffsetX, Mode=TwoWay}" />
                                 </StackPanel>
                                 <StackPanel Spacing="3">
                                     <TextBlock
@@ -330,7 +403,7 @@
                                         Minimum="-20"
                                         Maximum="20"
                                         FormatString="F0"
-                                        Value="{Binding Settings.WatermarkShadowOffsetY, Mode=TwoWay}" />
+                                        Value="{Binding SelectedWatermarkText.ShadowOffsetY, Mode=TwoWay}" />
                                 </StackPanel>
                                 <TextBlock
                                     Text="正=右/下，负=左/上"
@@ -360,7 +433,7 @@
                                     Minimum="0"
                                     Maximum="20"
                                     FormatString="F0"
-                                    Value="{Binding Settings.WatermarkShadowSigma, Mode=TwoWay}" />
+                                    Value="{Binding SelectedWatermarkText.ShadowSigma, Mode=TwoWay}" />
                                 <TextBlock
                                     Text="阴影模糊半径，0=无模糊"
                                     FontSize="10"
@@ -376,7 +449,7 @@
                                 FontWeight="Medium"
                                 Foreground="{StaticResource TextSecondary}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBox Text="{Binding Settings.WatermarkShadowColor, Mode=TwoWay}" MinWidth="80"/>
+                                <TextBox Text="{Binding SelectedWatermarkText.ShadowColorHex, Mode=TwoWay}" MinWidth="80"/>
                                 <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                             </StackPanel>
                         </StackPanel>
@@ -392,7 +465,7 @@
 
                         <!-- 显示水印边框 -->
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <CheckBox IsChecked="{Binding Settings.ShowWatermarkBorder, Mode=TwoWay}" />
+                            <CheckBox IsChecked="{Binding SelectedWatermarkText.ShowBorder, Mode=TwoWay}" />
                             <TextBlock
                                 Text="显示水印边框"
                                 FontSize="12.5"
@@ -408,7 +481,7 @@
                                 FontWeight="Medium"
                                 Foreground="{StaticResource TextSecondary}" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBox Text="{Binding Settings.WatermarkBorderColor, Mode=TwoWay}" MinWidth="80"/>
+                                <TextBox Text="{Binding SelectedWatermarkText.BorderColorHex, Mode=TwoWay}" MinWidth="80"/>
                                 <Border Width="24" Height="24" Background="{Binding WatermarkBorderColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
                             </StackPanel>
                         </StackPanel>
@@ -424,7 +497,7 @@
                                 Increment="1"
                                 Maximum="10"
                                 Minimum="1"
-                                Value="{Binding Settings.WatermarkBorderWidth, Mode=TwoWay}" />
+                                Value="{Binding SelectedWatermarkText.BorderWidth, Mode=TwoWay}" />
                         </StackPanel>
 
                     </StackPanel>
@@ -474,12 +547,15 @@
         </TabControl>
 
         <!-- ═══ 预览更改按钮 (始终可见) ═══ -->
-        <Button
-            Grid.Row="1"
-            Classes="primary"
-            Margin="12,8,12,12"
-            Command="{Binding PreviewCommand}"
-            Content="预览更改" />
 
+        <StackPanel
+            Grid.Row="1" HorizontalAlignment="Right">
+            <Button
+                Classes="primary"
+                Margin="12,8,12,12"
+                Command="{Binding PreviewCommand}"
+                Content="预览更改" />
+            <Button Content="保存水印设置" Command="{Binding SaveWartermarkSettingsCommand}"></Button>
+        </StackPanel>
     </Grid>
 </UserControl>

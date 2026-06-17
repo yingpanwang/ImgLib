@@ -8,6 +8,7 @@ using ImgLib.WatermarkPipeline;
 using SkiaSharp;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows.Input;
 
 namespace ImgLib.UI.ViewModels;
@@ -65,7 +66,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     public partial bool IsDraggingHistogram { get; set; }
 
     private ImageFile? _previewImageFile;
-    private System.Threading.CancellationTokenSource? _previewCancellationTokenSource;
+    private CancellationTokenSource? _previewCancellationTokenSource;
 
     public WatermarkDesignViewModel(
         WatermarkSettingsViewModel watermarkSettingsViewModel,
@@ -128,7 +129,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
                 if (!_previewCancellationTokenSource.Token.IsCancellationRequested)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 执行 SetBackground");
+                    Debug.WriteLine($"[WatermarkDesignViewModel] 执行 SetBackground");
                     await SetBackgroundWithPipeline();
                 }
             }
