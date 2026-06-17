@@ -150,30 +150,40 @@ public class WatermarkPipelineRunner
         pipeline.AddDrawImage();
         pipeline.AddRestoreCanvas();
 
-        // 4. 文本水印
-        if (!string.IsNullOrWhiteSpace(options.WatermarkTemplate))
+        // 4. 文本水印（支持多水印列表）
+        var effectiveTexts = options.GetEffectiveWatermarkTexts();
+        bool anyShowBorder = false;
+        foreach (var textItem in effectiveTexts)
         {
-            pipeline.AddCommand(new TextWatermarkCommand(options.WatermarkTemplate)
+            if (string.IsNullOrWhiteSpace(textItem.Template))
+                continue;
+
+            pipeline.AddCommand(new TextWatermarkCommand(textItem.Template)
             {
-                ColorHex = options.WatermarkColor,
-                FontSizeRatio = options.WatermarkFontSizeRatio,
-                Bold = options.WatermarkBold,
-                LineSpacing = options.WatermarkLineSpacing,
-                AutoFitFont = options.WatermarkAutoFitFont,
-                VerticalPosition = options.WatermarkVerticalPosition,
-                HorizontalAlignment = options.WatermarkHorizontalAlignment,
-                ShadowOffsetX = options.WatermarkShadowOffsetX,
-                ShadowOffsetY = options.WatermarkShadowOffsetY,
-                ShadowSigma = options.WatermarkShadowSigma,
-                ShadowColorHex = options.WatermarkShadowColor,
-                ShowBorder = options.ShowWatermarkBorder,
-                BorderColorHex = options.WatermarkBorderColor,
-                BorderWidth = options.WatermarkBorderWidth,
+                ColorHex = textItem.ColorHex,
+                FontSizeRatio = textItem.FontSizeRatio,
+                Bold = textItem.Bold,
+                LineSpacing = textItem.LineSpacing,
+                AutoFitFont = textItem.AutoFitFont,
+                VerticalPosition = textItem.VerticalPosition,
+                HorizontalAlignment = textItem.HorizontalAlignment,
+                ShadowOffsetX = textItem.ShadowOffsetX,
+                ShadowOffsetY = textItem.ShadowOffsetY,
+                ShadowSigma = textItem.ShadowSigma,
+                ShadowColorHex = textItem.ShadowColorHex,
+                ShowBorder = textItem.ShowBorder,
+                BorderColorHex = textItem.BorderColorHex,
+                BorderWidth = textItem.BorderWidth,
             });
+
+            if (textItem.ShowBorder)
+                anyShowBorder = true;
         }
 
-        // 5. 调试边框（仅当文本水印开启调试时）
-        if (options.ShowWatermarkBorder)
+        // 5. 调试边框（任一文本水印开启调试时启用）
+        // 注意：多水印模式下，每个文本水印的调试边框在 VisitTextWatermark 中绘制；
+        // DebugBorderCommand 仅作为兜底，遍历 TextBlockLayouts 统一绘制。
+        if (anyShowBorder)
         {
             pipeline.AddDebugBorder(options.WatermarkBorderColor, options.WatermarkBorderWidth);
         }

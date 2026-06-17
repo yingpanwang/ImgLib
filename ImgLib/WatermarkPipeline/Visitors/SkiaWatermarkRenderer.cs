@@ -130,17 +130,6 @@ public class SkiaWatermarkRenderer : IWatermarkCommandVisitor
         }
 
         // ── 7. 缓存布局到上下文（供后续 DebugBorder 命令使用）──
-        ctx.TextLines = lines;
-        ctx.TextLineCount = lineCount;
-        ctx.FontSize = fontSize;
-        ctx.MaxLineWidth = maxLineWidth;
-        ctx.LineHeight = lineHeight;
-        ctx.AscentAbove = ascentAbove;
-        ctx.DescentBelow = descentBelow;
-        ctx.TotalBlockHeight = totalBlockHeight;
-        ctx.FirstLineBaselineY = firstLineBaselineY;
-        ctx.TextX = textX;
-        ctx.TextAlign = textAlign;
 
         // 计算调试边框矩形
         float borderPadding = 10;
@@ -164,12 +153,74 @@ public class SkiaWatermarkRenderer : IWatermarkCommandVisitor
             borderRight = textX + maxLineWidth / 2 + borderPadding;
         }
 
-        ctx.DebugBorderRect = new SKRect(borderLeft, borderTop, borderRight, borderBottom);
+        var debugRect = new SKRect(borderLeft, borderTop, borderRight, borderBottom);
+
+        // 追加到多文本布局列表（供 DebugBorder 遍历）
+        ctx.TextBlockLayouts.Add(new TextBlockLayout
+        {
+            TextLines = lines,
+            TextLineCount = lineCount,
+            FontSize = fontSize,
+            MaxLineWidth = maxLineWidth,
+            LineHeight = lineHeight,
+            AscentAbove = ascentAbove,
+            DescentBelow = descentBelow,
+            TotalBlockHeight = totalBlockHeight,
+            FirstLineBaselineY = firstLineBaselineY,
+            TextX = textX,
+            TextAlign = textAlign,
+            DebugBorderRect = debugRect,
+            CommandOrder = cmd.Order,
+            ShowBorder = cmd.ShowBorder,
+            BorderColorHex = cmd.BorderColorHex,
+            BorderWidth = cmd.BorderWidth,
+        });
+
+        // 保留最后一个文本块的布局到旧字段（向后兼容）
+        ctx.TextLines = lines;
+        ctx.TextLineCount = lineCount;
+        ctx.FontSize = fontSize;
+        ctx.MaxLineWidth = maxLineWidth;
+        ctx.LineHeight = lineHeight;
+        ctx.AscentAbove = ascentAbove;
+        ctx.DescentBelow = descentBelow;
+        ctx.TotalBlockHeight = totalBlockHeight;
+        ctx.FirstLineBaselineY = firstLineBaselineY;
+        ctx.TextX = textX;
+        ctx.TextAlign = textAlign;
+        ctx.DebugBorderRect = debugRect;
     }
 
     public void VisitDebugBorder(DebugBorderCommand cmd, WatermarkRenderContext ctx)
     {
-        using var borderPaint = new SKPaint
+        // 多水印模式：遍历所有文本块布局，为开启调试边框的块绘制
+        if (ctx.TextBlockLayouts.Count > 0)
+        {
+            foreach (var layout in ctx.TextBlockLayouts)
+            {
+                if (!layout.ShowBorder)
+                    continue;
+
+                var rect = layout.DebugBorderRect;
+                if (rect == SKRect.Empty)
+                    continue;
+
+                using var borderPaint = new SKPaint
+                {
+                    Style = SKPaintStyle.Stroke,
+                    Color = ParseColor(layout.BorderColorHex, SKColors.Lime),
+                    StrokeWidth = layout.BorderWidth,
+                    IsAntialias = true
+                };
+
+                ctx.Canvas.DrawRect(rect, borderPaint);
+                DrawCornerMarkers(ctx.Canvas, rect, borderPaint);
+            }
+            return;
+        }
+
+        // 单水印模式（向后兼容）：使用旧字段
+        using var borderPaint2 = new SKPaint
         {
             Style = SKPaintStyle.Stroke,
             Color = ParseColor(cmd.ColorHex, SKColors.Lime),
@@ -177,11 +228,11 @@ public class SkiaWatermarkRenderer : IWatermarkCommandVisitor
             IsAntialias = true
         };
 
-        var rect = ctx.DebugBorderRect;
-        if (rect == SKRect.Empty) return;
+        var legacyRect = ctx.DebugBorderRect;
+        if (legacyRect == SKRect.Empty) return;
 
-        ctx.Canvas.DrawRect(rect, borderPaint);
-        DrawCornerMarkers(ctx.Canvas, rect, borderPaint);
+        ctx.Canvas.DrawRect(legacyRect, borderPaint2);
+        DrawCornerMarkers(ctx.Canvas, legacyRect, borderPaint2);
     }
 
     // ═══════════════════════════════════════════════

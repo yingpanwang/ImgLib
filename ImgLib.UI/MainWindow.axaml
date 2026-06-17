@@ -29,14 +29,11 @@
                 <MenuItem Header="菜单">
                     <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
                     <Separator />
-                    <MenuItem Command="{Binding ExportCurrentCommand}" Header="导出当前图片" />
-                    <MenuItem Command="{Binding ExportBatchCommand}" Header="批量导出" />
-                    <Separator />
                     <MenuItem Command="{Binding OpenSettingsCommand}" Header="设置 ⚙" />
-                    <Separator />
-                    <MenuItem Command="{Binding TestToastCommand}" Header="测试 Toast" />
                 </MenuItem>
                 <MenuItem Header="导出">
+                    <MenuItem Command="{Binding ExportCurrentCommand}" Header="导出当前图片" />
+                    <Separator />
                     <MenuItem Command="{Binding ExportBatchCommand}" Header="批量导出" />
                 </MenuItem>
             </Menu>

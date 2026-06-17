@@ -110,7 +110,15 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         if (value >= 0 && value < TextShadowOffsetPresets.Length)
         {
             IsTextShadowOffsetCustom = false;
-            (Settings.WatermarkShadowOffsetX, Settings.WatermarkShadowOffsetY) = TextShadowOffsetPresets[value];
+            var (x, y) = TextShadowOffsetPresets[value];
+            Settings.WatermarkShadowOffsetX = x;
+            Settings.WatermarkShadowOffsetY = y;
+            // 同步到选中的水印项
+            if (SelectedWatermarkText != null)
+            {
+                SelectedWatermarkText.ShadowOffsetX = x;
+                SelectedWatermarkText.ShadowOffsetY = y;
+            }
         }
         else
         {
@@ -133,6 +141,9 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             IsTextShadowSigmaCustom = false;
             Settings.WatermarkShadowSigma = TextShadowSigmaPresets[value];
+            // 同步到选中的水印项
+            if (SelectedWatermarkText != null)
+                SelectedWatermarkText.ShadowSigma = TextShadowSigmaPresets[value];
         }
         else
         {
@@ -166,6 +177,46 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     /// </summary>
     public ObservableCollection<ExifFieldItem> ExifFieldItems { get; } = new();
 
+    // ═══ 多水印文本 ═══
+    /// <summary>
+    /// 水印文本项列表（绑定到 Settings.WatermarkTextItems）
+    /// </summary>
+    public ObservableCollection<WatermarkTextItemSettings> WatermarkTextItems => Settings.WatermarkTextItems;
+
+    /// <summary>
+    /// 当前选中的水印文本项索引
+    /// </summary>
+    [ObservableProperty]
+    public partial int SelectedWatermarkTextIndex { get; set; }
+
+    /// <summary>
+    /// 当前选中的水印文本项（用于编辑面板绑定）
+    /// </summary>
+    public WatermarkTextItemSettings? SelectedWatermarkText
+    {
+        get
+        {
+            if (SelectedWatermarkTextIndex >= 0 && SelectedWatermarkTextIndex < WatermarkTextItems.Count)
+                return WatermarkTextItems[SelectedWatermarkTextIndex];
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 是否可以删除当前水印（至少保留一项时才能删除当前项，但总数 > 1 时允许）
+    /// </summary>
+    public bool CanRemoveWatermarkText => WatermarkTextItems.Count > 1;
+
+    /// <summary>
+    /// 当前选中项是否可以上移
+    /// </summary>
+    public bool CanMoveUp => SelectedWatermarkTextIndex > 0;
+
+    /// <summary>
+    /// 当前选中项是否可以下移
+    /// </summary>
+    public bool CanMoveDown => SelectedWatermarkTextIndex >= 0 && SelectedWatermarkTextIndex < WatermarkTextItems.Count - 1;
+
     // 预览命令（由外部注入）
     public ICommand? PreviewCommand { get; set; }
 
@@ -198,8 +249,116 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         _currentSettings = Settings;
         _currentSettings.PropertyChanged += OnSettingsPropertyChanged;
 
+        // 订阅水印文本项变化
+        SubscribeWatermarkTextItems(Settings.WatermarkTextItems);
+
         // 根据当前设置值初始化预设索引
         InitializePresetIndices();
+
+        // 初始化水印文本选中索引
+        if (Settings.WatermarkTextItems.Count > 0)
+            SelectedWatermarkTextIndex = 0;
+    }
+
+    [RelayCommand(AllowConcurrentExecutions = false)]
+    public Task SaveWartermarkSettings()
+    {
+        return Task.CompletedTask;
+    }
+
+    /// <summary>添加新的水印文本项</summary>
+    [RelayCommand]
+    private void AddWatermarkText()
+    {
+        var newItem = new WatermarkTextItemSettings();
+        newItem.PropertyChanged += OnWatermarkTextItemPropertyChanged;
+        WatermarkTextItems.Add(newItem);
+        SelectedWatermarkTextIndex = WatermarkTextItems.Count - 1;
+        RefreshCanExecuteState();
+        RequestPreview();
+    }
+
+    /// <summary>删除当前选中的水印文本项</summary>
+    [RelayCommand(CanExecute = nameof(CanRemoveWatermarkText))]
+    private void RemoveWatermarkText()
+    {
+        if (!CanRemoveWatermarkText || SelectedWatermarkTextIndex < 0)
+            return;
+
+        var idx = SelectedWatermarkTextIndex;
+        var item = WatermarkTextItems[idx];
+        item.PropertyChanged -= OnWatermarkTextItemPropertyChanged;
+        WatermarkTextItems.RemoveAt(idx);
+
+        // 调整选中索引
+        if (idx >= WatermarkTextItems.Count)
+            SelectedWatermarkTextIndex = WatermarkTextItems.Count - 1;
+        else
+            SelectedWatermarkTextIndex = idx;
+
+        RefreshCanExecuteState();
+        RequestPreview();
+    }
+
+    /// <summary>将当前选中的水印文本项上移</summary>
+    [RelayCommand(CanExecute = nameof(CanMoveUp))]
+    private void MoveWatermarkTextUp()
+    {
+        if (!CanMoveUp) return;
+
+        var idx = SelectedWatermarkTextIndex;
+        WatermarkTextItems.Move(idx, idx - 1);
+        SelectedWatermarkTextIndex = idx - 1;
+        RequestPreview();
+    }
+
+    /// <summary>将当前选中的水印文本项下移</summary>
+    [RelayCommand(CanExecute = nameof(CanMoveDown))]
+    private void MoveWatermarkTextDown()
+    {
+        if (!CanMoveDown) return;
+
+        var idx = SelectedWatermarkTextIndex;
+        WatermarkTextItems.Move(idx, idx + 1);
+        SelectedWatermarkTextIndex = idx + 1;
+        RequestPreview();
+    }
+
+    /// <summary>刷新 CanExecute 状态（CanRemove/CanMoveUp/CanMoveDown）</summary>
+    private void RefreshCanExecuteState()
+    {
+        OnPropertyChanged(nameof(CanRemoveWatermarkText));
+        OnPropertyChanged(nameof(CanMoveUp));
+        OnPropertyChanged(nameof(CanMoveDown));
+        OnPropertyChanged(nameof(SelectedWatermarkText));
+        RemoveWatermarkTextCommand.NotifyCanExecuteChanged();
+        MoveWatermarkTextUpCommand.NotifyCanExecuteChanged();
+        MoveWatermarkTextDownCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>水印文本项属性变化时的处理（触发预览）</summary>
+    private void OnWatermarkTextItemPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        // 模板变化时刷新预览文本
+        if (e.PropertyName == nameof(WatermarkTextItemSettings.Template))
+        {
+            UpdatePreviewText();
+        }
+
+        // 属性变化时更新选中项绑定
+        OnPropertyChanged(nameof(SelectedWatermarkText));
+
+        RequestPreview();
+    }
+
+    /// <summary>触发预览请求（带防抖由 WatermarkDesignViewModel 处理）</summary>
+    private void RequestPreview()
+    {
+        var previewSettings = SystemSettingsService.Current.PreviewSettings;
+        if (previewSettings.AutoPreview)
+        {
+            PreviewRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     /// <summary>
@@ -221,6 +380,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         if (_currentSettings != null)
         {
             _currentSettings.PropertyChanged -= OnSettingsPropertyChanged;
+            UnsubscribeWatermarkTextItems(_currentSettings.WatermarkTextItems);
         }
 
         // 监听新对象
@@ -228,7 +388,12 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         {
             _currentSettings = newValue;
             newValue.PropertyChanged += OnSettingsPropertyChanged;
+            SubscribeWatermarkTextItems(newValue.WatermarkTextItems);
             InitializePresetIndices();
+
+            // 选中第一个水印项
+            if (newValue.WatermarkTextItems.Count > 0)
+                SelectedWatermarkTextIndex = 0;
         }
     }
 
@@ -260,13 +425,49 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
     partial void OnHorizontalAlignIndexChanged(int value)
     {
-        Settings.WatermarkHorizontalAlignment = value switch
+        var alignment = value switch
         {
             0 => "Left",
             1 => "Center",
             2 => "Right",
             _ => "Center"
         };
+
+        Settings.WatermarkHorizontalAlignment = alignment;
+
+        // 多水印模式：同步到选中项
+        if (SelectedWatermarkText != null)
+            SelectedWatermarkText.HorizontalAlignment = alignment;
+    }
+
+    partial void OnSelectedWatermarkTextIndexChanged(int value)
+    {
+        UpdatePreviewText();
+        UpdateColorBrushes();
+        RefreshCanExecuteState();
+        OnPropertyChanged(nameof(SelectedWatermarkText));
+
+        // 将选中项的值同步到扁平 Settings（使预设系统正常工作）
+        if (SelectedWatermarkText != null)
+        {
+            HorizontalAlignIndex = SelectedWatermarkText.HorizontalAlignment switch
+            {
+                "Left" => 0,
+                "Right" => 2,
+                _ => 1,
+            };
+
+            // 同步到扁平属性（预设系统依赖这些）
+            Settings.WatermarkShadowOffsetX = SelectedWatermarkText.ShadowOffsetX;
+            Settings.WatermarkShadowOffsetY = SelectedWatermarkText.ShadowOffsetY;
+            Settings.WatermarkShadowSigma = SelectedWatermarkText.ShadowSigma;
+            Settings.WatermarkShadowColor = SelectedWatermarkText.ShadowColorHex;
+            Settings.ShowWatermarkBorder = SelectedWatermarkText.ShowBorder;
+            Settings.WatermarkBorderColor = SelectedWatermarkText.BorderColorHex;
+            Settings.WatermarkBorderWidth = SelectedWatermarkText.BorderWidth;
+
+            InitializePresetIndices();
+        }
     }
 
     private void OnSettingsPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -287,15 +488,43 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
     private void UpdatePreviewText()
     {
-        var option = Settings.ToImageGenerateOption();
-        PreviewWatermarkText = option.ParseWatermarkTemplate(ExifInfo);
+        // 多水印模式：预览选中的水印项
+        if (SelectedWatermarkText != null && ExifInfo != null)
+        {
+            var result = SelectedWatermarkText.Template;
+            foreach (var kvp in ExifInfo.GetTemplateReplacements())
+            {
+                result = result.Replace($"{{{kvp.Key}}}", kvp.Value ?? "N/A");
+            }
+            PreviewWatermarkText = result;
+        }
+        else if (SelectedWatermarkText != null)
+        {
+            PreviewWatermarkText = SelectedWatermarkText.Template;
+        }
+        else
+        {
+            // 向后兼容
+            var option = Settings.ToImageGenerateOption();
+            PreviewWatermarkText = option.ParseWatermarkTemplate(ExifInfo);
+        }
     }
 
     private void UpdateColorBrushes()
     {
-        WatermarkColorBrush = ParseColorBrush(Settings.WatermarkColor);
-        WatermarkShadowColorBrush = ParseColorBrush(Settings.WatermarkShadowColor);
-        WatermarkBorderColorBrush = ParseColorBrush(Settings.WatermarkBorderColor);
+        // 多水印模式：使用选中项的颜色
+        if (SelectedWatermarkText != null)
+        {
+            WatermarkColorBrush = ParseColorBrush(SelectedWatermarkText.ColorHex);
+            WatermarkShadowColorBrush = ParseColorBrush(SelectedWatermarkText.ShadowColorHex);
+            WatermarkBorderColorBrush = ParseColorBrush(SelectedWatermarkText.BorderColorHex);
+        }
+        else
+        {
+            WatermarkColorBrush = ParseColorBrush(Settings.WatermarkColor);
+            WatermarkShadowColorBrush = ParseColorBrush(Settings.WatermarkShadowColor);
+            WatermarkBorderColorBrush = ParseColorBrush(Settings.WatermarkBorderColor);
+        }
     }
 
     private static IBrush? ParseColorBrush(string colorHex)
@@ -357,6 +586,24 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         int tssIdx = Array.IndexOf(TextShadowSigmaPresets, Settings.WatermarkShadowSigma);
         TextShadowSigmaPresetIndex = tssIdx >= 0 ? tssIdx : TextShadowSigmaPresets.Length;
         IsTextShadowSigmaCustom = tssIdx < 0;
+    }
+
+    /// <summary>订阅所有水印文本项的 PropertyChanged 事件</summary>
+    private void SubscribeWatermarkTextItems(ObservableCollection<WatermarkTextItemSettings> items)
+    {
+        foreach (var item in items)
+        {
+            item.PropertyChanged += OnWatermarkTextItemPropertyChanged;
+        }
+    }
+
+    /// <summary>取消订阅所有水印文本项的 PropertyChanged 事件</summary>
+    private void UnsubscribeWatermarkTextItems(ObservableCollection<WatermarkTextItemSettings> items)
+    {
+        foreach (var item in items)
+        {
+            item.PropertyChanged -= OnWatermarkTextItemPropertyChanged;
+        }
     }
 
     private static Color ParseColor(string colorHex)

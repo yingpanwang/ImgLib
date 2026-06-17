@@ -72,7 +72,10 @@ public partial class WatermarkSettingsView : UserControl
         var clearItem = new MenuItem { Header = "清空模板" };
         clearItem.Click += (_, _) =>
         {
-            vm.Settings.WatermarkTemplate = string.Empty;
+            if (vm.SelectedWatermarkText != null)
+                vm.SelectedWatermarkText.Template = string.Empty;
+            else
+                vm.Settings.WatermarkTemplate = string.Empty;
         };
         menuFlyout.Items.Add(clearItem);
 
@@ -81,18 +84,17 @@ public partial class WatermarkSettingsView : UserControl
 
     /// <summary>
     /// 解析单个占位符的实际 EXIF 值。
-    /// 将占位符作为模板传入 ParseWatermarkTemplate，若被替换则返回实际值。
+    /// 直接在 ExifInfo 的替换字典中查找。
     /// </summary>
     private static string? ResolveValue(string placeholder, WatermarkSettingsViewModel vm)
     {
         if (vm.ExifInfo == null) return null;
 
-        var option = vm.Settings.ToImageGenerateOption();
-        option.WatermarkTemplate = placeholder;
-        var resolved = option.ParseWatermarkTemplate(vm.ExifInfo);
+        // 从占位符提取键名: "{Model}" → "Model"
+        var key = placeholder.Trim('{', '}');
+        var replacements = vm.ExifInfo.GetTemplateReplacements();
 
-        // 如果返回值与占位符不同，说明被成功替换
-        return resolved != placeholder ? resolved : null;
+        return replacements.TryGetValue(key, out var value) ? value : null;
     }
 
     private void InsertAtCursor(string text)

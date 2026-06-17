@@ -28,7 +28,52 @@ public class ImageGenerateOption
     public float ShadowOffsetY { get; set; }
     public float ShadowSigma { get; set; }
 
-    // ═══ 水印文本参数 ═══
+    // ═══ 多水印文本列表（推荐使用） ═══
+    /// <summary>
+    /// 水印文本项列表。每个项代表一条独立的水印文本，按列表顺序依次绘制。
+    /// 为空时自动使用旧的单水印属性（向后兼容）。
+    /// </summary>
+    public List<WatermarkTextItem> WatermarkTexts { get; set; } = new();
+
+    /// <summary>
+    /// 获取有效的水印文本项列表。
+    /// 若 <see cref="WatermarkTexts"/> 非空则直接返回；否则将旧的单水印属性包装为单元素列表。
+    /// </summary>
+    public List<WatermarkTextItem> GetEffectiveWatermarkTexts()
+    {
+        if (WatermarkTexts.Count > 0)
+            return WatermarkTexts;
+
+        // 向后兼容：将旧的扁平属性包装为单个 WatermarkTextItem
+        if (!string.IsNullOrWhiteSpace(WatermarkTemplate))
+        {
+            return new List<WatermarkTextItem>
+            {
+                new WatermarkTextItem
+                {
+                    Template = WatermarkTemplate,
+                    ColorHex = WatermarkColor,
+                    FontSizeRatio = WatermarkFontSizeRatio,
+                    Bold = WatermarkBold,
+                    LineSpacing = WatermarkLineSpacing,
+                    AutoFitFont = WatermarkAutoFitFont,
+                    VerticalPosition = WatermarkVerticalPosition,
+                    HorizontalAlignment = WatermarkHorizontalAlignment,
+                    ShadowOffsetX = WatermarkShadowOffsetX,
+                    ShadowOffsetY = WatermarkShadowOffsetY,
+                    ShadowSigma = WatermarkShadowSigma,
+                    ShadowColorHex = WatermarkShadowColor,
+                    ShowBorder = ShowWatermarkBorder,
+                    BorderColorHex = WatermarkBorderColor,
+                    BorderWidth = WatermarkBorderWidth,
+                }
+            };
+        }
+
+        return new List<WatermarkTextItem>();
+    }
+
+    // ═══ 水印文本参数（单水印，向后兼容） ═══
     /// <summary>
     /// 水印文本模板，支持 EXIF 变量替换。
     /// 可用变量示例: {Model}, {LensModel}, {FNumber}, {ISO}, {FocalLength}, {ExposureTime}, {DateTimeOriginal}

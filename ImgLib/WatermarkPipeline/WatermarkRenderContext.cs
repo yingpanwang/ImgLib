@@ -45,6 +45,11 @@ public class WatermarkRenderContext
 
     // ─── 文本水印布局缓存（由 TextWatermarkHandler 计算并存储）───
 
+    /// <summary>所有文本水印块的布局信息列表（按绘制顺序）</summary>
+    public List<TextBlockLayout> TextBlockLayouts { get; } = new();
+
+    // ─── 以下属性保留用于向后兼容（单文本场景）───
+
     /// <summary>解析并拆分后的文本行</summary>
     public string[]? TextLines { get; set; }
 
