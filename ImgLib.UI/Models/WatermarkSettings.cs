@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using ImgLib.UI.Services;
 
 namespace ImgLib.UI.Models;
@@ -8,92 +7,35 @@ namespace ImgLib.UI.Models;
 /// <summary>
 /// 界面设置类，用于绑定 UI 并触发属性变化通知
 /// </summary>
-public class WatermarkSettings : INotifyPropertyChanged
+public partial class WatermarkSettings : ObservableObject
 {
     // ═══ 多水印文本列表 ═══
-    private ObservableCollection<WatermarkTextItemSettings> _watermarkTextItems = new() { new WatermarkTextItemSettings() };
-    public ObservableCollection<WatermarkTextItemSettings> WatermarkTextItems
-    {
-        get => _watermarkTextItems;
-        set { _watermarkTextItems = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial ObservableCollection<WatermarkTextItemSettings> WatermarkTextItems { get; set; } = new() { new WatermarkTextItemSettings() };
 
     // ═══ 图像处理参数 ═══
-    private float _scale = 0.89f;
-    public float Scale
-    {
-        get => _scale;
-        set { _scale = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float Scale { get; set; } = 0.89f;
 
+    [ObservableProperty]
     private float _cornerRadius = 45f;
-    public float CornerRadius
-    {
-        get => _cornerRadius;
-        set { _cornerRadius = value; OnPropertyChanged(); }
-    }
 
-    private float _blurSigma = 25f;
-    public float BlurSigma
-    {
-        get => _blurSigma;
-        set { _blurSigma = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float BlurSigma { get; set; } = 25f;
 
-    private float _shadowOffsetX = 50f;
-    public float ShadowOffsetX
-    {
-        get => _shadowOffsetX;
-        set { _shadowOffsetX = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float ShadowOffsetX { get; set; } = 50f;
 
-    private float _shadowOffsetY = 50f;
-    public float ShadowOffsetY
-    {
-        get => _shadowOffsetY;
-        set { _shadowOffsetY = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float ShadowOffsetY { get; set; } = 50f;
 
-    private float _shadowSigma = 25f;
-    public float ShadowSigma
-    {
-        get => _shadowSigma;
-        set { _shadowSigma = value; OnPropertyChanged(); }
-    }
-
-    // // ═══ 预览相关参数 ═══
-    // private bool _enablePreviewDownsampling = true;
-    // public bool EnablePreviewDownsampling
-    // {
-    //     get => _enablePreviewDownsampling;
-    //     set { _enablePreviewDownsampling = value; OnPropertyChanged(); }
-    // }
-
-    // private bool _usePreviewPercentMode = false;
-    // public bool UsePreviewPercentMode
-    // {
-    //     get => _usePreviewPercentMode;
-    //     set { _usePreviewPercentMode = value; OnPropertyChanged(); }
-    // }
-
-    // private int _previewMaxDimension = 1200;
-    // public int PreviewMaxDimension
-    // {
-    //     get => _previewMaxDimension;
-    //     set { _previewMaxDimension = value; OnPropertyChanged(); }
-    // }
-
-    // private float _previewMaxPercent = 50f;
-    // public float PreviewMaxPercent
-    // {
-    //     get => _previewMaxPercent;
-    //     set { _previewMaxPercent = value; OnPropertyChanged(); }
-    // }
+    [ObservableProperty]
+    public partial float ShadowSigma { get; set; } = 25f;
 
     /// <summary>
     /// 从 ImageGenerateOption 复制值
     /// </summary>
-    public void FromImageGenerateOption(ImgLib.ImageGenerateOption option)
+    public void FromImageGenerateOption(ImageGenerateOption option)
     {
         Scale = option.Scale;
         CornerRadius = option.CornerRadius;
@@ -121,12 +63,12 @@ public class WatermarkSettings : INotifyPropertyChanged
     /// <summary>
     /// 转换为 ImageGenerateOption
     /// </summary>
-    public ImgLib.ImageGenerateOption ToImageGenerateOption()
+    public ImageGenerateOption ToImageGenerateOption()
     {
         var systemSettings = SystemSettingsService.Current;
         var previewSettings = systemSettings.PreviewSettings;
 
-        var option = new ImgLib.ImageGenerateOption(Scale)
+        var option = new ImageGenerateOption(Scale)
         {
             CornerRadius = CornerRadius,
             BlurSigma = BlurSigma,
@@ -147,12 +89,5 @@ public class WatermarkSettings : INotifyPropertyChanged
         }
 
         return option;
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

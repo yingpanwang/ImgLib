@@ -1,11 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
-using ImgLib.UI.Models;
-using ImgLib.UI.Services;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-
 namespace ImgLib.UI.ViewModels;
 
 /// <summary>
@@ -25,9 +17,6 @@ public partial class WatermarkSettingListViewModel : ViewModelBase
     [ObservableProperty]
     public partial ObservableCollection<WatermarkSettingFileEntry> SavedFiles { get; set; } = [];
 
-    /// <summary>用户点击加载某个已保存的设置文件时触发</summary>
-    public event EventHandler<WatermarkSettings>? LoadRequested;
-
     /// <summary>是否有已保存的文件（用于空状态 UI 显示）</summary>
     public bool HasFiles => SavedFiles.Count > 0;
 
@@ -35,6 +24,12 @@ public partial class WatermarkSettingListViewModel : ViewModelBase
     {
         // 启动时扫描预设目录
         ScanPresetsDirectory();
+
+        // 注册消息：水印设置保存成功 → 更新文件列表
+        WeakReferenceMessenger.Default.Register<SettingsFileSavedMessage>(this, (r, m) =>
+        {
+            AddSavedFile(m.FilePath);
+        });
     }
 
     /// <summary>
@@ -124,7 +119,7 @@ public partial class WatermarkSettingListViewModel : ViewModelBase
 
             if (settings != null)
             {
-                LoadRequested?.Invoke(this, settings);
+                WeakReferenceMessenger.Default.Send(new LoadWatermarkSettingsMessage(settings));
             }
             else
             {

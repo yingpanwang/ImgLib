@@ -553,7 +553,7 @@
             <Button
                 Classes="primary"
                 Margin="12,8,12,12"
-                Command="{Binding PreviewCommand}"
+                Command="{Binding TriggerPreviewCommand}"
                 Content="预览更改" />
             <Button Content="保存水印设置" Command="{Binding SaveWartermarkSettingsCommand}"></Button>
         </StackPanel>

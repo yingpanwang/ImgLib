@@ -1,20 +1,5 @@
-using Avalonia.Media;
 using Avalonia.Platform.Storage;
-using CommunityToolkit.Mvvm.Input;
-using ImgLib;
-using ImgLib.Models;
-using ImgLib.UI;
-using ImgLib.UI.Models;
-using ImgLib.UI.Services;
-using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Text.Json;
 using System.Windows.Input;
-using System.Text;
-using System.ComponentModel;
-using ImgLib.Services;
-
 namespace ImgLib.UI.ViewModels;
 
 public partial class WatermarkSettingsViewModel : ViewModelBase
@@ -218,24 +203,10 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     /// </summary>
     public bool CanMoveDown => SelectedWatermarkTextIndex >= 0 && SelectedWatermarkTextIndex < WatermarkTextItems.Count - 1;
 
-    // 预览命令（由外部注入）
-    public ICommand? PreviewCommand { get; set; }
-
     /// <summary>
-    /// 存储提供程序（由外部注入，用于弹出保存文件对话框）
+    /// 存储提供程序（由 View 注入，用于弹出保存文件对话框）
     /// </summary>
     public IStorageProvider? StorageProvider { get; set; }
-
-    /// <summary>
-    /// 水印设置文件列表 ViewModel（由外部注入，用于在保存后更新列表）
-    /// </summary>
-    public WatermarkSettingListViewModel? WatermarkSettingListViewModel { get; set; }
-
-    // 预览触发事件（用于自动预览）
-    public event EventHandler? PreviewRequested;
-
-    /// <summary>水印设置文件保存成功时触发，参数为保存的文件路径</summary>
-    public event EventHandler<string>? SettingsFileSaved;
 
     private WatermarkSettings? _currentSettings;
 
@@ -272,6 +243,13 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         // 初始化水印文本选中索引
         if (Settings.WatermarkTextItems.Count > 0)
             SelectedWatermarkTextIndex = 0;
+
+        // 注册消息：加载水印设置文件
+        WeakReferenceMessenger.Default.Register<LoadWatermarkSettingsMessage>(this, (r, m) =>
+        {
+            Settings = m.Settings;
+            ToastService.ShowSuccess("水印设置已加载");
+        });
     }
 
     /// <summary>保存当前水印设置到系统 AppData 预设目录</summary>
@@ -294,7 +272,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
 
             ToastService.ShowSuccess($"水印设置已保存: {fileName}");
-            SettingsFileSaved?.Invoke(this, filePath);
+            WeakReferenceMessenger.Default.Send(new SettingsFileSavedMessage(filePath));
         }
         catch (Exception ex)
         {
@@ -393,8 +371,15 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         var previewSettings = SystemSettingsService.Current.PreviewSettings;
         if (previewSettings.AutoPreview)
         {
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
+            WeakReferenceMessenger.Default.Send(new PreviewRequestedMessage());
         }
+    }
+
+    /// <summary>手动触发预览（按钮点击，忽略自动预览开关）</summary>
+    [RelayCommand]
+    private void TriggerPreview()
+    {
+        WeakReferenceMessenger.Default.Send(new PreviewRequestedMessage());
     }
 
     /// <summary>
@@ -506,8 +491,8 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
         System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 属性变化: {e.PropertyName}, AutoPreview={previewSettings.AutoPreview}");
         if (previewSettings.AutoPreview)
         {
-            System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 触发 PreviewRequested 事件");
-            PreviewRequested?.Invoke(this, EventArgs.Empty);
+            System.Diagnostics.Debug.WriteLine($"[WatermarkSettingsViewModel] 触发 PreviewRequested 消息");
+            WeakReferenceMessenger.Default.Send(new PreviewRequestedMessage());
         }
     }
 

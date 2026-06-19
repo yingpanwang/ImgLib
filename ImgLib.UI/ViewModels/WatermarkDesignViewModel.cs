@@ -1,18 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Input;
-using ImgLib.Models;
-using ImgLib.UI.Models;
-using ImgLib.UI.Services;
-using ImgLib.UI.Views;
-using ImgLib.WatermarkPipeline;
-using SkiaSharp;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
-using System.Windows.Input;
-
-namespace ImgLib.UI.ViewModels;
+﻿namespace ImgLib.UI.ViewModels;
 
 public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposable
 {
@@ -87,8 +73,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         PreviewSettingsViewModel = previewSettingsViewModel;
         WatermarkSettingListViewModel = watermarkSettingListViewModel;
 
-        // 监听文件列表的加载请求
-        WatermarkSettingListViewModel.LoadRequested += OnLoadRequested;
+        WeakReferenceMessenger.Default.Register<PreviewRequestedMessage>(this, (r, m) => OnPreviewRequested());
     }
 
     // private void OnPreviewSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -107,36 +92,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         IsSettingsPanelExpanded = !IsSettingsPanelExpanded;
     }
 
-    private WatermarkSettingsViewModel? _previousWatermarkSettingsViewModel;
-
-    partial void OnWatermarkSettingsViewModelChanged(WatermarkSettingsViewModel value)
+    private void OnPreviewRequested()
     {
-        // 取消旧 VM 的事件订阅
-        if (_previousWatermarkSettingsViewModel != null)
-        {
-            _previousWatermarkSettingsViewModel.PreviewRequested -= OnPreviewRequested;
-            _previousWatermarkSettingsViewModel.SettingsFileSaved -= OnSettingsFileSaved;
-        }
-
-        _previousWatermarkSettingsViewModel = value;
-
-        // 注入预览命令
-        value.PreviewCommand = SetBackgroundCommand;
-        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 注入 PreviewCommand: {SetBackgroundCommand != null}, CanExecute: {SetBackgroundCommand?.CanExecute(null)}");
-
-        // 监听自动预览事件
-        value.PreviewRequested += OnPreviewRequested;
-
-        // 监听保存成功事件 → 更新文件列表
-        value.SettingsFileSaved += OnSettingsFileSaved;
-
-        // 注入文件列表 VM（供 WatermarkSettingsView 内部绑定）
-        value.WatermarkSettingListViewModel = WatermarkSettingListViewModel;
-    }
-
-    private void OnPreviewRequested(object? sender, EventArgs e)
-    {
-        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 收到 PreviewRequested 事件");
+        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 收到 PreviewRequested 消息");
 
         // 取消之前的预览任务
         _previewCancellationTokenSource?.Cancel();
@@ -169,19 +127,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         }, _previewCancellationTokenSource.Token);
     }
 
-    /// <summary>水印设置保存成功后，将文件路径添加到列表</summary>
-    private void OnSettingsFileSaved(object? sender, string filePath)
-    {
-        WatermarkSettingListViewModel.AddSavedFile(filePath);
-    }
-
-    /// <summary>用户从文件列表中选择加载某个设置文件</summary>
-    private void OnLoadRequested(object? sender, WatermarkSettings settings)
-    {
-        WatermarkSettingsViewModel.Settings = settings;
-        ToastService.ShowSuccess("水印设置已加载");
-    }
-
     partial void OnPreviewFilePathChanged(string? value)
     {
         if (string.IsNullOrEmpty(PreviewFilePath))
@@ -192,7 +137,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         _previewCancellationTokenSource = new System.Threading.CancellationTokenSource();
         var ct = _previewCancellationTokenSource.Token;
 
-        // 切换图片时重置旋转角度（轻量操作，可在 UI 线程）
+        // 切换图片时重置旋转角度
         PreviewAngle = 0;
 
         // 异步加载预览图，避免全分辨率解码阻塞 UI 线程
@@ -200,8 +145,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     }
 
     /// <summary>
-    /// 后台加载预览图片：ImageFile 创建 + Bitmap 解码均在后台线程，
-    /// 仅属性赋值回到 UI 线程，消除选中切换时的卡顿。
+    /// 后台加载预览图片
     /// </summary>
     private async Task LoadPreviewAsync(string filePath, System.Threading.CancellationToken ct)
     {
@@ -253,7 +197,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
                 // 如果开启了自动预览，切换图片时自动重新生成预览
                 if (PreviewSettingsViewModel.AutoPreview)
                 {
-                    OnPreviewRequested(this, EventArgs.Empty);
+                    OnPreviewRequested();
                 }
             });
         }
@@ -272,7 +216,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     [RelayCommand]
     public async Task SetBackground()
     {
-        System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 开始: PreviewImageSource={PreviewImageSource != null}, PreviewFilePath={PreviewFilePath}");
+        Debug.WriteLine($"[WatermarkDesignViewModel] SetBackground 开始: PreviewImageSource={PreviewImageSource != null}, PreviewFilePath={PreviewFilePath}");
 
         if (PreviewImageSource == null || string.IsNullOrWhiteSpace(PreviewFilePath))
         {
@@ -315,7 +259,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     /// <summary>
     /// 使用 WatermarkPipeline（访客模式）生成水印预览。
-    /// 与 <see cref="SetBackground"/> 功能等价，但通过管线命令 + 访客渲染器实现。
     /// </summary>
     public async Task SetBackgroundWithPipeline()
     {
@@ -356,7 +299,7 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
             options.Scale,
             WatermarkSettingsViewModel.ExifInfo);
 
-        // 从 ImageGenerateOption 构建管线 → 执行
+        // 从 ImageGenerateOption 构建管线
         var pipeline = WatermarkPipelineRunner.FromOptions(options);
 
 
@@ -378,7 +321,9 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         }
     }
 
-    /// <summary>预览降采样（从原始 ImageService 逻辑提取）</summary>
+    /// <summary>
+    /// 预览降采样（从原始 ImageService 逻辑提取）
+    /// </summary>
     private static SKBitmap ApplyPreviewDownsampling(SKBitmap original, ImageGenerateOption options)
     {
         if (!options.EnablePreviewDownsampling)
@@ -417,7 +362,6 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
 
     public void Dispose()
     {
-        //PreviewSettingsViewModel.PropertyChanged -= OnPreviewSettingsChanged;
         Reset();
     }
 }

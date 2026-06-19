@@ -1,120 +1,58 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
 namespace ImgLib.UI.Models;
 
 /// <summary>
-/// 单个水印文本项的 UI 绑定模型，实现 <see cref="INotifyPropertyChanged"/>。
-/// 与 <see cref="ImgLib.WatermarkTextItem"/> 对应，负责双向绑定。
+/// 单个水印文本项的 UI 绑定模型
 /// </summary>
-public class WatermarkTextItemSettings : INotifyPropertyChanged
+public partial class WatermarkTextItemSettings : ObservableObject
 {
-    private string _template = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
-    public string Template
-    {
-        get => _template;
-        set { _template = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial string Template { get; set; } = "{Model} | {LensModel} | f/{FNumber} | ISO {ISO} | {ExposureTime}";
 
-    private string _colorHex = "#FFFFFF";
-    public string ColorHex
-    {
-        get => _colorHex;
-        set { _colorHex = value; OnPropertyChanged(); }
-    }
+    partial void OnTemplateChanged(string value) => OnPropertyChanged(nameof(DisplayLabel));
 
-    private float _fontSizeRatio = 0.03f;
-    public float FontSizeRatio
-    {
-        get => _fontSizeRatio;
-        set { _fontSizeRatio = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial string ColorHex { get; set; } = "#FFFFFF";
 
-    private bool _bold = true;
-    public bool Bold
-    {
-        get => _bold;
-        set { _bold = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float FontSizeRatio { get; set; } = 0.03f;
 
-    private float _lineSpacing = 1.2f;
-    public float LineSpacing
-    {
-        get => _lineSpacing;
-        set { _lineSpacing = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial bool Bold { get; set; } = true;
 
-    private bool _autoFitFont = false;
-    public bool AutoFitFont
-    {
-        get => _autoFitFont;
-        set { _autoFitFont = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float LineSpacing { get; set; } = 1.2f;
 
-    private float _verticalPosition = 0.5f;
-    public float VerticalPosition
-    {
-        get => _verticalPosition;
-        set { _verticalPosition = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial bool AutoFitFont { get; set; } = false;
 
-    private string _horizontalAlignment = "Center";
-    public string HorizontalAlignment
-    {
-        get => _horizontalAlignment;
-        set { _horizontalAlignment = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float VerticalPosition { get; set; } = 0.5f;
+
+    [ObservableProperty]
+    public partial string HorizontalAlignment { get; set; } = "Center";
 
     // ─── 投影参数 ───
-    private float _shadowOffsetX = 2f;
-    public float ShadowOffsetX
-    {
-        get => _shadowOffsetX;
-        set { _shadowOffsetX = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float ShadowOffsetX { get; set; } = 2f;
 
-    private float _shadowOffsetY = 2f;
-    public float ShadowOffsetY
-    {
-        get => _shadowOffsetY;
-        set { _shadowOffsetY = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float ShadowOffsetY { get; set; } = 2f;
 
-    private float _shadowSigma = 5f;
-    public float ShadowSigma
-    {
-        get => _shadowSigma;
-        set { _shadowSigma = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float ShadowSigma { get; set; } = 5f;
 
-    private string _shadowColorHex = "#80000000";
-    public string ShadowColorHex
-    {
-        get => _shadowColorHex;
-        set { _shadowColorHex = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial string ShadowColorHex { get; set; } = "#80000000";
 
     // ─── 调试边框 ───
-    private bool _showBorder = false;
-    public bool ShowBorder
-    {
-        get => _showBorder;
-        set { _showBorder = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial bool ShowBorder { get; set; } = false;
 
-    private string _borderColorHex = "#00FF00";
-    public string BorderColorHex
-    {
-        get => _borderColorHex;
-        set { _borderColorHex = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial string BorderColorHex { get; set; } = "#00FF00";
 
-    private float _borderWidth = 2f;
-    public float BorderWidth
-    {
-        get => _borderWidth;
-        set { _borderWidth = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    public partial float BorderWidth { get; set; } = 2f;
 
     // ─── 显示标签 ───
     /// <summary>列表中的显示名称（模板截取或自定义名称）</summary>
@@ -122,10 +60,10 @@ public class WatermarkTextItemSettings : INotifyPropertyChanged
     {
         get
         {
-            if (!string.IsNullOrWhiteSpace(_template))
+            if (!string.IsNullOrWhiteSpace(Template))
             {
                 // 截取前 40 字符作为预览，去除换行
-                var preview = _template.Replace('\n', ' ').Replace('\r', ' ');
+                var preview = Template.Replace('\n', ' ').Replace('\r', ' ');
                 return preview.Length > 40 ? preview[..40] + "..." : preview;
             }
             return "(空水印)";
@@ -152,7 +90,6 @@ public class WatermarkTextItemSettings : INotifyPropertyChanged
         BorderWidth = item.BorderWidth;
     }
 
-    /// <summary>转换为 <see cref="ImgLib.WatermarkTextItem"/></summary>
     public WatermarkTextItem ToWatermarkTextItem()
     {
         return new WatermarkTextItem
@@ -175,20 +112,11 @@ public class WatermarkTextItemSettings : INotifyPropertyChanged
         };
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        // Template 变更时也刷新 DisplayLabel
-        if (propertyName == nameof(Template))
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayLabel)));
-
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    /// <summary>手动刷新 DisplayLabel 绑定</summary>
+    /// <summary>
+    /// 手动刷新 DisplayLabel 绑定
+    /// </summary>
     public void RefreshDisplayLabel()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayLabel)));
+        OnPropertyChanged(nameof(DisplayLabel));
     }
 }

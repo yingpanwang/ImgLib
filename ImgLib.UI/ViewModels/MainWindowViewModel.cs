@@ -1,13 +1,4 @@
-using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.Input;
-using ImgLib.Models;
-using ImgLib.UI.Services;
-using ImgLib.UI.Views;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using System.Threading;
 
 namespace ImgLib.UI.ViewModels;
 

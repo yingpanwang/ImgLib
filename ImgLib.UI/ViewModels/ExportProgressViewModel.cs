@@ -1,6 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
-using System.Threading;
-
 namespace ImgLib.UI.ViewModels;
 
 public sealed partial class ExportProgressViewModel : ViewModelBase

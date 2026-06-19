@@ -1,15 +1,3 @@
-using Avalonia.Media.Imaging;
-using ImgLib.Models;
-using ImgLib.Services;
-using ImgLib.UI.Services;
-using SkiaSharp;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-
 namespace ImgLib.UI.ViewModels;
 
 public partial class ImgListItemViewModel(ImageFile sourceFile) : ViewModelBase, IDisposable

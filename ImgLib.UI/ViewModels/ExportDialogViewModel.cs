@@ -1,9 +1,3 @@
-using CommunityToolkit.Mvvm.Input;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-
 namespace ImgLib.UI.ViewModels;
 
 public partial class ExportDialogViewModel : ViewModelBase
@@ -22,7 +16,7 @@ public partial class ExportDialogViewModel : ViewModelBase
     /// <summary>
     /// 导出选择列表
     /// </summary>
-    public ObservableCollection<ExportDialogItemViewModel> Items { get; } = [];
+    public ObservableCollection<ExportDialogItemViewModel> Items { get; }
 
     /// <summary>
     /// 已选中数量
@@ -48,11 +42,21 @@ public partial class ExportDialogViewModel : ViewModelBase
     [ObservableProperty]
     public partial string StatusText { get; set; } = string.Empty;
 
+    public ExportDialogViewModel()
+    {
+        Items = [];
+        Items.CollectionChanged += OnItemsCollectionChanged;
+    }
+
     /// <summary>
     /// 从文件路径列表初始化选择项（默认全部选中）
     /// </summary>
     public void Initialize(IReadOnlyList<string> filePaths)
     {
+        // 取消旧项的订阅
+        foreach (var oldItem in Items)
+            oldItem.PropertyChanged -= OnItemPropertyChanged;
+
         Items.Clear();
         TotalCount = filePaths.Count;
 
@@ -108,6 +112,23 @@ public partial class ExportDialogViewModel : ViewModelBase
         if (e.PropertyName == nameof(ExportDialogItemViewModel.IsSelected))
         {
             RefreshState();
+        }
+    }
+
+    /// <summary>
+    /// 管理集合变更时的 PropertyChanged 订阅，防止内存泄漏
+    /// </summary>
+    private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (ExportDialogItemViewModel item in e.OldItems)
+                item.PropertyChanged -= OnItemPropertyChanged;
+        }
+        if (e.NewItems != null)
+        {
+            foreach (ExportDialogItemViewModel item in e.NewItems)
+                item.PropertyChanged += OnItemPropertyChanged;
         }
     }
 

@@ -1,10 +1,3 @@
-using System.IO;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using ImgLib.Services;
-using ImgLib.UI.Models;
-using ImgLib.UI.Services;
-
 namespace ImgLib.UI.ViewModels;
 
 public partial class SettingsWindowViewModel : ViewModelBase

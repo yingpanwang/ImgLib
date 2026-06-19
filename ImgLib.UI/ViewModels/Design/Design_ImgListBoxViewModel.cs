@@ -1,4 +1,4 @@
-﻿using DynamicData;
+﻿// using DynamicData;
 
 namespace ImgLib.UI.ViewModels.Design;
 
@@ -16,6 +16,12 @@ public sealed partial class Design_ImgListBoxViewModel : ImgListBoxViewModel
     {
         this.Path = @"C:\Users\Administrator\Desktop\后期临时";
 
-        ImgListItems?.AddRange(ImgListItemViewModel.Create(Path));
+        if (ImgListItems is not null)
+        {
+            foreach (var item in ImgListItemViewModel.Create(Path))
+            {
+                ImgListItems.Add(item);
+            }
+        }
     }
 }

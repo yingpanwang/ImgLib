@@ -1,11 +1,4 @@
-using DynamicData;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+// using DynamicData;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -156,7 +149,12 @@ public partial class ImgListBoxViewModel : ViewModelBase
             return;
 
         _loadedCount += items.Count;
-        ImgListItems?.AddRange(items);
+        // ImgListItems?.AddRange(items);
+        if (ImgListItems is not null)
+        {
+            foreach (var item in items)
+                ImgListItems?.Add(item);
+        }
         OnPropertyChanged(nameof(HeaderText));
         OnPropertyChanged(nameof(HasMoreItems));
     }

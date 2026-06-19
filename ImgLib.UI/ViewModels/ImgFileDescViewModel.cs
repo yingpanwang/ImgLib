@@ -1,7 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using SkiaSharp;
-
-namespace ImgLib.UI.ViewModels;
+﻿namespace ImgLib.UI.ViewModels;
 
 public sealed partial class ImgFileDescViewModel : ViewModelBase
 {

@@ -1,7 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-using ImgLib.UI.Models;
-using ImgLib.UI.Services;
-
 namespace ImgLib.UI.ViewModels;
 
 /// <summary>
