@@ -7,7 +7,7 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <LangVersion>preview</LangVersion>
-    <PublishSingleFile>true</PublishSingleFile>
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
     <!-- Aot相关 -->
     <!-- <PublishTrimmed>true</PublishTrimmed> -->
     <!-- 设置裁剪模式，partial 表示保留部分不可达代码，更安全 -->

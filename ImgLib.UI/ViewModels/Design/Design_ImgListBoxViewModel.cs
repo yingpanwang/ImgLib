@@ -7,7 +7,8 @@ public sealed partial class Design_ImgListBoxViewModel : ImgListBoxViewModel
     public Design_ImgListBoxViewModel() : this(new WatermarkDesignViewModel(
         new WatermarkSettingsViewModel(),
         new HistogramViewModel(),
-        new PreviewSettingsViewModel()))
+        new PreviewSettingsViewModel(),
+        new WatermarkSettingListViewModel()))
     {
     }
 

@@ -1,5 +1,6 @@
 using Avalonia.Media.Imaging;
 using ImgLib.Models;
+using ImgLib.Services;
 using ImgLib.UI.Services;
 using SkiaSharp;
 using System;
@@ -77,9 +78,9 @@ public partial class ImgListItemViewModel(ImageFile sourceFile) : ViewModelBase,
         {
             // 1. 检查磁盘缓存
             var lastWrite = File.GetLastWriteTimeUtc(path);
-            var cached = ThumbnailCacheService.TryGet(path, lastWrite);
-            if (cached is not null)
-                return cached;
+            var cachedFilePath = ThumbnailCacheService.TryGet(path, lastWrite);
+            if (cachedFilePath is not null)
+                return new Bitmap(cachedFilePath);
 
             // 2. 流式解码到目标尺寸
             using var fs = File.OpenRead(path);

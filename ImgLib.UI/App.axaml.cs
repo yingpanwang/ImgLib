@@ -63,6 +63,7 @@ namespace ImgLib.UI
             services.AddSingleton<ToastViewModel>();
             services.AddSingleton<ExportProgressViewModel>();
             services.AddSingleton<WatermarkDesignViewModel>();
+            services.AddSingleton<WatermarkSettingListViewModel>();
             services.AddSingleton<HistogramViewModel>();
             services.AddSingleton<SystemSettingsViewModel>(_ => SystemSettingsService.Current);
             services.AddSingleton<PreviewSettingsViewModel>(sp =>

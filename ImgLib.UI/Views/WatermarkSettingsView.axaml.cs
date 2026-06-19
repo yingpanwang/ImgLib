@@ -24,6 +24,7 @@ public partial class WatermarkSettingsView : UserControl
 
         _viewModel = vm;
         vm.PropertyChanged += OnViewModelPropertyChanged;
+        vm.StorageProvider = TopLevel.GetTopLevel(this)?.StorageProvider;
 
         BuildContextMenu(vm);
     }

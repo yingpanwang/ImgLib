@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib.Models;
+using ImgLib.UI.Models;
 using ImgLib.UI.Services;
 using ImgLib.UI.Views;
 using ImgLib.WatermarkPipeline;
@@ -68,16 +69,26 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     private ImageFile? _previewImageFile;
     private CancellationTokenSource? _previewCancellationTokenSource;
 
+    /// <summary>
+    /// 水印设置文件列表 ViewModel
+    /// </summary>
+    public WatermarkSettingListViewModel WatermarkSettingListViewModel { get; }
+
     public WatermarkDesignViewModel(
         WatermarkSettingsViewModel watermarkSettingsViewModel,
         HistogramViewModel histogramViewModel,
-        PreviewSettingsViewModel previewSettingsViewModel)
+        PreviewSettingsViewModel previewSettingsViewModel,
+        WatermarkSettingListViewModel watermarkSettingListViewModel)
     {
         WatermarkSettingsViewModel = watermarkSettingsViewModel;
         HistogramViewModel = histogramViewModel;
         IsSettingsPanelExpanded = true;
 
         PreviewSettingsViewModel = previewSettingsViewModel;
+        WatermarkSettingListViewModel = watermarkSettingListViewModel;
+
+        // 监听文件列表的加载请求
+        WatermarkSettingListViewModel.LoadRequested += OnLoadRequested;
     }
 
     // private void OnPreviewSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -96,14 +107,31 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
         IsSettingsPanelExpanded = !IsSettingsPanelExpanded;
     }
 
+    private WatermarkSettingsViewModel? _previousWatermarkSettingsViewModel;
+
     partial void OnWatermarkSettingsViewModelChanged(WatermarkSettingsViewModel value)
     {
+        // 取消旧 VM 的事件订阅
+        if (_previousWatermarkSettingsViewModel != null)
+        {
+            _previousWatermarkSettingsViewModel.PreviewRequested -= OnPreviewRequested;
+            _previousWatermarkSettingsViewModel.SettingsFileSaved -= OnSettingsFileSaved;
+        }
+
+        _previousWatermarkSettingsViewModel = value;
+
         // 注入预览命令
         value.PreviewCommand = SetBackgroundCommand;
         System.Diagnostics.Debug.WriteLine($"[WatermarkDesignViewModel] 注入 PreviewCommand: {SetBackgroundCommand != null}, CanExecute: {SetBackgroundCommand?.CanExecute(null)}");
 
         // 监听自动预览事件
         value.PreviewRequested += OnPreviewRequested;
+
+        // 监听保存成功事件 → 更新文件列表
+        value.SettingsFileSaved += OnSettingsFileSaved;
+
+        // 注入文件列表 VM（供 WatermarkSettingsView 内部绑定）
+        value.WatermarkSettingListViewModel = WatermarkSettingListViewModel;
     }
 
     private void OnPreviewRequested(object? sender, EventArgs e)
@@ -139,6 +167,19 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
                 Debug.WriteLine($"预览取消:{PreviewFilePath}");
             }
         }, _previewCancellationTokenSource.Token);
+    }
+
+    /// <summary>水印设置保存成功后，将文件路径添加到列表</summary>
+    private void OnSettingsFileSaved(object? sender, string filePath)
+    {
+        WatermarkSettingListViewModel.AddSavedFile(filePath);
+    }
+
+    /// <summary>用户从文件列表中选择加载某个设置文件</summary>
+    private void OnLoadRequested(object? sender, WatermarkSettings settings)
+    {
+        WatermarkSettingsViewModel.Settings = settings;
+        ToastService.ShowSuccess("水印设置已加载");
     }
 
     partial void OnPreviewFilePathChanged(string? value)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using ImgLib.Models;
 using ImgLib.UI.Models;
@@ -14,6 +15,9 @@ namespace ImgLib.UI;
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(SystemSettings))]
 [JsonSerializable(typeof(PreviewSettings))]
+[JsonSerializable(typeof(WatermarkSettings))]
+[JsonSerializable(typeof(WatermarkTextItemSettings))]
+[JsonSerializable(typeof(ObservableCollection<WatermarkTextItemSettings>))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
 [JsonSerializable(typeof(ExifInfo))]
 [JsonSerializable(typeof(NikonExifInfo))]

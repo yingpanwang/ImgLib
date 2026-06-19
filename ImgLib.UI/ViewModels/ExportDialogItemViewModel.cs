@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+using ImgLib.Services;
 using ImgLib.UI.Services;
 using SkiaSharp;
 using System.IO;
@@ -46,9 +47,9 @@ public partial class ExportDialogItemViewModel : ViewModelBase, IDisposable
                 var lastWrite = File.GetLastWriteTimeUtc(FilePath);
 
                 // 检查缓存
-                var cached = ThumbnailCacheService.TryGet(FilePath, lastWrite);
-                if (cached is not null)
-                    return cached;
+                var cachedFilePath = ThumbnailCacheService.TryGet(FilePath, lastWrite);
+                if (!string.IsNullOrEmpty(cachedFilePath))
+                    return new Bitmap(cachedFilePath);
 
                 // 流式解码缩略图（目标尺寸约 150x100，用于对话框选择列表）
                 using var fs = File.OpenRead(FilePath);

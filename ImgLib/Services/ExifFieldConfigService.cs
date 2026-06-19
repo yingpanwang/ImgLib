@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using ImgLib.UI;
 
-namespace ImgLib.UI.Services;
+namespace ImgLib.Services;
 
 /// <summary>
 /// 加载 EXIF 字段名称映射配置，允许用户通过配置文件自定义显示名称
@@ -75,7 +74,7 @@ public static class ExifFieldConfigService
             try
             {
                 var json = File.ReadAllText(configPath);
-                var mappings = JsonSerializer.Deserialize(json, ImgLibUIJsonContext.Default.DictionaryStringString);
+                var mappings = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
                 if (mappings != null && mappings.Count > 0)
                 {
                     _cachedMappings = mappings;

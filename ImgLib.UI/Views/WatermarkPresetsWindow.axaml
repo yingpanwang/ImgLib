@@ -1,0 +1,32 @@
+<Window
+    x:Class="ImgLib.UI.Views.WatermarkPresetsWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:ImgLib.UI.ViewModels"
+    xmlns:views="using:ImgLib.UI.Views"
+    Title="水印预设"
+    Width="520"
+    Height="500"
+    MinWidth="400"
+    MinHeight="300"
+    WindowStartupLocation="CenterOwner"
+    CanResize="True"
+    x:DataType="vm:WatermarkSettingListViewModel"
+    mc:Ignorable="d">
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- 预设列表内容区 -->
+        <views:WatermarkSettingListView Grid.Row="0" />
+
+        <!-- 底部关闭按钮 -->
+        <Button
+            Grid.Row="1"
+            Classes="secondary"
+            Margin="16,12,16,16"
+            HorizontalAlignment="Right"
+            Content="关闭"
+            Click="OnCloseClick" />
+    </Grid>
+</Window>

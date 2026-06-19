@@ -62,24 +62,29 @@
                         </StackPanel>
 
                         <Separator />
+                        <Grid RowDefinitions="Auto" ColumnDefinitions="*,Auto">
 
-                        <!-- 缩略图缓存 -->
-                        <StackPanel Spacing="5">
-                            <TextBlock
-                                Text="缩略图缓存"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <TextBlock
-                                Text="{Binding ThumbnailCachePath}"
-                                FontSize="11"
-                                Foreground="{StaticResource TextPrimary}"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                Text="缩略图文件缓存在上述目录，可手动删除以释放磁盘空间"
-                                FontSize="10"
-                                Foreground="{StaticResource TextTertiary}" />
-                        </StackPanel>
+                            <!-- 缩略图缓存 -->
+                            <StackPanel Spacing="5" Grid.Row="0" Grid.Column="0">
+                                <TextBlock
+                                    Text="缩略图缓存"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource TextSecondary}" />
+                                <TextBlock
+                                    Text="{Binding ThumbnailCachePath}"
+                                    FontSize="11"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    Text="缩略图文件缓存在上述目录，可手动删除以释放磁盘空间"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                            <Button Grid.Column="1"
+                                    Content="{Binding ClearThumbnailCacheButtonText}"
+                                    Command="{Binding ClearThumbnailCacheCommand}" />
+                        </Grid>
 
                     </StackPanel>
                 </ScrollViewer>

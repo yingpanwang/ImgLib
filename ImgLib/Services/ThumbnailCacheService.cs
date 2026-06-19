@@ -1,10 +1,9 @@
-using Avalonia.Media.Imaging;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ImgLib.UI.Services;
+namespace ImgLib.Services;
 
 /// <summary>
 /// 缩略图磁盘缓存服务。
@@ -32,14 +31,14 @@ public static class ThumbnailCacheService
     /// <summary>
     /// 尝试从缓存获取缩略图。未命中返回 null。
     /// </summary>
-    public static Bitmap? TryGet(string filePath, DateTime lastWriteTimeUtc)
+    public static string? TryGet(string filePath, DateTime lastWriteTimeUtc)
     {
         var cacheFile = Path.Combine(CacheDir, CacheKey(filePath, lastWriteTimeUtc) + ".png");
         if (File.Exists(cacheFile))
         {
             try
             {
-                return new Bitmap(cacheFile);
+                return cacheFile;
             }
             catch
             {
@@ -57,7 +56,7 @@ public static class ThumbnailCacheService
     {
         try
         {
-            Directory.CreateDirectory(CacheDir);
+            System.IO.Directory.CreateDirectory(CacheDir);
 
             var cacheFile = Path.Combine(CacheDir, CacheKey(filePath, lastWriteTimeUtc) + ".png");
             var tmpFile = cacheFile + ".tmp";
@@ -68,6 +67,25 @@ public static class ThumbnailCacheService
         catch
         {
             // 缓存写入失败不影响主流程
+        }
+    }
+
+    /// <summary>
+    /// 获取缓存目录下所有文件的总大小（字节）。
+    /// </summary>
+    public static long GetCacheSize()
+    {
+        try
+        {
+            if (!System.IO.Directory.Exists(CacheDir))
+                return 0;
+
+            var dir = new DirectoryInfo(CacheDir);
+            return dir.EnumerateFiles("*", SearchOption.AllDirectories).Sum(f => f.Length);
+        }
+        catch
+        {
+            return 0;
         }
     }
 

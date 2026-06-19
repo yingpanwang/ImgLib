@@ -288,6 +288,21 @@ public partial class MainWindowViewModel(
     }
 
     [RelayCommand]
+    public void OpenWatermarkPresets()
+    {
+        if (ParentWindow == null)
+        {
+            ToastService.ShowError("无法打开水印预设窗口：主窗口未初始化");
+            return;
+        }
+
+        var presetsVm = serviceProvider.GetRequiredService<WatermarkSettingListViewModel>();
+
+        var window = new WatermarkPresetsWindow { DataContext = presetsVm };
+        window.Show(ParentWindow);
+    }
+
+    [RelayCommand]
     public void TestToast()
     {
         toastViewModel.ShowMessage("测试通知", ToastType.Info);

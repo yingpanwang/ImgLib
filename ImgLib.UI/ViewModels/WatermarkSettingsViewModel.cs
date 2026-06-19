@@ -1,4 +1,5 @@
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ImgLib;
 using ImgLib.Models;
@@ -7,17 +8,19 @@ using ImgLib.UI.Models;
 using ImgLib.UI.Services;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.Json;
 using System.Windows.Input;
 using System.Text;
 using System.ComponentModel;
+using ImgLib.Services;
 
 namespace ImgLib.UI.ViewModels;
 
 public partial class WatermarkSettingsViewModel : ViewModelBase
 {
     [ObservableProperty]
-    public partial WatermarkSettings Settings { get; private set; }
+    public partial WatermarkSettings Settings { get; set; }
 
     [ObservableProperty]
     public partial ObservableCollection<ExifInfoNode> ExifInfoTree { get; private set; } = new();
@@ -30,7 +33,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     public partial ImgFileDescViewModel ImageInfo { get; set; } = new();
 
     // ═══ 圆角预设 ═══
-    private static readonly float[] CornerRadiusPresets = { 0, 15, 45, 80, 120 };
+    private static readonly float[] CornerRadiusPresets = [0, 15, 45, 80, 120];
 
     [ObservableProperty]
     public partial int CornerRadiusPresetIndex { get; set; } = 2;
@@ -75,7 +78,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
     // ═══ 阴影偏移预设 ═══
     private static readonly (float X, float Y)[] ShadowOffsetPresets =
-        { (0, 0), (20, 20), (50, 50), (80, 80) };
+        [(0, 0), (20, 20), (50, 50), (80, 80)];
 
     [ObservableProperty]
     public partial int ShadowOffsetPresetIndex { get; set; } = 2;
@@ -98,7 +101,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
 
     // ═══ 文字阴影偏移预设 ═══
     private static readonly (float X, float Y)[] TextShadowOffsetPresets =
-        { (0, 0), (1, 1), (2, 2), (4, 4), (8, 8) };
+        [(0, 0), (1, 1), (2, 2), (4, 4), (8, 8)];
 
     [ObservableProperty]
     public partial int TextShadowOffsetPresetIndex { get; set; } = 2;
@@ -126,7 +129,7 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     }
 
     // ═══ 文字阴影模糊预设 ═══
-    private static readonly float[] TextShadowSigmaPresets = { 0, 2, 5, 10, 15 };
+    private static readonly float[] TextShadowSigmaPresets = [0, 2, 5, 10, 15];
 
     [ObservableProperty]
     public partial int TextShadowSigmaPresetIndex { get; set; } = 2;
@@ -218,8 +221,21 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     // 预览命令（由外部注入）
     public ICommand? PreviewCommand { get; set; }
 
+    /// <summary>
+    /// 存储提供程序（由外部注入，用于弹出保存文件对话框）
+    /// </summary>
+    public IStorageProvider? StorageProvider { get; set; }
+
+    /// <summary>
+    /// 水印设置文件列表 ViewModel（由外部注入，用于在保存后更新列表）
+    /// </summary>
+    public WatermarkSettingListViewModel? WatermarkSettingListViewModel { get; set; }
+
     // 预览触发事件（用于自动预览）
     public event EventHandler? PreviewRequested;
+
+    /// <summary>水印设置文件保存成功时触发，参数为保存的文件路径</summary>
+    public event EventHandler<string>? SettingsFileSaved;
 
     private WatermarkSettings? _currentSettings;
 
@@ -258,10 +274,32 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             SelectedWatermarkTextIndex = 0;
     }
 
+    /// <summary>保存当前水印设置到系统 AppData 预设目录</summary>
     [RelayCommand(AllowConcurrentExecutions = false)]
-    public Task SaveWartermarkSettings()
+    public async Task SaveWartermarkSettings()
     {
-        return Task.CompletedTask;
+        try
+        {
+            var presetsDir = WatermarkSettingListViewModel.PresetsDirectory;
+
+            // 确保目录存在
+            if (!Directory.Exists(presetsDir))
+                Directory.CreateDirectory(presetsDir);
+
+            // 自动生成文件名：水印设置_yyyyMMdd_HHmmss.json
+            var fileName = $"水印设置_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            var filePath = Path.Combine(presetsDir, fileName);
+
+            var json = JsonSerializer.Serialize(Settings, ImgLibUIJsonContext.Default.WatermarkSettings);
+            await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
+
+            ToastService.ShowSuccess($"水印设置已保存: {fileName}");
+            SettingsFileSaved?.Invoke(this, filePath);
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"保存水印设置失败: {ex.Message}");
+        }
     }
 
     /// <summary>添加新的水印文本项</summary>

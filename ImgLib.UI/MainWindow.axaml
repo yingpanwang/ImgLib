@@ -29,7 +29,14 @@
                 <MenuItem Header="菜单">
                     <MenuItem Command="{Binding OpenRootFolderCommand}" Header="打开目录" />
                     <Separator />
+                    <MenuItem Command="{Binding OpenWatermarkPresetsCommand}" Header="水印预设" />
+                    <Separator />
                     <MenuItem Command="{Binding OpenSettingsCommand}" Header="设置 ⚙" />
+                </MenuItem>
+                <MenuItem Header="导入">
+                    <MenuItem Header="导入图片" />
+                    <Separator/>
+                    <MenuItem Header="导入水印预设"/>
                 </MenuItem>
                 <MenuItem Header="导出">
                     <MenuItem Command="{Binding ExportCurrentCommand}" Header="导出当前图片" />

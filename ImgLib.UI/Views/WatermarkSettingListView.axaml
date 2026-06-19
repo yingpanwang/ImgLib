@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:ImgLib.UI.ViewModels"
+             xmlns:models="using:ImgLib.UI.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="ImgLib.UI.Views.WatermarkSettingListView"
+             x:DataType="vm:WatermarkSettingListViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <!-- 顶部操作栏 -->
+        <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+            <!-- 存储路径提示 -->
+            <TextBlock
+                Text="预设文件存储在系统 AppData 目录，启动时自动加载"
+                FontSize="10"
+                Foreground="{StaticResource TextTertiary}" />
+            <!-- 刷新按钮 -->
+            <Button
+                Content="刷新列表"
+                Classes="secondary"
+                FontSize="11"
+                Padding="8,3"
+                HorizontalAlignment="Left"
+                Command="{Binding RefreshListCommand}" />
+        </StackPanel>
+
+        <!-- 空状态提示 -->
+        <TextBlock
+            Grid.Row="1"
+            Text="暂无已保存的水印设置"
+            FontSize="12"
+            Foreground="{StaticResource TextTertiary}"
+            HorizontalAlignment="Center"
+            Margin="0,20,0,0"
+            IsVisible="{Binding HasFiles, Converter={x:Static BoolConverters.Not}}" />
+
+        <!-- 文件列表 -->
+        <ListBox Grid.Row="1"
+                 IsVisible="{Binding HasFiles}"
+                 ItemsSource="{Binding SavedFiles}" >
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="models:WatermarkSettingFileEntry">
+                    <Border
+                        BorderBrush="{StaticResource BorderSubtle}"
+                        BorderThickness="0,0,0,1"
+                        Padding="4,6">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <!-- 文件信息 -->
+                            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{Binding FileName}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="{StaticResource TextPrimary}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    Text="{Binding DirectoryName}"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <TextBlock
+                                    Text="{Binding SavedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"
+                                    FontSize="10"
+                                    Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- 操作按钮 -->
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Spacing="6"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0,0,0">
+                                <Button
+                                    Content="加载"
+                                    Classes="secondary"
+                                    FontSize="11"
+                                    Padding="8,3"
+                                    Command="{Binding $parent[UserControl].DataContext.LoadWatermarkSettingCommand}"
+                                    CommandParameter="{Binding}" />
+                                <Button
+                                    Content="删除"
+                                    Classes="secondary"
+                                    FontSize="11"
+                                    Padding="8,3"
+                                    Command="{Binding $parent[UserControl].DataContext.RemoveEntryCommand}"
+                                    CommandParameter="{Binding}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>
