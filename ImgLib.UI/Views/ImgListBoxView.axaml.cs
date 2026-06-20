@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.VisualTree;
 using ImgLib.UI.ViewModels;
 
@@ -21,6 +22,26 @@ public partial class ImgListBoxView : UserControl
                 sv.ScrollChanged += OnScrollViewerScrollChanged;
             }
         };
+
+        // 键盘按键处理
+        l.KeyDown += OnListBoxKeyDown;
+    }
+
+    /// <summary>
+    /// 键盘导航：Delete 删除、↑↓ 已由 ListBox 内置处理
+    /// </summary>
+    private void OnListBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not ImgListBoxViewModel vm)
+            return;
+
+        switch (e.Key)
+        {
+            case Key.Delete when vm.SelectedImgItem is not null:
+                vm.DeleteSelectedImageCommand.Execute(null);
+                e.Handled = true;
+                break;
+        }
     }
 
     /// <summary>

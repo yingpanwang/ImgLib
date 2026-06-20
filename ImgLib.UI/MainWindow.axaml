@@ -7,11 +7,16 @@
     xmlns:v="using:ImgLib.UI"
     xmlns:vViews="using:ImgLib.UI.Views"
     xmlns:vm="using:ImgLib.UI.ViewModels"
+    xmlns:models="using:ImgLib.UI.Models"
+    xmlns:conv="using:ImgLib.UI.Converters"
     Title="ImgLib"
     d:DesignHeight="650"
     d:DesignWidth="800"
     x:DataType="vm:MainWindowViewModel"
     mc:Ignorable="d">
+
+    <!-- ═══ DataTemplates: ViewModel → View 映射 ═══ -->
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -19,7 +24,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Menu Bar -->
+        <!-- ═══ Menu Bar ═══ -->
         <Border Grid.Row="0"
                 Background="{StaticResource SidebarBg}"
                 BorderBrush="{StaticResource BorderSubtle}"
@@ -46,40 +51,108 @@
             </Menu>
         </Border>
 
-        <!-- Main Content -->
-        <Grid Grid.Row="2">
+        <!-- ═══ Main Content ═══ -->
+        <Grid x:Name="ContentGrid" Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" MinWidth="400"></ColumnDefinition>
-                <ColumnDefinition Width="1"></ColumnDefinition>
-                <ColumnDefinition Width="6*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" MinWidth="0" />
+                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="6*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Left: Image List -->
+            <!-- ═══ Left: Navigation Bar ═══ -->
             <Border Grid.Column="0"
+                    Background="{StaticResource SidebarBg}"
+                    BorderBrush="{StaticResource BorderSubtle}"
+                    BorderThickness="0,0,1,0">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding NavigationItems}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Spacing="2" Margin="4,6" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:NavigationItem">
+                                <Border
+                                    Background="{Binding IsSelected, Converter={x:Static conv:NavConverters.BoolToSelectedBg}}"
+                                    CornerRadius="8">
+                                    <Button
+                                        Command="{Binding $parent[Window].DataContext.NavigateCommand}"
+                                        CommandParameter="{Binding}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        CornerRadius="8"
+                                        Cursor="Hand"
+                                        Padding="4,8"
+                                        HorizontalContentAlignment="Center">
+                                        <Button.Styles>
+                                            <Style Selector="Button:pointerover">
+                                                <Setter Property="Background" Value="{StaticResource HoverBg}" />
+                                            </Style>
+                                        </Button.Styles>
+                                        <StackPanel Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Spacing="2">
+                                            <TextBlock Text="{Binding Icon}"
+                                                       FontSize="20"
+                                                       HorizontalAlignment="Center" />
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontSize="9"
+                                                       Foreground="{StaticResource TextSecondary}"
+                                                       HorizontalAlignment="Center"
+                                                       TextWrapping="Wrap"
+                                                       TextAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <!-- ═══ Left-Middle: Image List ═══ -->
+            <Border x:Name="ImageListBorder"
+                    Grid.Column="1"
                     Background="{StaticResource SidebarBg}">
                 <v:ImgListBoxView DataContext="{Binding ImgListBoxViewModel}" />
             </Border>
 
-            <!-- Splitter -->
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="Transparent" />
+            <!-- ═══ Splitter ═══ -->
+            <GridSplitter x:Name="ContentSplitter"
+                          Grid.Column="2"
+                          ResizeDirection="Columns"
+                          Background="Transparent" />
 
-            <!-- Right: Design Area -->
-            <DockPanel Grid.Column="2"
-                       Background="{StaticResource ContentBg}">
-                <v:WatermarkDesignView DataContext="{Binding WatermarkDesignViewModel}" />
-            </DockPanel>
+            <!-- ═══ Right: Workspace Area ═══ -->
+            <Border Grid.Column="3"
+                    Background="{StaticResource ContentBg}">
+                <ContentControl Content="{Binding ActiveWorkspace}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate x:DataType="vm:WatermarkDesignViewModel">
+                            <v:WatermarkDesignView />
+                        </DataTemplate>
+                        <DataTemplate x:DataType="vm:GalleryViewModel">
+                            <v:GalleryView />
+                        </DataTemplate>
+                        <DataTemplate x:DataType="vm:DebugViewModel">
+                            <v:DebugView />
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </Border>
         </Grid>
 
-        <!-- Floating Panels (Right Bottom Corner) -->
+        <!-- ═══ Floating Panels (Right Bottom Corner) ═══ -->
         <Border Grid.Row="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Margin="16"
                 Background="{x:Null}">
             <StackPanel Spacing="8">
-                <!-- Export Progress -->
                 <vViews:ExportProgressView DataContext="{Binding ExportProgressViewModel}" />
-                <!-- Toast Notifications -->
                 <vViews:ToastView DataContext="{Binding ToastViewModel}" />
             </StackPanel>
         </Border>

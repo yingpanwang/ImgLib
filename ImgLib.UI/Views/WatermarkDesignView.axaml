@@ -14,16 +14,13 @@
     d:DesignWidth="800"
     x:DataType="vm:WatermarkDesignViewModel"
     mc:Ignorable="d">
-    <Grid ColumnDefinitions="*,Auto" RowDefinitions="*">
-
+    <Grid ColumnDefinitions="*,Auto">
         <!-- ═══ Image Preview Area ═══ -->
-        <Border
-            Grid.Row="0"
-            Grid.Column="0"
-            Background="#FAFAFA"
-            BorderBrush="{StaticResource BorderSubtle}"
-            BorderThickness="0,0,1,0"
-            Padding="0">
+        <Border Grid.Column="0"
+                Background="#FAFAFA"
+                BorderBrush="{StaticResource BorderSubtle}"
+                BorderThickness="0"
+                Padding="0">
             <Grid Name="PreviewGrid">
                 <paz:ZoomBorder
                     EnablePan="True"
@@ -45,12 +42,6 @@
                         Source="{Binding PreviewImageSource}">
                         <Image.ContextMenu>
                             <ContextMenu>
-                                <!-- <MenuItem Header="旋转" >
-                                <MenuItem Header="向左旋转"
-                                Command="{Binding DataContext.RotateLeftCommand, ElementName=Root}"/>
-                                <MenuItem Header="向右旋转"
-                                Command="{Binding DataContext.RotateRightCommand, ElementName=Root}"/>
-                                </MenuItem> -->
                                 <MenuItem Header="重置">
                                     <i:Interaction.Behaviors>
                                         <EventTrigger EventName="Click">
@@ -97,7 +88,7 @@
                     <v:HistogramView DataContext="{Binding HistogramViewModel}" />
                 </Border>
 
-                <!-- ═══ 收起/展开设置面板按钮 ═══ -->
+                <!-- ═══ 展开/收起设置面板按钮 ═══ -->
                 <Button
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
@@ -107,13 +98,13 @@
                     Padding="0"
                     Background="#E9060606"
                     BorderBrush="#25000000"
-                    BorderThickness="1,1,0,1"
+                    BorderThickness="1,0,0,1"
                     CornerRadius="6,0,0,6"
                     Cursor="Hand"
                     Command="{Binding ToggleSettingsPanelCommand}"
-                    ToolTip.Tip="收起设置面板">
+                    ToolTip.Tip="切换设置面板"
+                    ZIndex="5">
                     <Panel>
-                        <!-- 展开状态：显示 ❮ 表示可收起 -->
                         <TextBlock
                             Text="❮"
                             FontSize="14"
@@ -121,32 +112,31 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             IsVisible="{Binding IsSettingsPanelExpanded}" />
-                        <!-- 收起状态：显示 ❯ 表示可展开 -->
                         <TextBlock
-                            Text="水印设置"
+                            Text="❯"
                             FontSize="14"
                             Foreground="{StaticResource TextSecondary}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            TextWrapping="Wrap"
                             IsVisible="{Binding IsSettingsPanelExpanded, Converter={x:Static BoolConverters.Not}}" />
                     </Panel>
                 </Button>
             </Grid>
         </Border>
 
-        <!-- ═══ Settings Panel (可收起) ═══ -->
+        <!-- ═══ Settings Panel (右侧栏，展开时推开预览) ═══ -->
         <Border
-            Grid.Row="0"
             Grid.Column="1"
             IsVisible="{Binding IsSettingsPanelExpanded}"
             Background="{StaticResource PanelBg}"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="1,0,0,0"
             Padding="5"
             Width="380"
             MinWidth="320"
             MaxWidth="480">
             <ScrollViewer>
-                <v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" DockPanel.Dock="Bottom" />
+                <v:WatermarkSettingsView DataContext="{Binding WatermarkSettingsViewModel}" />
             </ScrollViewer>
         </Border>
     </Grid>

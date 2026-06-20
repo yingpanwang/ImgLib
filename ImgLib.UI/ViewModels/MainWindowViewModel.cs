@@ -1,4 +1,5 @@
 using Avalonia.Platform.Storage;
+using ImgLib.UI.Models;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -8,7 +9,9 @@ public partial class MainWindowViewModel(
     ImgListBoxViewModel imgListBoxViewModel,
     ToastViewModel toastViewModel,
     ExportProgressViewModel exportProgressViewModel,
-    WatermarkDesignViewModel watermarkDesignViewModel) : ViewModelBase
+    WatermarkDesignViewModel watermarkDesignViewModel,
+    GalleryViewModel galleryViewModel,
+    DebugViewModel debugViewModel) : ViewModelBase
 {
     [ObservableProperty]
     public partial ImgListBoxViewModel ImgListBoxViewModel { get; set; } = imgListBoxViewModel;
@@ -26,6 +29,69 @@ public partial class MainWindowViewModel(
 
     [ObservableProperty]
     public partial string CurrentRootFolder { get; set; }
+
+    // ═══════════════════════════════════════════
+    // 导航栏
+    // ═══════════════════════════════════════════
+
+    /// <summary>导航条目列表</summary>
+    public ObservableCollection<NavigationItem> NavigationItems { get; } = [];
+
+    /// <summary>当前选中的导航条目</summary>
+    [ObservableProperty]
+    private NavigationItem? _selectedNavigationItem;
+
+    /// <summary>当前激活的工作区 ViewModel（右侧区域根据此属性切换视图）</summary>
+    [ObservableProperty]
+    public partial ViewModelBase? ActiveWorkspace { get; set; }
+
+    /// <summary>是否显示图片列表面板（某些工作区不需要）</summary>
+    [ObservableProperty]
+    private bool _isImageListVisible = true;
+
+    /// <summary>
+    /// 初始化导航栏条目。在构造函数完成后由 App 调用，
+    /// 因为 NavigationItem 需要引用 WatermarkDesignViewModel 等已注入的依赖。
+    /// </summary>
+    public void InitializeNavigation()
+    {
+        NavigationItems.Add(new NavigationItem("watermark", "水印设计", "🎨"));
+        NavigationItems.Add(new NavigationItem("gallery", "图片浏览", "🖼"));
+        NavigationItems.Add(new NavigationItem("export", "批量导出", "📤"));
+        NavigationItems.Add(new NavigationItem("debug", "调试", "🔧"));
+
+        // 默认选中水印设计
+        SelectedNavigationItem = NavigationItems[0];
+    }
+
+    partial void OnSelectedNavigationItemChanged(NavigationItem? value)
+    {
+        if (value is null)
+            return;
+
+        // 更新选中状态
+        foreach (var item in NavigationItems)
+            item.IsSelected = item == value;
+
+        ActiveWorkspace = value.Key switch
+        {
+            "watermark" => WatermarkDesignViewModel,
+            "gallery" => galleryViewModel,
+            "export" => WatermarkDesignViewModel,
+            "debug" => debugViewModel,
+            _ => WatermarkDesignViewModel
+        };
+
+        // 控制图片列表可见性
+        IsImageListVisible = value.Key switch
+        {
+            "watermark" => true,
+            "gallery" => false,
+            "export" => true,
+            "debug" => false,
+            _ => true
+        };
+    }
 
     [RelayCommand]
     public async Task OpenRootFolder()
@@ -297,5 +363,14 @@ public partial class MainWindowViewModel(
     public void TestToast()
     {
         toastViewModel.ShowMessage("测试通知", ToastType.Info);
+    }
+
+    /// <summary>
+    /// 导航到指定功能区域
+    /// </summary>
+    [RelayCommand]
+    private void Navigate(NavigationItem item)
+    {
+        SelectedNavigationItem = item;
     }
 }

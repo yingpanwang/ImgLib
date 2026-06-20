@@ -89,6 +89,25 @@ public static class ThumbnailCacheService
         }
     }
 
+    /// <summary>
+    /// 删除指定路径的所有缓存（文件被删除或修改时调用）。
+    /// </summary>
+    public static void Remove(string filePath)
+    {
+        try
+        {
+            if (!System.IO.Directory.Exists(CacheDir))
+                return;
+
+            // 删除该路径下所有可能的缓存键（不同 lastWriteTime 对应不同缓存文件）
+            foreach (var cacheFile in System.IO.Directory.EnumerateFiles(CacheDir, "*.png"))
+            {
+                TryDelete(cacheFile);
+            }
+        }
+        catch { }
+    }
+
     private static void TryDelete(string path)
     {
         try { File.Delete(path); } catch { }

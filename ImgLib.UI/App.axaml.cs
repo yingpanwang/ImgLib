@@ -26,6 +26,7 @@ namespace ImgLib.UI
                 var provider = ConfigureServices(desktop);
                 var mvm = provider.GetRequiredService<MainWindowViewModel>();
                 mvm.ParentWindow = desktop.MainWindow;
+                mvm.InitializeNavigation();
 
                 // 初始化全局 Toast 服务
                 ToastService.Initialize(provider.GetRequiredService<ToastViewModel>());
@@ -63,6 +64,8 @@ namespace ImgLib.UI
             services.AddSingleton<ToastViewModel>();
             services.AddSingleton<ExportProgressViewModel>();
             services.AddSingleton<WatermarkDesignViewModel>();
+            services.AddSingleton<GalleryViewModel>();
+            services.AddSingleton<DebugViewModel>();
             services.AddSingleton<WatermarkSettingListViewModel>();
             services.AddSingleton<HistogramViewModel>();
             services.AddSingleton<SystemSettingsViewModel>(_ => SystemSettingsService.Current);

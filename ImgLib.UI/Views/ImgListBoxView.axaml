@@ -48,13 +48,40 @@
     </UserControl.Styles>
 
     <DockPanel Margin="0,8,0,0">
-        <!-- List Header -->
+        <!-- ═══ Header ═══ -->
         <Border DockPanel.Dock="Top"
-                Padding="14,6,14,10">
-            <TextBlock Text="{Binding HeaderText}"
-                       FontSize="14"
-                       FontWeight="SemiBold"
-                       Foreground="{StaticResource TextPrimary}" />
+                Padding="12,6,12,10">
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Text="{Binding HeaderText}"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}"
+                           VerticalAlignment="Center" />
+                <StackPanel Grid.Row="0" Grid.Column="1"
+                            Orientation="Horizontal" Spacing="4">
+                    <!-- 排序模式 -->
+                    <ComboBox ItemsSource="{Binding SortModes}"
+                              BorderBrush="Transparent"
+                              SelectedItem="{Binding CurrentSortMode, Mode=TwoWay}"
+                              MinWidth="80"
+                              FontSize="11" />
+                    <!-- 升降序切换 -->
+                    <Button Width="28" Height="28"
+                            Padding="0"
+                            Background="Transparent"
+                            BorderBrush="{StaticResource BorderSubtle}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Cursor="Hand"
+                            Command="{Binding ToggleSortDirectionCommand}">
+                        <TextBlock Text="{Binding SortDirectionArrow}"
+                                   FontSize="12"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Button>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <ListBox
