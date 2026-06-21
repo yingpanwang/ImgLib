@@ -79,18 +79,9 @@ jobs:
           -p:EnableUnsafeBinaryFormatterSerialization=false
           -p:JsonSerializerIsReflectionEnabledByDefault=false
 
-      - name: Upload artifact (Framework-dependent)
-        if: ${{ matrix.aot == false }}
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ImgLib-${{ matrix.name }}
           path: ImgLib.UI/bin/Release/net8.0/${{ matrix.rid }}/publish/
-          if-no-files-found: error
-
-      - name: Upload artifact (AOT)
-        if: ${{ matrix.aot == true }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ImgLib-${{ matrix.name }}
-          path: ImgLib.UI/bin/Release/net8.0/publish/${{ matrix.rid }}/
           if-no-files-found: error
