@@ -9,17 +9,33 @@ on:
 
 jobs:
   build:
-    name: Build (${{ matrix.rid }})
+    name: Build (${{ matrix.name }})
     strategy:
       fail-fast: false
       matrix:
         include:
+          # ── 框架依赖 ──
           - os: windows-latest
             rid: win-x64
-            artifact_name: ImgLib-win-x64
+            name: win-x64-framework
+            self_contained: false
+            aot: false
           - os: macos-14
             rid: osx-arm64
-            artifact_name: ImgLib-osx-arm64
+            name: osx-arm64-framework
+            self_contained: false
+            aot: false
+          # ── AOT 独立包 ──
+          - os: windows-latest
+            rid: win-x64
+            name: win-x64-aot
+            self_contained: true
+            aot: true
+          - os: macos-14
+            rid: osx-arm64
+            name: osx-arm64-aot
+            self_contained: true
+            aot: true
 
     runs-on: ${{ matrix.os }}
 
@@ -38,18 +54,31 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
-      - name: Publish
+      - name: Publish (Framework-dependent)
+        if: ${{ !matrix.self_contained && !matrix.aot }}
         run: >
           dotnet publish ImgLib.UI/ImgLib.UI.csproj
           -c Release
           -r ${{ matrix.rid }}
-          --self-contained
+          --no-restore
+
+      - name: Publish (AOT)
+        if: ${{ matrix.aot }}
+        run: >
+          dotnet publish ImgLib.UI/ImgLib.UI.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          -p:PublishAot=true
+          -p:SelfContained=true
           -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=true
+          -p:TrimMode=full
           --no-restore
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
+          name: ImgLib-${{ matrix.name }}
           path: ImgLib.UI/bin/Release/net8.0/${{ matrix.rid }}/publish/
           if-no-files-found: error
