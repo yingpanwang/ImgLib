@@ -68,8 +68,16 @@ jobs:
           -c Release
           -r ${{ matrix.rid }}
           -p:PublishAot=true
-          -p:PublishSingleFile=true
-          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:PublishTrimmed=true
+          -p:TrimMode=partial
+          -p:IsAotCompatible=true
+          -p:PublishReadyToRun=false
+          -p:InvariantGlobalization=true
+          -p:DebugType=none
+          -p:DebugSymbols=false
+          -p:EventSourceSupport=false
+          -p:EnableUnsafeBinaryFormatterSerialization=false
+          -p:JsonSerializerIsReflectionEnabledByDefault=false
 
       - name: Upload artifact (Framework-dependent)
         if: ${{ matrix.aot == false }}
