@@ -157,6 +157,34 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
     [ObservableProperty]
     public partial int HorizontalAlignIndex { get; set; } = 1;
 
+    // 高级水平锚点索引
+    [ObservableProperty]
+    public partial int AdvancedHAlignIndex { get; set; } = 1;
+
+    // 高级垂直锚点索引
+    [ObservableProperty]
+    public partial int AdvancedVAlignIndex { get; set; } = 2;
+
+    // 高级定位 X 百分比 (0-100)
+    [ObservableProperty]
+    private int _positionXPercent = 50;
+
+    partial void OnPositionXPercentChanged(int value)
+    {
+        if (SelectedWatermarkText is { } t)
+            t.PositionX = value / 100f;
+    }
+
+    // 高级定位 Y 百分比 (0-100)
+    [ObservableProperty]
+    private int _positionYPercent = 50;
+
+    partial void OnPositionYPercentChanged(int value)
+    {
+        if (SelectedWatermarkText is { } t)
+            t.PositionY = value / 100f;
+    }
+
     // ═══ EXIF 字段选择 ═══
     /// <summary>
     /// 可选的 EXIF 字段列表（从配置文件加载显示名称映射）
@@ -359,6 +387,18 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             UpdatePreviewText();
         }
 
+        // PositionX/Y 变化时同步百分比属性
+        if (e.PropertyName == nameof(WatermarkTextItemSettings.PositionX))
+        {
+            if (sender is WatermarkTextItemSettings s)
+                PositionXPercent = (int)Math.Round(s.PositionX * 100);
+        }
+        else if (e.PropertyName == nameof(WatermarkTextItemSettings.PositionY))
+        {
+            if (sender is WatermarkTextItemSettings s)
+                PositionYPercent = (int)Math.Round(s.PositionY * 100);
+        }
+
         // 属性变化时更新选中项绑定
         OnPropertyChanged(nameof(SelectedWatermarkText));
 
@@ -454,9 +494,36 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
             _ => "Center"
         };
 
-        // 同步到选中项
         if (SelectedWatermarkText != null)
             SelectedWatermarkText.HorizontalAlignment = alignment;
+    }
+
+    partial void OnAdvancedHAlignIndexChanged(int value)
+    {
+        var align = value switch
+        {
+            0 => "Left",
+            1 => "Center",
+            2 => "Right",
+            _ => "Center"
+        };
+
+        if (SelectedWatermarkText != null)
+            SelectedWatermarkText.AdvancedHAlign = align;
+    }
+
+    partial void OnAdvancedVAlignIndexChanged(int value)
+    {
+        var align = value switch
+        {
+            0 => "Top",
+            1 => "Center",
+            2 => "Bottom",
+            _ => "Bottom"
+        };
+
+        if (SelectedWatermarkText != null)
+            SelectedWatermarkText.AdvancedVAlign = align;
     }
 
     partial void OnSelectedWatermarkTextIndexChanged(int value)
@@ -475,6 +542,23 @@ public partial class WatermarkSettingsViewModel : ViewModelBase
                 "Right" => 2,
                 _ => 1,
             };
+
+            AdvancedHAlignIndex = SelectedWatermarkText.AdvancedHAlign switch
+            {
+                "Left" => 0,
+                "Right" => 2,
+                _ => 1,
+            };
+
+            AdvancedVAlignIndex = SelectedWatermarkText.AdvancedVAlign switch
+            {
+                "Top" => 0,
+                "Center" => 1,
+                _ => 2,
+            };
+
+            PositionXPercent = (int)Math.Round(SelectedWatermarkText.PositionX * 100);
+            PositionYPercent = (int)Math.Round(SelectedWatermarkText.PositionY * 100);
 
             InitializePresetIndices();
         }

@@ -128,7 +128,13 @@
 
             <!-- ═══ Right: Workspace Area ═══ -->
             <Border Grid.Column="3"
-                    Background="{StaticResource ContentBg}">
+                    Background="{StaticResource ContentBg}"
+                    Opacity="{Binding WorkspaceOpacity}">
+                <Border.Transitions>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.15" Easing="CubicEaseOut" />
+                    </Transitions>
+                </Border.Transitions>
                 <ContentControl Content="{Binding ActiveWorkspace}">
                     <ContentControl.DataTemplates>
                         <DataTemplate x:DataType="vm:WatermarkDesignViewModel">

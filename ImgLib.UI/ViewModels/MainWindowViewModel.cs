@@ -1,5 +1,4 @@
 using Avalonia.Platform.Storage;
-using ImgLib.UI.Models;
 
 namespace ImgLib.UI.ViewModels;
 
@@ -30,10 +29,6 @@ public partial class MainWindowViewModel(
     [ObservableProperty]
     public partial string CurrentRootFolder { get; set; }
 
-    // ═══════════════════════════════════════════
-    // 导航栏
-    // ═══════════════════════════════════════════
-
     /// <summary>导航条目列表</summary>
     public ObservableCollection<NavigationItem> NavigationItems { get; } = [];
 
@@ -49,9 +44,12 @@ public partial class MainWindowViewModel(
     [ObservableProperty]
     private bool _isImageListVisible = true;
 
+    /// <summary>工作区切换淡入淡出透明度</summary>
+    [ObservableProperty]
+    private double _workspaceOpacity = 1;
+
     /// <summary>
-    /// 初始化导航栏条目。在构造函数完成后由 App 调用，
-    /// 因为 NavigationItem 需要引用 WatermarkDesignViewModel 等已注入的依赖。
+    /// 初始化导航栏条目
     /// </summary>
     public void InitializeNavigation()
     {
@@ -73,6 +71,10 @@ public partial class MainWindowViewModel(
         foreach (var item in NavigationItems)
             item.IsSelected = item == value;
 
+        // 工作区切换淡入淡出
+        WorkspaceOpacity = 0;
+        _ = FadeWorkspaceAsync();
+
         ActiveWorkspace = value.Key switch
         {
             "watermark" => WatermarkDesignViewModel,
@@ -91,6 +93,12 @@ public partial class MainWindowViewModel(
             "debug" => false,
             _ => true
         };
+    }
+
+    private async Task FadeWorkspaceAsync()
+    {
+        await Task.Delay(80);
+        WorkspaceOpacity = 1;
     }
 
     [RelayCommand]
@@ -172,7 +180,7 @@ public partial class MainWindowViewModel(
             MaxDegreeOfParallelism = maxConcurrency,
             CancellationToken = token
         };
-
+ 
         await Task.Run(async () =>
         {
             try
@@ -314,14 +322,29 @@ public partial class MainWindowViewModel(
         }
 
         using var inputStream = imageFile.GetSourceStream();
-        using var outputStream = System.IO.File.Create(outputPath);
+        using var original = SKBitmap.Decode(inputStream);
+        if (original == null)
+        {
+            ToastService.ShowError("无法解码图片");
+            return;
+        }
 
-        ImageService.GenerateWithOptions(
-            inputStream,
-            outputStream,
-            options,
-            exifInfo,
-            isPreview: false);
+        int w = original.Width;
+        int h = original.Height;
+
+        // 导出时直接使用原图作为工作图（无预览降采样）
+        using var surface = SKSurface.Create(new SKImageInfo(w, h));
+        var canvas = surface.Canvas;
+
+        var ctx = new WatermarkRenderContext(canvas, original, original, w, h, options.Scale, exifInfo);
+        var pipeline = WatermarkPipelineRunner.FromOptions(options);
+        pipeline.Execute(ctx);
+
+        using var image = surface.Snapshot();
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
+
+        using var outputStream = System.IO.File.Create(outputPath);
+        data.SaveTo(outputStream);
     }
 
     [RelayCommand]

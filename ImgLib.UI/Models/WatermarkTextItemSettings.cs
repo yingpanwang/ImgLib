@@ -31,6 +31,63 @@ public partial class WatermarkTextItemSettings : ObservableObject
     [ObservableProperty]
     public partial string HorizontalAlignment { get; set; } = "Center";
 
+    // ═══════════════════════════════════════════
+    // 高级定位
+    // ═══════════════════════════════════════════
+
+    [ObservableProperty]
+    public partial bool UseAdvancedPositioning { get; set; } = false;
+
+    partial void OnUseAdvancedPositioningChanged(bool value)
+    {
+        if (value)
+        {
+            // 开启高级模式 → 从简单值换算初始值
+            PositionX = HorizontalAlignment switch
+            {
+                "Left" => 0.05f,
+                "Right" => 0.95f,
+                _ => 0.5f
+            };
+            PositionY = 1.0f - VerticalPosition;
+            AdvancedHAlign = HorizontalAlignment;
+            AdvancedVAlign = "Bottom";
+        }
+        else
+        {
+            // 关闭高级模式 → 从高级值反算简单值
+            VerticalPosition = 1.0f - PositionY;
+            HorizontalAlignment = AdvancedHAlign;
+        }
+    }
+
+    [ObservableProperty]
+    public partial float PositionX { get; set; } = 0.5f;
+
+    [ObservableProperty]
+    public partial float PositionY { get; set; } = 0.5f;
+
+    [ObservableProperty]
+    public partial string AdvancedHAlign { get; set; } = "Center";
+
+    [ObservableProperty]
+    public partial string AdvancedVAlign { get; set; } = "Bottom";
+
+    [ObservableProperty]
+    public partial bool Repeat { get; set; } = false;
+
+    [ObservableProperty]
+    public partial float RepeatSpacingX { get; set; } = 0.3f;
+
+    [ObservableProperty]
+    public partial float RepeatSpacingY { get; set; } = 0.2f;
+
+    [ObservableProperty]
+    public partial float RepeatAngle { get; set; } = 0f;
+
+    [ObservableProperty]
+    public partial bool RelativeToCanvas { get; set; } = false;
+
     // ─── 投影参数 ───
     [ObservableProperty]
     public partial float ShadowOffsetX { get; set; } = 2f;
@@ -81,6 +138,16 @@ public partial class WatermarkTextItemSettings : ObservableObject
         AutoFitFont = item.AutoFitFont;
         VerticalPosition = item.VerticalPosition;
         HorizontalAlignment = item.HorizontalAlignment;
+        UseAdvancedPositioning = item.UseAdvancedPositioning;
+        PositionX = item.PositionX;
+        PositionY = item.PositionY;
+        AdvancedHAlign = item.AdvancedHAlign;
+        AdvancedVAlign = item.AdvancedVAlign;
+        Repeat = item.Repeat;
+        RepeatSpacingX = item.RepeatSpacingX;
+        RepeatSpacingY = item.RepeatSpacingY;
+        RepeatAngle = item.RepeatAngle;
+        RelativeToCanvas = item.RelativeToCanvas;
         ShadowOffsetX = item.ShadowOffsetX;
         ShadowOffsetY = item.ShadowOffsetY;
         ShadowSigma = item.ShadowSigma;
@@ -102,6 +169,16 @@ public partial class WatermarkTextItemSettings : ObservableObject
             AutoFitFont = AutoFitFont,
             VerticalPosition = VerticalPosition,
             HorizontalAlignment = HorizontalAlignment,
+            UseAdvancedPositioning = UseAdvancedPositioning,
+            PositionX = PositionX,
+            PositionY = PositionY,
+            AdvancedHAlign = AdvancedHAlign,
+            AdvancedVAlign = AdvancedVAlign,
+            Repeat = Repeat,
+            RepeatSpacingX = RepeatSpacingX,
+            RepeatSpacingY = RepeatSpacingY,
+            RepeatAngle = RepeatAngle,
+            RelativeToCanvas = RelativeToCanvas,
             ShadowOffsetX = ShadowOffsetX,
             ShadowOffsetY = ShadowOffsetY,
             ShadowSigma = ShadowSigma,

@@ -37,9 +37,15 @@
                     <Image
                         Name="PreviewImage"
                         Margin="5,5"
+                        Opacity="{Binding PreviewOpacity}"
                         DockPanel.Dock="Top"
                         RenderTransformOrigin="0.5,0.5"
                         Source="{Binding PreviewImageSource}">
+                        <Image.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Opacity" Duration="0:0:0.25" Easing="CubicEaseOut" />
+                            </Transitions>
+                        </Image.Transitions>
                         <Image.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="重置">

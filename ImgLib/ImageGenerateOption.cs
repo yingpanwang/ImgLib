@@ -32,7 +32,7 @@ public class ImageGenerateOption
     /// 水印文本项列表。每个项代表一条独立的水印文本，按列表顺序依次绘制。
     /// 为空时自动使用旧的单水印属性（向后兼容）。
     /// </summary>
-    public List<WatermarkTextItem> WatermarkTexts { get; set; } = new();
+    public List<WatermarkTextItem> WatermarkTexts { get; set; } = [];
 
     /// <summary>
     /// 获取有效的水印文本项列表。

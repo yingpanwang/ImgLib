@@ -6,6 +6,22 @@ public sealed partial class WatermarkDesignViewModel : ViewModelBase, IDisposabl
     public partial Bitmap? PreviewImageSource { get; private set; }
 
     [ObservableProperty]
+    private double _previewOpacity = 1;
+
+    partial void OnPreviewImageSourceChanged(Bitmap? value)
+    {
+        // 新图淡入
+        PreviewOpacity = 0;
+        _ = FadeInAsync();
+    }
+
+    private async Task FadeInAsync()
+    {
+        await Task.Delay(50);
+        PreviewOpacity = 1;
+    }
+
+    [ObservableProperty]
     public partial double PreviewAngle { get; private set; }
 
     //[ObservableProperty]

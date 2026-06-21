@@ -10,6 +10,9 @@ public partial class ImgListBoxViewModel : ViewModelBase
 
     private CancellationTokenSource? _loadCts;
     private List<string>? _allPaths;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HeaderText))]
+    [NotifyPropertyChangedFor(nameof(HasMoreItems))]
     private int _loadedCount;
     private bool _isLoadingPage;
     private int _loadGeneration; // 每次 Path 切换递增，防止旧页结果污染新列表
@@ -100,11 +103,11 @@ public partial class ImgListBoxViewModel : ViewModelBase
     public bool HasItems => _allPaths is { Count: > 0 };
 
     /// <summary>是否还有更多条目可加载</summary>
-    public bool HasMoreItems => _allPaths is not null && _loadedCount < _allPaths.Count;
+    public bool HasMoreItems => _allPaths is not null && LoadedCount < _allPaths.Count;
 
     /// <summary>列表标题，含已加载数量与总数</summary>
     public string HeaderText => _allPaths is { Count: > 0 } all
-        ? $"图片列表 ({_loadedCount}/{all.Count})"
+        ? $"图片列表 ({LoadedCount}/{all.Count})"
         : "图片列表";
 
     WatermarkDesignViewModel _watermarkDesignViewModel;
@@ -122,13 +125,11 @@ public partial class ImgListBoxViewModel : ViewModelBase
 
         // 重置分页状态
         _allPaths = null;
-        _loadedCount = 0;
+        LoadedCount = 0;
         _isLoadingPage = false;
         _loadGeneration++;
 
         ImgListItems?.Clear();
-        OnPropertyChanged(nameof(HeaderText));
-        OnPropertyChanged(nameof(HasMoreItems));
 
         if (string.IsNullOrEmpty(Path))
             return;
@@ -205,7 +206,7 @@ public partial class ImgListBoxViewModel : ViewModelBase
             return;
 
         var generation = _loadGeneration;
-        var batch = _allPaths.Skip(_loadedCount).Take(PageSize).ToList();
+        var batch = _allPaths.Skip(LoadedCount).Take(PageSize).ToList();
         if (batch.Count == 0)
             return;
 
@@ -220,15 +221,13 @@ public partial class ImgListBoxViewModel : ViewModelBase
         if (ct.IsCancellationRequested)
             return;
 
-        _loadedCount += items.Count;
+        LoadedCount += items.Count;
         // ImgListItems?.AddRange(items);
         if (ImgListItems is not null)
         {
             foreach (var item in items)
                 ImgListItems?.Add(item);
         }
-        OnPropertyChanged(nameof(HeaderText));
-        OnPropertyChanged(nameof(HasMoreItems));
     }
 
     partial void OnSelectedImgItemChanged(ImgListItemViewModel? value)
@@ -239,10 +238,6 @@ public partial class ImgListBoxViewModel : ViewModelBase
             _watermarkDesignViewModel.PreviewFilePath = value.FilePath;
         }
     }
-
-    // ═══════════════════════════════════════════
-    // 排序变更 → 重新排序并重载首页
-    // ═══════════════════════════════════════════
 
     partial void OnCurrentSortModeChanged(SortMode value) => ApplySortAndReload();
     partial void OnSortAscendingChanged(bool value) => ApplySortAndReload();
@@ -255,11 +250,9 @@ public partial class ImgListBoxViewModel : ViewModelBase
         _allPaths = SortPaths(_allPaths).ToList();
 
         // 重置分页并重载首页
-        _loadedCount = 0;
+        LoadedCount = 0;
         _loadGeneration++;
         ImgListItems?.Clear();
-        OnPropertyChanged(nameof(HeaderText));
-        OnPropertyChanged(nameof(HasMoreItems));
 
         _ = LoadPageAsync(CancellationToken.None);
     }

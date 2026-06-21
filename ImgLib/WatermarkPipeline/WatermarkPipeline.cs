@@ -14,10 +14,6 @@ public class WatermarkPipelineRunner
     /// <summary>管线中的命令列表（只读）</summary>
     public IReadOnlyList<IWatermarkCommand> Commands => _commands.AsReadOnly();
 
-    // ═══════════════════════════════════════════════
-    //  执行
-    // ═══════════════════════════════════════════════
-
     /// <summary>
     /// 按 <see cref="IWatermarkCommand.Order"/> 升序执行管线中所有已启用的命令。
     /// </summary>
@@ -35,9 +31,7 @@ public class WatermarkPipelineRunner
         }
     }
 
-    // ═══════════════════════════════════════════════
-    //  命令管理
-    // ═══════════════════════════════════════════════
+    #region 命令操作
 
     /// <summary>添加命令到管线末尾</summary>
     public WatermarkPipelineRunner AddCommand(IWatermarkCommand command)
@@ -66,9 +60,7 @@ public class WatermarkPipelineRunner
         return this;
     }
 
-    // ═══════════════════════════════════════════════
-    //  流式构建 API
-    // ═══════════════════════════════════════════════
+    #endregion
 
     /// <summary>添加模糊背景</summary>
     public WatermarkPipelineRunner AddBlurBackground(float sigma = 25f)
@@ -125,10 +117,6 @@ public class WatermarkPipelineRunner
         string colorHex = "#00FF00", float strokeWidth = 2f)
         => AddCommand(new DebugBorderCommand(colorHex, strokeWidth));
 
-    // ═══════════════════════════════════════════════
-    //  静态工厂方法
-    // ═══════════════════════════════════════════════
-
     /// <summary>从 ImageGenerateOption 创建默认管线</summary>
     public static WatermarkPipelineRunner FromOptions(ImageGenerateOption options)
     {
@@ -167,6 +155,16 @@ public class WatermarkPipelineRunner
                 AutoFitFont = textItem.AutoFitFont,
                 VerticalPosition = textItem.VerticalPosition,
                 HorizontalAlignment = textItem.HorizontalAlignment,
+                UseAdvancedPositioning = textItem.UseAdvancedPositioning,
+                PositionX = textItem.PositionX,
+                PositionY = textItem.PositionY,
+                AdvancedHAlign = textItem.AdvancedHAlign,
+                AdvancedVAlign = textItem.AdvancedVAlign,
+                Repeat = textItem.Repeat,
+                RepeatSpacingX = textItem.RepeatSpacingX,
+                RepeatSpacingY = textItem.RepeatSpacingY,
+                RepeatAngle = textItem.RepeatAngle,
+                RelativeToCanvas = textItem.RelativeToCanvas,
                 ShadowOffsetX = textItem.ShadowOffsetX,
                 ShadowOffsetY = textItem.ShadowOffsetY,
                 ShadowSigma = textItem.ShadowSigma,

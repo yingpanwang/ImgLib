@@ -314,33 +314,241 @@
                             Foreground="{StaticResource TextTertiary}"
                             Margin="24,0,0,0" />
 
-                        <!-- 水平对齐 -->
-                        <StackPanel Spacing="5">
+                        <!-- 高级定位开关 -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <CheckBox IsChecked="{Binding SelectedWatermarkText.UseAdvancedPositioning, Mode=TwoWay}" />
                             <TextBlock
-                                Text="水平对齐"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <ComboBox SelectedIndex="{Binding HorizontalAlignIndex, Mode=TwoWay}">
-                                <ComboBoxItem Content="Left"/>
-                                <ComboBoxItem Content="Center"/>
-                                <ComboBoxItem Content="Right"/>
-                            </ComboBox>
+                                Text="高级定位"
+                                FontSize="12.5"
+                                Foreground="{StaticResource TextPrimary}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock
+                            Text="开启后可在图片任意位置放置水印，支持平铺重复"
+                            FontSize="10"
+                            Foreground="{StaticResource TextTertiary}"
+                            Margin="24,0,0,0" />
+
+                        <!-- ═══ 简单定位（默认） ═══ -->
+                        <StackPanel Spacing="10"
+                                    IsVisible="{Binding SelectedWatermarkText.UseAdvancedPositioning, Converter={x:Static BoolConverters.Not}}">
+                            <!-- 水平对齐 -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="水平对齐" FontSize="12" FontWeight="Medium"
+                                           Foreground="{StaticResource TextSecondary}" />
+                                <ComboBox SelectedIndex="{Binding HorizontalAlignIndex, Mode=TwoWay}">
+                                    <ComboBoxItem Content="Left"/>
+                                    <ComboBoxItem Content="Center"/>
+                                    <ComboBoxItem Content="Right"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- 垂直位置 -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="垂直位置 (0=底部, 1=顶部)" FontSize="12" FontWeight="Medium"
+                                           Foreground="{StaticResource TextSecondary}" />
+                                <NumericUpDown Increment="0.1" Maximum="1" Minimum="0" FormatString="F1"
+                                               Value="{Binding SelectedWatermarkText.VerticalPosition, Mode=TwoWay}" />
+                            </StackPanel>
                         </StackPanel>
 
-                        <!-- 垂直位置 -->
+                        <!-- ═══ 高级定位 ═══ -->
+                        <StackPanel Spacing="10"
+                                    IsVisible="{Binding SelectedWatermarkText.UseAdvancedPositioning, Mode=TwoWay}">
+                            <!-- X 位置 -->
+                            <StackPanel Spacing="3">
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+                                    <TextBlock Text="X 位置"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding PositionXPercent, StringFormat={}{0}%}"
+                                               FontSize="12" FontWeight="Bold"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <Slider Minimum="0" Maximum="100" TickFrequency="5"
+                                        Value="{Binding PositionXPercent, Mode=TwoWay}"
+                                        MinWidth="240" />
+                                <TextBlock Text="0%=左边 · 100%=右边" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- Y 位置 -->
+                            <StackPanel Spacing="3">
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+                                    <TextBlock Text="Y 位置"
+                                               FontSize="12" FontWeight="Medium"
+                                               Foreground="{StaticResource TextSecondary}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding PositionYPercent, StringFormat={}{0}%}"
+                                               FontSize="12" FontWeight="Bold"
+                                               Foreground="{StaticResource AccentBrush}"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                                <Slider Minimum="0" Maximum="100" TickFrequency="5"
+                                        Value="{Binding PositionYPercent, Mode=TwoWay}"
+                                        MinWidth="240" />
+                                <TextBlock Text="0%=顶部 · 100%=底部" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- 水平锚点 -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="水平锚点" FontSize="12" FontWeight="Medium"
+                                           Foreground="{StaticResource TextSecondary}" />
+                                <ComboBox SelectedIndex="{Binding AdvancedHAlignIndex, Mode=TwoWay}">
+                                    <ComboBoxItem Content="Left"/>
+                                    <ComboBoxItem Content="Center"/>
+                                    <ComboBoxItem Content="Right"/>
+                                </ComboBox>
+                                <TextBlock Text="文本相对于锚点的水平对齐方式" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- 垂直锚点 -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="垂直锚点" FontSize="12" FontWeight="Medium"
+                                           Foreground="{StaticResource TextSecondary}" />
+                                <ComboBox SelectedIndex="{Binding AdvancedVAlignIndex, Mode=TwoWay}">
+                                    <ComboBoxItem Content="Top"/>
+                                    <ComboBoxItem Content="Center"/>
+                                    <ComboBoxItem Content="Bottom"/>
+                                </ComboBox>
+                                <TextBlock Text="文本相对于锚点的垂直对齐方式" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+
+                            <!-- 画布参考 -->
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox IsChecked="{Binding SelectedWatermarkText.RelativeToCanvas, Mode=TwoWay}" />
+                                <TextBlock Text="坐标相对于整个画布" FontSize="12.5"
+                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <TextBlock Text="开启后 0-100% 映射到含模糊边框的完整画布，关闭则仅映射到图片区域"
+                                       FontSize="10" Foreground="{StaticResource TextTertiary}" Margin="24,0,0,0" />
+                        </StackPanel>
+
+                        <!-- ═══ 平铺重复（独立于简单/高级模式） ═══ -->
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox IsChecked="{Binding SelectedWatermarkText.Repeat, Mode=TwoWay}" />
+                                <TextBlock Text="平铺重复" FontSize="12.5"
+                                           Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Spacing="8"
+                                        IsVisible="{Binding SelectedWatermarkText.Repeat, Mode=TwoWay}">
+                                <StackPanel Spacing="3">
+                                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+                                        <TextBlock Text="水平间距" FontSize="12" FontWeight="Medium"
+                                                   Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding SelectedWatermarkText.RepeatSpacingX, StringFormat={}{0:P0}}"
+                                                   FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Slider Minimum="0.05" Maximum="1" TickFrequency="0.05"
+                                            Value="{Binding SelectedWatermarkText.RepeatSpacingX, Mode=TwoWay}" MinWidth="240" />
+                                </StackPanel>
+                                <StackPanel Spacing="3">
+                                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+                                        <TextBlock Text="垂直间距" FontSize="12" FontWeight="Medium"
+                                                   Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding SelectedWatermarkText.RepeatSpacingY, StringFormat={}{0:P0}}"
+                                                   FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Slider Minimum="0.05" Maximum="1" TickFrequency="0.05"
+                                            Value="{Binding SelectedWatermarkText.RepeatSpacingY, Mode=TwoWay}" MinWidth="240" />
+                                </StackPanel>
+
+                                <!-- 旋转角度 -->
+                                <StackPanel Spacing="3">
+                                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,2">
+                                        <TextBlock Text="旋转角度" FontSize="12" FontWeight="Medium"
+                                                   Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding SelectedWatermarkText.RepeatAngle, StringFormat={}{0}°}"
+                                                   FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Slider Minimum="-90" Maximum="90" TickFrequency="5"
+                                            Value="{Binding SelectedWatermarkText.RepeatAngle, Mode=TwoWay}"
+                                            MinWidth="240" />
+                                    <TextBlock Text="0°=水平 · 45°=对角线 · 90°=垂直" FontSize="10"
+                                               Foreground="{StaticResource TextTertiary}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Height="1" Background="{StaticResource BorderSubtle}" Margin="0,4" />
+                        <TextBlock Text="文字阴影" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextSecondary}" />
+
+                        <!-- 阴影偏移 -->
                         <StackPanel Spacing="5">
-                            <TextBlock
-                                Text="垂直位置 (0=底部, 1=顶部)"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <NumericUpDown
-                                Increment="0.1"
-                                Maximum="1"
-                                Minimum="0"
-                                FormatString="F1"
-                                Value="{Binding SelectedWatermarkText.VerticalPosition, Mode=TwoWay}" />
+                            <TextBlock Text="阴影偏移" FontSize="12" FontWeight="Medium"
+                                       Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding TextShadowOffsetPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
+                                <ComboBoxItem>右下微偏 (1, 1)</ComboBoxItem>
+                                <ComboBoxItem>右下标准 (2, 2)</ComboBoxItem>
+                                <ComboBoxItem>右下明显 (4, 4)</ComboBoxItem>
+                                <ComboBoxItem>右下远偏 (8, 8)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="8" IsVisible="{Binding IsTextShadowOffsetCustom}">
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="X 偏移" FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown Increment="1" Minimum="-20" Maximum="20" FormatString="F0"
+                                                   Value="{Binding SelectedWatermarkText.ShadowOffsetX, Mode=TwoWay}" />
+                                </StackPanel>
+                                <StackPanel Spacing="3">
+                                    <TextBlock Text="Y 偏移" FontSize="11"
+                                               Foreground="{StaticResource TextSecondary}" />
+                                    <NumericUpDown Increment="1" Minimum="-20" Maximum="20" FormatString="F0"
+                                                   Value="{Binding SelectedWatermarkText.ShadowOffsetY, Mode=TwoWay}" />
+                                </StackPanel>
+                                <TextBlock Text="正=右/下，负=左/上" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 阴影模糊半径 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="阴影模糊半径" FontSize="12" FontWeight="Medium"
+                                       Foreground="{StaticResource TextSecondary}" />
+                            <ComboBox SelectedIndex="{Binding TextShadowSigmaPresetIndex, Mode=TwoWay}">
+                                <ComboBoxItem>无模糊 (0)</ComboBoxItem>
+                                <ComboBoxItem>轻微模糊 (2)</ComboBoxItem>
+                                <ComboBoxItem>标准模糊 (5)</ComboBoxItem>
+                                <ComboBoxItem>较强模糊 (10)</ComboBoxItem>
+                                <ComboBoxItem>强模糊 (15)</ComboBoxItem>
+                                <ComboBoxItem>自定义...</ComboBoxItem>
+                            </ComboBox>
+                            <StackPanel Spacing="5" IsVisible="{Binding IsTextShadowSigmaCustom}">
+                                <NumericUpDown Increment="1" Minimum="0" Maximum="20" FormatString="F0"
+                                               Value="{Binding SelectedWatermarkText.ShadowSigma, Mode=TwoWay}" />
+                                <TextBlock Text="阴影模糊半径，0=无模糊" FontSize="10"
+                                           Foreground="{StaticResource TextTertiary}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- 阴影颜色 -->
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="阴影颜色" FontSize="12" FontWeight="Medium"
+                                       Foreground="{StaticResource TextSecondary}" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBox Text="{Binding SelectedWatermarkText.ShadowColorHex, Mode=TwoWay}" MinWidth="80" />
+                                <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}"
+                                        CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1" />
+                            </StackPanel>
                         </StackPanel>
 
                         <!-- 文字颜色 -->
@@ -360,105 +568,6 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- ═══ 文字阴影 Tab ═══ -->
-            <TabItem Header="文字阴影">
-                <ScrollViewer Padding="12,8">
-                    <StackPanel Spacing="14">
-
-                        <!-- 文字阴影偏移 -->
-                        <StackPanel Spacing="5">
-                            <TextBlock
-                                Text="阴影偏移"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <ComboBox SelectedIndex="{Binding TextShadowOffsetPresetIndex, Mode=TwoWay}">
-                                <ComboBoxItem>无偏移 (0, 0)</ComboBoxItem>
-                                <ComboBoxItem>右下微偏 (1, 1)</ComboBoxItem>
-                                <ComboBoxItem>右下标准 (2, 2)</ComboBoxItem>
-                                <ComboBoxItem>右下明显 (4, 4)</ComboBoxItem>
-                                <ComboBoxItem>右下远偏 (8, 8)</ComboBoxItem>
-                                <ComboBoxItem>自定义...</ComboBoxItem>
-                            </ComboBox>
-                            <StackPanel Spacing="8" IsVisible="{Binding IsTextShadowOffsetCustom}">
-                                <StackPanel Spacing="3">
-                                    <TextBlock
-                                        Text="X 偏移"
-                                        FontSize="11"
-                                        Foreground="{StaticResource TextSecondary}" />
-                                    <NumericUpDown
-                                        Increment="1"
-                                        Minimum="-20"
-                                        Maximum="20"
-                                        FormatString="F0"
-                                        Value="{Binding SelectedWatermarkText.ShadowOffsetX, Mode=TwoWay}" />
-                                </StackPanel>
-                                <StackPanel Spacing="3">
-                                    <TextBlock
-                                        Text="Y 偏移"
-                                        FontSize="11"
-                                        Foreground="{StaticResource TextSecondary}" />
-                                    <NumericUpDown
-                                        Increment="1"
-                                        Minimum="-20"
-                                        Maximum="20"
-                                        FormatString="F0"
-                                        Value="{Binding SelectedWatermarkText.ShadowOffsetY, Mode=TwoWay}" />
-                                </StackPanel>
-                                <TextBlock
-                                    Text="正=右/下，负=左/上"
-                                    FontSize="10"
-                                    Foreground="{StaticResource TextTertiary}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!-- 阴影模糊半径 -->
-                        <StackPanel Spacing="5">
-                            <TextBlock
-                                Text="阴影模糊半径"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <ComboBox SelectedIndex="{Binding TextShadowSigmaPresetIndex, Mode=TwoWay}">
-                                <ComboBoxItem>无模糊 (0)</ComboBoxItem>
-                                <ComboBoxItem>轻微模糊 (2)</ComboBoxItem>
-                                <ComboBoxItem>标准模糊 (5)</ComboBoxItem>
-                                <ComboBoxItem>较强模糊 (10)</ComboBoxItem>
-                                <ComboBoxItem>强模糊 (15)</ComboBoxItem>
-                                <ComboBoxItem>自定义...</ComboBoxItem>
-                            </ComboBox>
-                            <StackPanel Spacing="5" IsVisible="{Binding IsTextShadowSigmaCustom}">
-                                <NumericUpDown
-                                    Increment="1"
-                                    Minimum="0"
-                                    Maximum="20"
-                                    FormatString="F0"
-                                    Value="{Binding SelectedWatermarkText.ShadowSigma, Mode=TwoWay}" />
-                                <TextBlock
-                                    Text="阴影模糊半径，0=无模糊"
-                                    FontSize="10"
-                                    Foreground="{StaticResource TextTertiary}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!-- 阴影颜色 -->
-                        <StackPanel Spacing="5">
-                            <TextBlock
-                                Text="阴影颜色"
-                                FontSize="12"
-                                FontWeight="Medium"
-                                Foreground="{StaticResource TextSecondary}" />
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBox Text="{Binding SelectedWatermarkText.ShadowColorHex, Mode=TwoWay}" MinWidth="80"/>
-                                <Border Width="24" Height="24" Background="{Binding WatermarkShadowColorBrush}" CornerRadius="4" BorderBrush="#CCCCCC" BorderThickness="1"/>
-                            </StackPanel>
-                        </StackPanel>
-
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-
-            <!-- ═══ 调试选项 Tab ═══ -->
             <TabItem Header="调试选项">
                 <ScrollViewer Padding="12,8">
                     <StackPanel Spacing="14">
